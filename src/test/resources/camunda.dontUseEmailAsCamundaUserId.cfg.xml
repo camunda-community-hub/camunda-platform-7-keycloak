@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="processEngineName" value="KeycloakDontUseEmailAsUserId-engine" />
+  
+    <property name="jdbcUrl" value="jdbc:h2:mem:KeycloakDontUseEmailAsUserId;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+  
+    <!-- Database configurations -->
+    <property name="history" value="audit" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+    
+    <property name="createDiagramOnDeploy" value="true" />
+    
+    <property name="processEnginePlugins">
+      <list>
+        <ref bean="keycloakIdentityProviderPlugin" />
+      </list>
+    </property>
+    
+  </bean>
+  
+  <bean id="keycloakIdentityProviderPlugin" class="de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin">
+  
+    <property name="keycloakIssuerUrl" value="https://localhost:9001/auth/realms/master" />
+    <property name="keycloakAdminUrl" value="https://localhost:9001/auth/admin/realms/master" />
+    <property name="clientId" value="camunda-identity-service" />
+    <property name="clientSecret" value="6e44dbbf-9938-4c84-94c7-4fa8e320efa0" />
+
+    <property name="disableSSLCertificateValidation" value="true" />
+    <property name="useEmailAsCamundaUserId" value="false" />
+  </bean>
+
+</beans>
