@@ -76,15 +76,16 @@ A complete list of configuration options can be found below:
 
 | *Property* | *Description* |
 | --- | --- |
-| `authDomainUrl` | The basic URL of your Auth0 domain.<br />Sample: `https://<your-domain>.eu.auth0.com` |
-| `authExtensionApiUrl` | Complete URL of the Authentication Extension API.<br />Sample: `https://<your-domain>.eu.webtask.io/xxxxabc42def4242ghi42xxxx/api` |
+| `keycloakIssuerUrl` | The basic issuer URL of your Keycloak server including the realm.<br />Sample: `https://<your-keycloak-server>/auth/realms/master` |
+| `keycloakAdminUrl` | The admin URL of the Keycloak server REST API including the realm.<br />Sample: `https://<your-keycloak-server>/auth/admin/realms/master` |
 | `clientId` | The Client ID of your application. |
 | `clientSecret` | The Client Secret of your application. |
-| `useEmailAsCamundaUserId` | Whether to use the Auth0 email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic Auth0 user-id. Keep in mind that you will only be able to login without SSO with users managed by connections using one of the following strategies: ``auth0-adldap, ad, auth0, waad, adfs``.|
+| `useEmailAsCamundaUserId` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic Keycloak ID. Keep in mind that you will only be able to login without SSO with users managed by connections using one of the following strategies: **TODO**.|
 | `administratorGroupName` | The name of the administrator group. If this name is set and engine authorization is enabled, the plugin will create group-level Administrator authorizations on all built-in resources. |
 | `administratorUserName` | The name of the administrator user. If this name is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
 | `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Auth0 users or groups we advise to set this property to false to improve the performance of the user and group query. |
 | `maxHttpConnections` | Maximum number HTTP connections for the Auth0 connection pool. Default: `200`|
+| `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. | 
 
 ## Activating Single Sign On
 
@@ -109,9 +110,9 @@ In order to setup Spring Boot's OAuth2 security add the following Maven dependen
 Insert a KeycloakAuthenticationProvider as follows:
 
 	/**
-	 * OAuth2 Authentication Provider for usage with Auth0 and Auth0IdentityProviderPlugin. 
+	 * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
 	 */
-	public class Auth0AuthenticationProvider extends ContainerBasedAuthenticationProvider {
+	public class KeycloakAuthenticationProvider extends ContainerBasedAuthenticationProvider {
 	
 	    @Override
 	    public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
@@ -126,7 +127,7 @@ Insert a KeycloakAuthenticationProvider as follows:
 	            return AuthenticationResult.unsuccessful();
 	        }
 	        
-	        // Extract user_id from Auth0 authentication result - which is part of the requested user info
+	        // Extract user ID from Keycloak authentication result - which is part of the requested user info
 	        @SuppressWarnings("unchecked")
 	        String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("sub");
 	        if (StringUtils.isEmpty(userId)) {
@@ -153,7 +154,7 @@ Insert a KeycloakAuthenticationProvider as follows:
 Last but not least add a security configuration and enable OAuth2 SSO:
 
 	/**
-	 * Camunda Web application SSO configuration for usage with Auth0IdentityProviderPlugin.
+	 * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
 	 */
 	@Configuration
 	@EnableOAuth2Sso
@@ -179,7 +180,7 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 	
 	        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
 	        filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
-	        filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "de.accso.camunda.showcase.sso.Auth0AuthenticationProvider"));
+	        filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "de.accso.camunda.showcase.sso.KeycloakAuthenticationProvider"));
 	        filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
 	        filterRegistration.addUrlPatterns("/app/*");
 	        return filterRegistration;
@@ -203,16 +204,16 @@ Finally configure Spring Security with your Auth0 Single Page Web App `client-id
 	    resource:
 	      userInfoUri: https://<your-domain>.eu.auth0.com/userinfo
 
-**Beware**: SSO will only work that way in case you have the Auth0IdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
+**Beware**: SSO will only work that way in case you have the KeycloakIdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
 
 	// Extract email from Auth0 authentication result - which is part of the requested user info
 	@SuppressWarnings("unchecked")
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email");
 	
-Keep in mind that Auth0's `user_id` is definitely unique which might not always be the case for the `email` attribute (think of multiple connectors using the same mail address).
+Keep in mind that Keycloak's `user_id` is definitely unique which might not always be the case for the `email` attribute (think of multiple connectors using the same mail address).
 
 -->
 
 ------------------------------------------------------------
 
-That's it. Have a happy Auth0 experience and focus on what really matters: the core processes of your customer.
+That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
