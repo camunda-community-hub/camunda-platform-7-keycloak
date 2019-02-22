@@ -15,13 +15,14 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for connections using **TODO**. Hence without SSO you will only be able to login with users managed by such connections.
 
+Features:
+
+*   ReadOnlyIdentityProvider
+*   Broad support for user and group queries
+*   Compatible with Spring Boot OAuth2 SSO
+
 Current version: `0.1.0-SNAPSHOT`<br >
 Tested with: Camunda `7.10.0` and Camunda `7.10.1-ee`
-
-Known issues:
-
-*   A strategy to distinguish SYSTEM and WORKFLOW groups is missing. Currently only the administrator group is mapped to type SYSTEM.
-*   Group query filters are applied on the client side - the Authorization Extension API does not allow further criteria.
 
 ## Prerequisites in your Keycloak realm
 
@@ -83,17 +84,13 @@ A complete list of configuration options can be found below:
 | `useEmailAsCamundaUserId` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic Keycloak ID. Keep in mind that you will only be able to login without SSO with users managed by connections using one of the following strategies: **TODO**.|
 | `administratorGroupName` | The name of the administrator group. If this name is set and engine authorization is enabled, the plugin will create group-level Administrator authorizations on all built-in resources. |
 | `administratorUserName` | The name of the administrator user. If this name is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
-| `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Auth0 users or groups we advise to set this property to false to improve the performance of the user and group query. |
-| `maxHttpConnections` | Maximum number HTTP connections for the Auth0 connection pool. Default: `200`|
+| `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Keycloak users or groups we advise to set this property to false to improve the performance of the user and group query. |
+| `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `200`|
 | `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. | 
 
 ## Activating Single Sign On
 
 In this part, we’ll discuss how to activate SSO – Single Sign On – for the Camunda Web App using Spring Boots Security OAuth2 capabilities in combination with this plugin and Keycloak as authorization server.
-
-**TODO**
-
-<!---
 
 In order to setup Spring Boot's OAuth2 security add the following Maven dependencies to your project:
 
@@ -143,7 +140,7 @@ Insert a KeycloakAuthenticationProvider as follows:
 	
 	    private List<String> getUserGroups(String userId, ProcessEngine engine){
 	        List<String> groupIds = new ArrayList<>();
-	        // query groups using Auth0IdentityProvider plugin
+	        // query groups using KeycloakIdentityProvider plugin
 	        engine.getIdentityService().createGroupQuery().groupMember(userId).list()
 	        	.forEach( g -> groupIds.add(g.getId()));
 	        return groupIds;
@@ -188,31 +185,28 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 	
 	}
 	
-Finally configure Spring Security with your Auth0 Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
+Finally configure Spring Security with your Keycloak Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
 
 	security:
 	  basic:
 	    enabled: false
 	  oauth2:
 	    client:
-	      client-id: yyy2121abc21def2121ghi2121yyy
+	      client-id: camunda-identity-service
 	      client-secret: yyy2121abc21def2121ghi212132121abc21def2121ghi2121eyyy
-	      accessTokenUri: https://<your-domain>.eu.auth0.com/oauth/token
-	      userAuthorizationUri: https://<your-domain>.eu.auth0.com/authorize
-	      tokenName: oauth_token
+	      accessTokenUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/token
+	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/auth
 	      scope: openid profile email
 	    resource:
-	      userInfoUri: https://<your-domain>.eu.auth0.com/userinfo
+	      userInfoUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/userinfo
 
 **Beware**: SSO will only work that way in case you have the KeycloakIdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
 
-	// Extract email from Auth0 authentication result - which is part of the requested user info
+	// Extract email from Keycloak authentication result - which is part of the requested user info
 	@SuppressWarnings("unchecked")
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email");
 	
-Keep in mind that Keycloak's `user_id` is definitely unique which might not always be the case for the `email` attribute (think of multiple connectors using the same mail address).
-
--->
+Keep in mind that Keycloak's `ID` is definitely unique which might not always be the case for the `email` attribute (think of multiple connectors using the same mail address).
 
 ------------------------------------------------------------
 

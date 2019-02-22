@@ -35,7 +35,7 @@
     <property name="keycloakIssuerUrl" value="https://localhost:9001/auth/realms/master" />
     <property name="keycloakAdminUrl" value="https://localhost:9001/auth/admin/realms/master" />
     <property name="clientId" value="camunda-identity-service" />
-    <property name="clientSecret" value="6e44dbbf-9938-4c84-94c7-4fa8e320efa0" />
+    <property name="clientSecret" value="893ba601-3588-480d-986c-799b23254c60" />
 
     <property name="disableSSLCertificateValidation" value="true" />
     <property name="useEmailAsCamundaUserId" value="false" />

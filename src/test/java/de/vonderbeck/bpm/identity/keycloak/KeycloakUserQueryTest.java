@@ -118,7 +118,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
 
 
   public void testFilterByGroupId() {
-    List<User> result = identityService.createUserQuery().memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354").list();
+    List<User> result = identityService.createUserQuery().memberOfGroup(GROUP_ID_TEAMLEAD).list();
     assertEquals(2, result.size());
     
     result = identityService.createUserQuery().memberOfGroup("non-exist").list();
@@ -128,7 +128,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
  
   public void testFilterByGroupIdAndFirstname() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354")
+        .memberOfGroup(GROUP_ID_TEAMLEAD)
         .userFirstName("Gunnar")
         .list();
     assertEquals(1, result.size());
@@ -136,7 +136,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
 
   public void testFilterByGroupIdAndId() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354")
+        .memberOfGroup(GROUP_ID_TEAMLEAD)
         .userId("gunnar.von-der-beck@accso.de")
         .list();
     assertEquals(1, result.size());
@@ -144,7 +144,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
 
   public void testFilterByGroupIdAndLastname() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354")
+        .memberOfGroup(GROUP_ID_TEAMLEAD)
         .userLastName("von der Beck")
         .list();
     assertEquals(1, result.size());
@@ -152,7 +152,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
 
   public void testFilterByGroupIdAndEmail() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354")
+        .memberOfGroup(GROUP_ID_TEAMLEAD)
         .userEmail("gunnar.von-der-beck@accso.de")
         .list();
     assertEquals(1, result.size());
@@ -160,7 +160,7 @@ public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
 
   public void testFilterByGroupIdAndEmailLike() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("c0b9d291-2e49-4c10-9023-df6219e64354")
+        .memberOfGroup(GROUP_ID_TEAMLEAD)
         .userEmailLike("*@accso.de")
         .list();
     assertEquals(1, result.size());
