@@ -4,9 +4,9 @@
 
 Keycloak&trade; (<https://www.keycloak.org/>) is an Open Source Identity and Access Management platform including advanced features such as User Federation, Identity Brokering and Social Login.
 
-Camunda&trade; already provides a generic sample for Single Sign On when using Spring Boot.
+Camunda&trade; (<https://camunda.com/>) already provides a generic sample for Single Sign On when using Spring Boot.
 See <https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso>.
-Detailed instructions on how to use Spring Boots OAuth2 SSO in combination with this Keycloak Identity Provider Plugin can be found below.
+Specific instructions on how to use Spring Boots OAuth2 SSO in combination with this Keycloak Identity Provider Plugin can be found below.
 
 **Why this plugin?** SSO is sufficient in case you only want authentication but have no further advanced security roles. If one needs to use Camundas IdentityService APIs or wants to see actual Users and Groups show up in Cockpit, a custom IdentityProvider needs to be implemented as well.
 
