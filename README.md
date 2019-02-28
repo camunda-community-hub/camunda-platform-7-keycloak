@@ -217,6 +217,7 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email");
 	
 Keep in mind that Keycloak's `ID` is definitely unique which might not always be the case for the `email` attribute, depending on your setup.
+Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
 
 ------------------------------------------------------------
 
