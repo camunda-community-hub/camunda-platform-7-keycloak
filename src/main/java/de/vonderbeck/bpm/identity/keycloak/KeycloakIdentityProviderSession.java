@@ -283,7 +283,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	/**
 	 * Creates an Keycloak user search filter query
 	 * @param query the user query
-	 * @return request query in lucene syntax
+	 * @return request query
 	 */
 	protected String createUserSearchFilter(KeycloakUserQuery query) {
 		StringBuilder filter = new StringBuilder();
@@ -315,7 +315,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 	
 	/**
-	 * Adds a single argument to lucene syntax based filter
+	 * Adds a single argument to search filter
 	 * @param filter the current filter
 	 * @param name the name of the attribute
 	 * @param value the value to search
