@@ -1,10 +1,7 @@
 package de.vonderbeck.bpm.identity.keycloak;
 
-import static de.vonderbeck.bpm.identity.keycloak.KeycloakIdentityProviderTest.*;
-
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;

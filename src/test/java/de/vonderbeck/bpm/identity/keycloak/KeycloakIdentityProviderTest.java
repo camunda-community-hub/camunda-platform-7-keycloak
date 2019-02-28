@@ -40,10 +40,13 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
  */
 public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngineTestCase {
 
+	// TODO: read this from properties file
 	private static final String KEYCLOAK_URL = "https://localhost:9001/auth";
 	private static final String KEYCLOAK_ADMIN_USER = "keycloak";
 	private static final String KEYCLOAK_ADMIN_PWD = "keycloak1!";
 
+	// ------------------------------------------------------------------------
+	
 	private final static Logger LOG = BaseLogger.createLogger(
 		      TestLogger.class, "KEYCLOAK", "de.vonderbeck.bpm.identity.keycloak", "42").getLogger();
 	
@@ -59,6 +62,7 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 	
 	protected static String CLIENT_SECRET = null;
 	
+	// creates Keycloak setup only once per test run
 	static {
 		try {
 			setupRestTemplate();
@@ -77,10 +81,19 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 		});
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected void initializeProcessEngine() {
 		processEngine = getOrInitializeCachedProcessEngine();
 	}
 
+	/**
+	 * Initializes the process engine using standard configuration camunda.cfg.xml, but
+	 * replaces the KeyCloakProvider's client secret with the actual test setup.
+	 * @return the process engine
+	 */
 	private static ProcessEngine getOrInitializeCachedProcessEngine() {
 		if (cachedProcessEngine == null) {
 			ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
@@ -95,15 +108,30 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 		return cachedProcessEngine;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
 
-
+	// ------------------------------------------------------------------------
+	// Test setup
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Setup Keycloak test realm, client, users and groups.
+	 * @throws JSONException in case of errors
+	 */
 	private static void setupKeycloak() throws JSONException {
 		LOG.info("Setting up Keycloak Test Realm");
 		
@@ -134,6 +162,10 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 		assignUserGroup(headers, realm, USER_ID_MANAGER, GROUP_ID_TEAMLEAD);
 	}
 	
+	/**
+	 * Deletes Keycloak test realm
+	 * @throws JSONException in case of errors
+	 */
 	public static void tearDownKeycloak() throws JSONException {
 		LOG.info("Cleaning up Keycloak Test Realm");
 
@@ -192,6 +224,11 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 		return headers;
 	}
 	
+	/**
+	 * Creates a new Keycloak realm.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 */
 	private static void createRealm(HttpHeaders headers, String realm) {
 	    String realmData = "{\"id\":null,\"realm\":\"" + realm + "\",\"notBefore\":0,\"revokeRefreshToken\":false,\"refreshTokenMaxReuse\":0,\"accessTokenLifespan\":300,\"accessTokenLifespanForImplicitFlow\":900,\"ssoSessionIdleTimeout\":1800,\"ssoSessionMaxLifespan\":36000,\"ssoSessionIdleTimeoutRememberMe\":0,\"ssoSessionMaxLifespanRememberMe\":0,\"offlineSessionIdleTimeout\":2592000,\"offlineSessionMaxLifespanEnabled\":false,\"offlineSessionMaxLifespan\":5184000,\"accessCodeLifespan\":60,\"accessCodeLifespanUserAction\":300,\"accessCodeLifespanLogin\":1800,\"actionTokenGeneratedByAdminLifespan\":43200,\"actionTokenGeneratedByUserLifespan\":300,\"enabled\":true,\"sslRequired\":\"external\",\"registrationAllowed\":false,\"registrationEmailAsUsername\":false,\"rememberMe\":false,\"verifyEmail\":false,\"loginWithEmailAllowed\":true,\"duplicateEmailsAllowed\":false,\"resetPasswordAllowed\":false,\"editUsernameAllowed\":false,\"bruteForceProtected\":false,\"permanentLockout\":false,\"maxFailureWaitSeconds\":900,\"minimumQuickLoginWaitSeconds\":60,\"waitIncrementSeconds\":60,\"quickLoginCheckMilliSeconds\":1000,\"maxDeltaTimeSeconds\":43200,\"failureFactor\":30,\"defaultRoles\":[\"uma_authorization\",\"offline_access\"],\"requiredCredentials\":[\"password\"],\"otpPolicyType\":\"totp\",\"otpPolicyAlgorithm\":\"HmacSHA1\",\"otpPolicyInitialCounter\":0,\"otpPolicyDigits\":6,\"otpPolicyLookAheadWindow\":1,\"otpPolicyPeriod\":30,\"otpSupportedApplications\":[\"FreeOTP\",\"Google Authenticator\"],\"browserSecurityHeaders\":{\"contentSecurityPolicyReportOnly\":\"\",\"xContentTypeOptions\":\"nosniff\",\"xRobotsTag\":\"none\",\"xFrameOptions\":\"SAMEORIGIN\",\"xXSSProtection\":\"1; mode=block\",\"contentSecurityPolicy\":\"frame-src 'self'; frame-ancestors 'self'; object-src 'none';\",\"strictTransportSecurity\":\"max-age=31536000; includeSubDomains\"},\"smtpServer\":{},\"eventsEnabled\":false,\"eventsListeners\":[\"jboss-logging\"],\"enabledEventTypes\":[],\"adminEventsEnabled\":false,\"adminEventsDetailsEnabled\":false,\"internationalizationEnabled\":false,\"supportedLocales\":[],\"browserFlow\":\"browser\",\"registrationFlow\":\"registration\",\"directGrantFlow\":\"direct grant\",\"resetCredentialsFlow\":\"reset credentials\",\"clientAuthenticationFlow\":\"clients\",\"dockerAuthenticationFlow\":\"docker auth\",\"attributes\":{\"_browser_header.xXSSProtection\":\"1; mode=block\",\"_browser_header.xFrameOptions\":\"SAMEORIGIN\",\"_browser_header.strictTransportSecurity\":\"max-age=31536000; includeSubDomains\",\"permanentLockout\":\"false\",\"quickLoginCheckMilliSeconds\":\"1000\",\"_browser_header.xRobotsTag\":\"none\",\"maxFailureWaitSeconds\":\"900\",\"minimumQuickLoginWaitSeconds\":\"60\",\"failureFactor\":\"30\",\"actionTokenGeneratedByUserLifespan\":\"300\",\"maxDeltaTimeSeconds\":\"43200\",\"_browser_header.xContentTypeOptions\":\"nosniff\",\"offlineSessionMaxLifespan\":\"5184000\",\"actionTokenGeneratedByAdminLifespan\":\"43200\",\"_browser_header.contentSecurityPolicyReportOnly\":\"\",\"bruteForceProtected\":\"false\",\"_browser_header.contentSecurityPolicy\":\"frame-src 'self'; frame-ancestors 'self'; object-src 'none';\",\"waitIncrementSeconds\":\"60\",\"offlineSessionMaxLifespanEnabled\":\"false\"},\"userManagedAccessAllowed\":false}";
 	    HttpEntity<String> request = new HttpEntity<>(realmData, headers);
@@ -200,12 +237,26 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 	    LOG.info("Created realm " + realm);
 	}
 	
+	/**
+	 * Deletes a Keycloak realm.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 */
 	private static void deleteRealm(HttpHeaders headers, String realm) {
 	    ResponseEntity<String>response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
 	    LOG.info("Deleted realm " + realm);
 	}
 	
+	/**
+	 * Creates a new Keycloak client including access rights for querying users and groups using the REST API.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param clientId the client ID
+	 * @param redirectUri valid redirect URI
+	 * @return the client secret required for authentication
+	 * @throws JSONException in case of errors
+	 */
 	private static String createClient(HttpHeaders headers, String realm, String clientId, String redirectUri) throws JSONException {
 	    // Create Client
 	    String clientData = "{\"id\":null,\"clientId\":\"" + clientId + "\",\"surrogateAuthRequired\":false,\"enabled\":true,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"" + redirectUri + "\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml_force_name_id_format\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"id\":null,\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"id\":null,\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"id\":null,\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"role_list\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}";
@@ -272,6 +323,18 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 	    return clientSecret;
 	}
 	
+	/**
+	 * Creates a user.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param userName the username
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @param email the email
+	 * @param password the password (optional, can be {@code null} in case no authentication is planned/required)
+	 * @return the user ID
+	 * @throws JSONException in case of errors
+	 */
 	private static String createUser(HttpHeaders headers, String realm, String userName, String firstName, String lastName, String email, String password) throws JSONException {
 		// create user
 	    String userData = "{\"id\":null,\"username\":\""+ userName + "\",\"enabled\":true,\"totp\":false,\"emailVerified\":false,\"firstName\":\"" + firstName + "\",\"lastName\":\"" + lastName + "\",\"email\":\"" + email + "\",\"disableableCredentialTypes\":[\"password\"],\"requiredActions\":[],\"federatedIdentities\":[],\"notBefore\":0,\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}";
@@ -293,6 +356,15 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 	    return userId;
 	}
 	
+	/**
+	 * Creates a group.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param groupName the name of the group
+	 * @param isSystemGroup {@code true} in case of system groups, {@code false} for workflow groups
+	 * @return the group ID
+	 * @throws JSONException in case of errors
+	 */
 	private static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup) throws JSONException {
 		// create group
 	    String camundaAdmin = "{\"id\":null,\"name\":\"" + groupName + "\",\"path\":\"/" + groupName + "\",\"attributes\":{" + 
@@ -315,6 +387,13 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 	    throw new IllegalStateException("Error creating group " + groupName);
 	}
 	
+	/**
+	 * Assigns a user to a group.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param userId the user ID
+	 * @param groupId the group ID
+	 */
 	private static void assignUserGroup(HttpHeaders headers, String realm, String userId, String groupId) {
 		ResponseEntity<String>response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/users/" + userId + "/groups/" + groupId, 
 				HttpMethod.PUT, new HttpEntity<>(headers), String.class);
