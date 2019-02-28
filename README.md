@@ -22,7 +22,7 @@ Features:
 *   Compatible with Spring Boot OAuth2 SSO
 
 Current version: `0.2.0-SNAPSHOT`<br >
-Tested with: Camunda `7.10.0` and Camunda `7.10.1-ee`
+Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.1-ee`
 
 Known limitations:
 
@@ -33,9 +33,9 @@ Known limitations:
 ## Prerequisites in your Keycloak realm
 
 1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
-2.  Create a new client named ``camunda-identity-service`` with access type confidential and service accounts enabled:
+2.  Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
 	![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
-3.	Add the roles ``query-groups, query-users, view-users`` to the service account client roles of your realm (``master-realm`` or ``realm-management``, depending on whether you are using master or a separate realm):
+3.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (`master-realm` or `realm-management`, depending on whether you are using master or a separate realm):
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
 4.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
