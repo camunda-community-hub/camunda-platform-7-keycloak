@@ -21,17 +21,27 @@ Features:
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
 
-Current version: `0.1.0-SNAPSHOT`<br >
+Current version: `0.2.0-SNAPSHOT`<br >
 Tested with: Camunda `7.10.0` and Camunda `7.10.1-ee`
+
+Known limitations:
+
+*   A strategy to distinguish SYSTEM and WORKFLOW groups is missing. Currently only the administrator group is mapped to type SYSTEM.
+*   Some filters are applied on the client side - the REST API does not allow full criteria in all required cases
+*   Sort criteria for queries not yet implemented
 
 ## Prerequisites in your Keycloak realm
 
 1.  Create a new client named ``camunda-identity-service`` with access type confidential and service accounts enabled:
 	![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
-2.	Add the role ``admin`` to the service account roles:
+2.	Add the roles ``query-groups, query-users, view-users`` to the service account client roles of your realm (``master-realm`` or ``realm-management``, depending on whether you are using master or a separate realm):
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
 3.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
+
+<!--
+4.  You can mark groups as Camunda SYSTEM groups by adding an attribute named ``type`` with value ``SYSTEM``. The designated administrator group (see configuration parameter ``administratorGroupName``) is automatically of type SYSTEM. All other groups will be treated as workflow groups.
+-->
 
 ## Usage with Camuna Spring Boot
 
@@ -40,7 +50,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>de.vonderbeck.bpm.identity</groupId>
 			<artifactId>camunda-identity-keycloak</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 
 
@@ -65,20 +75,19 @@ Configuration in `application.yaml` will then look as follows:
 	    enabled: true
 	
 	plugin.identity.keycloak:
-	  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/master
-	  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/master
+	  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]
+	  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/[master|<realm-name>]
 	  clientId: camunda-identity-service
 	  clientSecret: 42aa42bb-1234-4242-a24a-42a2b420cde0
 	  useEmailAsCamundaUserId: true
 	  administratorGroupName: camunda-admin
-	  disableSSLCertificateValidation: true
 
 A complete list of configuration options can be found below:
 
 | *Property* | *Description* |
 | --- | --- |
-| `keycloakIssuerUrl` | The basic issuer URL of your Keycloak server including the realm.<br />Sample: `https://<your-keycloak-server>/auth/realms/master` |
-| `keycloakAdminUrl` | The admin URL of the Keycloak server REST API including the realm.<br />Sample: `https://<your-keycloak-server>/auth/admin/realms/master` |
+| `keycloakIssuerUrl` | The basic issuer URL of your Keycloak server including the realm.<br />Sample for master realm: `https://<your-keycloak-server>/auth/realms/master` |
+| `keycloakAdminUrl` | The admin URL of the Keycloak server REST API including the realm.<br />Sample for master realm: `https://<your-keycloak-server>/auth/admin/realms/master` |
 | `clientId` | The Client ID of your application. |
 | `clientSecret` | The Client Secret of your application. |
 | `useEmailAsCamundaUserId` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic Keycloak ID. Keep in mind that you will only be able to login without SSO with users managed by connections using one of the following strategies: **TODO**.|
@@ -194,11 +203,11 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 	    client:
 	      client-id: camunda-identity-service
 	      client-secret: yyy2121abc21def2121ghi212132121abc21def2121ghi2121eyyy
-	      accessTokenUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/token
-	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/auth
+	      accessTokenUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/token
+	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/auth
 	      scope: openid profile email
 	    resource:
-	      userInfoUri: https://<your-keycloak-server>/auth/realms/master/protocol/openid-connect/userinfo
+	      userInfoUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/userinfo
 
 **Beware**: SSO will only work that way in case you have the KeycloakIdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
 

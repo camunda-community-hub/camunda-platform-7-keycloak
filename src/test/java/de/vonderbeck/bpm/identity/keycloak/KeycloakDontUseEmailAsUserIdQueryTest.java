@@ -4,27 +4,38 @@ import static de.vonderbeck.bpm.identity.keycloak.KeycloakIdentityProviderTest.*
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
+import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin;
 
 /**
  * User query test for the Auth0 identity provider.
  */
-public class KeycloakDontUseEmailAsUserIdQueryTest extends ResourceProcessEngineTestCase {
+public class KeycloakDontUseEmailAsUserIdQueryTest extends KeycloakIdentityProviderTest {
 
-	public KeycloakDontUseEmailAsUserIdQueryTest() {
-		super("camunda.dontUseEmailAsCamundaUserId.cfg.xml");
+	@Override
+	protected void initializeProcessEngine() {
+		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+				.createProcessEngineConfigurationFromResource("camunda.dontUseEmailAsCamundaUserId.cfg.xml");
+		config.getProcessEnginePlugins().forEach(p -> {
+			if (p instanceof KeycloakIdentityProviderPlugin) {
+				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
+			}
+		});
+		processEngine = config.buildProcessEngine();
 	}
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Override
+	protected void closeDownProcessEngine() {
+		super.closeDownProcessEngine();
+		processEngine.close();
+		processEngine = null;
 	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	
 	// ------------------------------------------------------------------------
 	// Authorization tests
 	// ------------------------------------------------------------------------
@@ -38,7 +49,7 @@ public class KeycloakDontUseEmailAsUserIdQueryTest extends ResourceProcessEngine
 	// ------------------------------------------------------------------------
 	
 	public void testUserQueryFilterByUserId() {
-		User user = identityService.createUserQuery().userId(USER_ID_OTHER).singleResult();
+		User user = identityService.createUserQuery().userId(USER_ID_TEAMLEAD).singleResult();
 		assertNotNull(user);
 
 		user = identityService.createUserQuery().userId(USER_ID_CAMUNDA_ADMIN).singleResult();
@@ -55,7 +66,7 @@ public class KeycloakDontUseEmailAsUserIdQueryTest extends ResourceProcessEngine
 	}
 
 	public void testUserQueryFilterByUserIdIn() {
-		List<User> users = identityService.createUserQuery().userIdIn(USER_ID_CAMUNDA_ADMIN, USER_ID_OTHER).list();
+		List<User> users = identityService.createUserQuery().userIdIn(USER_ID_CAMUNDA_ADMIN, USER_ID_TEAMLEAD).list();
 		assertNotNull(users);
 		assertEquals(2, users.size());
 

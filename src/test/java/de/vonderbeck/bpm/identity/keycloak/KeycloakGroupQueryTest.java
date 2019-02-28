@@ -40,12 +40,12 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 
 	public void testFilterByGroupIdIn() {
 		List<Group> groups = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGEMENT)
+				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
 				.list();
 
 		assertEquals(2, groups.size());
 		for (Group group : groups) {
-			if (!group.getName().equals("camunda-admin") && !group.getName().equals("management")) {
+			if (!group.getName().equals("camunda-admin") && !group.getName().equals("manager")) {
 				fail();
 			}
 		}
@@ -53,14 +53,14 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 
 	public void testFilterByGroupIdInAndType() {
 		Group group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGEMENT)
+				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
 				.groupType("WORKFLOW")
 				.singleResult();
 		assertNotNull(group);
-		assertEquals("management", group.getName());
+		assertEquals("manager", group.getName());
 		
 		group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGEMENT)
+				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
 				.groupType("SYSTEM")
 				.singleResult();
 		assertNotNull(group);
@@ -69,7 +69,7 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 
 	public void testFilterByGroupIdInAndUserId() {
 		Group group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGEMENT)
+				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
 				.groupMember("camunda@accso.de")
 				.singleResult();
 		assertNotNull(group);
@@ -77,12 +77,12 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 	}
 	
 	public void testFilterByGroupName() {
-		Group group = identityService.createGroupQuery().groupName("management").singleResult();
+		Group group = identityService.createGroupQuery().groupName("manager").singleResult();
 		assertNotNull(group);
 
 		// validate result
-		assertEquals(GROUP_ID_MANAGEMENT, group.getId());
-		assertEquals("management", group.getName());
+		assertEquals(GROUP_ID_MANAGER, group.getId());
+		assertEquals("manager", group.getName());
 
 		group = identityService.createGroupQuery().groupName("whatever").singleResult();
 		assertNull(group);
@@ -93,8 +93,8 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 		assertNotNull(group);
 
 		// validate result
-		assertEquals(GROUP_ID_MANAGEMENT, group.getId());
-		assertEquals("management", group.getName());
+		assertEquals(GROUP_ID_MANAGER, group.getId());
+		assertEquals("manager", group.getName());
 
 		group = identityService.createGroupQuery().groupNameLike("what*").singleResult();
 		assertNull(group);
