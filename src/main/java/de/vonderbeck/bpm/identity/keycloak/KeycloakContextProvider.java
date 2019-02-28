@@ -16,7 +16,7 @@ import de.vonderbeck.bpm.identity.keycloak.util.KeycloakPluginLogger;
 /**
  * Keycloak context provider. 
  * <p>
- * Manages access tokens for the management API and the authorization extension API.
+ * Manages access tokens for then Keycloak REST API.
  */
 public class KeycloakContextProvider {
 
