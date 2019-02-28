@@ -11,7 +11,8 @@ public class KeycloakConfiguration {
 	/** Keycloak admin REST api base URL including realm name {@code https://<mykeyclaokserver>/auth/admin/realms/master}. */
 	protected String keycloakAdminUrl;
 
-	// Client must have access type confidential, service accounts enabled, service account roles must include admin
+	// Client must have access type confidential, service accounts enabled, 
+	// service account roles must include realm roles for query-users, query-groups, view-users
 	/** The client ID. */
 	protected String clientId;
 	/** The client secret. */
