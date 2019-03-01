@@ -241,6 +241,8 @@ For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/
 
 ------------------------------------------------------------
 
+License: [Apache License 2.0](https://opensource.org/licenses/Apache-2.0)
+
 That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
 
 Brought to you by:
@@ -248,4 +250,3 @@ Brought to you by:
 ![Accso](doc/ACCSO-Logo.png "https://accso.de/")
 
 [Gunnar von der Beck](https://www.xing.com/profile/Gunnar_vonderBeck/portfolio "XING Profile"), [Accso - Accelerated Solutions GmbH](https://accso.de/ "https://accso.de/")
-
