@@ -218,6 +218,27 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 Keep in mind that Keycloak's `ID` is definitely unique which might not always be the case for the `email` attribute, depending on your setup.
 Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
 
+## Unit testing the plugin
+
+In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
+
+	version: "3.3"
+	
+	services:
+	  jboss.keycloak:
+	    build: .
+	    image: jboss/keycloak
+	    restart: always
+	    environment:
+	      TZ: Europe/Berlin
+	      KEYCLOAK_USER: keycloak
+	      KEYCLOAK_PASSWORD: keycloak1!
+	    ports:
+	      - "9001:8443"
+	      - "9000:8080"
+
+For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
+
 ------------------------------------------------------------
 
 That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
