@@ -4,8 +4,7 @@
 
 Keycloak&trade; (<https://www.keycloak.org/>) is an Open Source Identity and Access Management platform including advanced features such as User Federation, Identity Brokering and Social Login.
 
-Camunda&trade; (<https://camunda.com/>) already provides a generic sample for Single Sign On when using Spring Boot.
-See <https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso>.
+Camunda&trade; (<https://camunda.com/>) in it's current version  is perfectly suited to carry out BPM projects in the cloud. Identity management in the cloud, however, often differs from classical approaches. Camunda already provides a generic sample for Single Sign On when using Spring Boot. See <https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso>.
 Specific instructions on how to use Spring Boots OAuth2 SSO in combination with this Keycloak Identity Provider Plugin can be found below.
 
 **Why this plugin?** SSO is sufficient in case you only want authentication but have no further advanced security roles. If one needs to use Camundas IdentityService APIs or wants to see actual Users and Groups show up in Cockpit, a custom IdentityProvider needs to be implemented as well.
@@ -21,7 +20,7 @@ Features:
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
 
-Current version: `0.2.0-SNAPSHOT`<br >
+Current version: `0.4.0-SNAPSHOT`<br >
 Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.1-ee`
 
 Known limitations:
@@ -51,7 +50,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>de.vonderbeck.bpm.identity</groupId>
 			<artifactId>camunda-identity-keycloak</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.4.0-SNAPSHOT</version>
 		</dependency>
 
 
@@ -222,3 +221,7 @@ Email uniqueness can be configured on a per realm level depending on the setting
 ------------------------------------------------------------
 
 That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
+
+Brought to you by
+
+![Accso](doc/ACCSO-Logo.png "https://accso.de/")
