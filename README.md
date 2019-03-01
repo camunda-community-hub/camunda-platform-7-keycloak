@@ -243,6 +243,9 @@ For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/
 
 That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
 
-Brought to you by
+Brought to you by:
 
 ![Accso](doc/ACCSO-Logo.png "https://accso.de/")
+
+Gunnar von der Beck, [Accso - Accelerated Solutions GmbH](https://accso.de/ "https://accso.de/")
+
