@@ -5,14 +5,15 @@ package de.vonderbeck.bpm.identity.keycloak;
  */
 public class KeycloakConfiguration {
 
-	/** Keycloak issuer URL including realm name {@code https://<mykeyclaokserver>/auth/realms/master}. */
+	/** Keycloak issuer URL including realm name, e.g. {@code https://<mykeyclaokserver>/auth/realms/master}. */
 	protected String keycloakIssuerUrl;
 
-	/** Keycloak admin REST api base URL including realm name {@code https://<mykeyclaokserver>/auth/admin/realms/master}. */
+	/** Keycloak admin REST api base URL including realm name, e.g. {@code https://<mykeyclaokserver>/auth/admin/realms/master}. */
 	protected String keycloakAdminUrl;
 
 	// Client must have access type confidential, service accounts enabled, 
 	// service account roles must include realm roles for query-users, query-groups, view-users
+
 	/** The client ID. */
 	protected String clientId;
 	/** The client secret. */
@@ -37,11 +38,14 @@ public class KeycloakConfiguration {
 	 * on all built-in resources. */
 	protected String administratorUserName;
 	
+	/** Whether to enable Camunda authorization checks for groups and users. */
 	protected boolean authorizationCheckEnabled = true;
 
+	/** Disables SSL certificate validation. Useful for testing. */
 	protected boolean disableSSLCertificateValidation = false;
 	
-	protected int maxHttpConnections = 200;
+	/** Maximum number of HTTP connections of the Keycloak specific connection pool. */
+	protected int maxHttpConnections = 50;
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters

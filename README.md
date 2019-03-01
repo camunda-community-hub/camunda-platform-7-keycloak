@@ -27,7 +27,7 @@ Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.1-ee`
 Known limitations:
 
 *   A strategy to distinguish SYSTEM and WORKFLOW groups is missing. Currently only the administrator group is mapped to type SYSTEM.
-*   Some filters are applied on the client side - the REST API does not allow full criteria in all required cases
+*   Some query filters are applied on the client side - the REST API does not allow full criteria search in all required cases
 *   Sort criteria for queries not yet implemented
 
 ## Prerequisites in your Keycloak realm
@@ -95,7 +95,7 @@ A complete list of configuration options can be found below:
 | `administratorGroupName` | The name of the administrator group. If this name is set and engine authorization is enabled, the plugin will create group-level Administrator authorizations on all built-in resources. |
 | `administratorUserName` | The name of the administrator user. If this name is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
 | `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Keycloak users or groups we advise to set this property to false to improve the performance of the user and group query. |
-| `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `200`|
+| `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `50`|
 | `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. | 
 
 ## Activating Single Sign On
