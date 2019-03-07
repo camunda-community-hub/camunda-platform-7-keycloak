@@ -681,7 +681,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		try {
 			JSONArray types = result.getJSONObject("attributes").getJSONArray("type");
 			for (int i = 0; i < types.length(); i++) {
-				if (Groups.GROUP_TYPE_SYSTEM.equals(types.getString(i).toLowerCase())) {
+				if (Groups.GROUP_TYPE_SYSTEM.equals(types.getString(i).toUpperCase())) {
 					return true;
 				}
 			}

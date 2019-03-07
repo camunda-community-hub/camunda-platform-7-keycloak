@@ -17,7 +17,7 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 	public void testQueryNoFilter() {
 		List<Group> groupList = identityService.createGroupQuery().list();
 
-		assertEquals(3, groupList.size());
+		assertEquals(4, groupList.size());
 	}
 
 	public void testFilterByGroupId() {
@@ -37,7 +37,14 @@ public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
 		List<Group> result = identityService.createGroupQuery().groupMember("camunda@accso.de").list();
 		assertEquals(1, result.size());
 	}
-
+	
+	/* The REST API of Keycloak does not deliver group attributes :-(
+	public void testFilterByGroupType() {
+		List<Group> result = identityService.createGroupQuery().groupType("SYSTEM").list();
+		assertEquals(2, result.size());
+	}
+	*/
+	
 	public void testFilterByGroupIdIn() {
 		List<Group> groups = identityService.createGroupQuery()
 				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)

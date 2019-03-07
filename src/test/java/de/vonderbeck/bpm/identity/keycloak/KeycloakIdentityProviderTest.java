@@ -149,6 +149,7 @@ public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngin
 		GROUP_ID_ADMIN = createGroup(headers, realm, "camunda-admin", true);
 		GROUP_ID_TEAMLEAD = createGroup(headers, realm, "teamlead", false);
 		GROUP_ID_MANAGER = createGroup(headers, realm, "manager", false);
+		createGroup(headers, realm, "cam-read-only", true); // create additional system group
 
 		// Create Users
 		USER_ID_CAMUNDA_ADMIN = createUser(headers, realm, "camunda", "Admin", "Camunda", "camunda@accso.de", "camunda1!");
