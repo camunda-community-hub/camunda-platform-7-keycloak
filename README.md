@@ -20,14 +20,15 @@ Features:
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
 
-Current version: `0.4.0-SNAPSHOT`<br >
-Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.1-ee`
+Current version: `0.5.0-SNAPSHOT`<br >
+Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.3-ee`
 
 Known limitations:
 
 *   A strategy to distinguish SYSTEM and WORKFLOW groups is missing. Currently only the administrator group is mapped to type SYSTEM.
-*   Some query filters are applied on the client side - the REST API does not allow full criteria search in all required cases
-*   Sort criteria for queries not yet implemented
+*   Some query filters are applied on the client side - the Keycloak REST API does not allow full criteria search in all required cases.
+*   Sort criteria for queries are implemented on the client side - the Keycloak REST API does not allow result ordering.
+*   Tenants are currently not supported.
 
 ## Prerequisites in your Keycloak realm
 
@@ -50,7 +51,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>de.vonderbeck.bpm.identity</groupId>
 			<artifactId>camunda-identity-keycloak</artifactId>
-			<version>0.4.0-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 
 
@@ -92,7 +93,7 @@ A complete list of configuration options can be found below:
 | `clientSecret` | The Client Secret of your application. |
 | `useEmailAsCamundaUserId` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic Keycloak ID. Keep in mind that you will only be able to login without SSO with Keycloak's internally managed users and users managed by the LDAP / Keberos User federation.|
 | `administratorGroupName` | The name of the administrator group. If this name is set and engine authorization is enabled, the plugin will create group-level Administrator authorizations on all built-in resources. |
-| `administratorUserName` | The name of the administrator user. If this name is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
+| `administratorUserId` | The ID of the administrator user. If this ID is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
 | `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Keycloak users or groups we advise to set this property to false to improve the performance of the user and group query. |
 | `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `50`|
 | `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. | 
@@ -235,7 +236,6 @@ In order to run the unit tests I have used a local docker setup of Keycloak with
 	      KEYCLOAK_PASSWORD: keycloak1!
 	    ports:
 	      - "9001:8443"
-	      - "9000:8080"
 
 For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
 

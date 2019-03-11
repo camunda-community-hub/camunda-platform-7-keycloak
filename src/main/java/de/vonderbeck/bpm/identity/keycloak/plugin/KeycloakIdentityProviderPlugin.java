@@ -47,13 +47,13 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			if (processEngineConfiguration.getAdminGroups() == null) {
 				processEngineConfiguration.setAdminGroups(new ArrayList<String>());
 			}
-			processEngineConfiguration.getAdminGroups().add(administratorGroupName);
+			// add the configured administrator group to the engine configuration later: needs translation to group ID
 		}
-		if (!StringUtils.isEmpty(administratorUserName)) {
+		if (!StringUtils.isEmpty(administratorUserId)) {
 			if (processEngineConfiguration.getAdminUsers() == null) {
 				processEngineConfiguration.setAdminUsers(new ArrayList<String>());
 			}
-			processEngineConfiguration.getAdminUsers().add(administratorUserName);
+			processEngineConfiguration.getAdminUsers().add(administratorUserId);
 		}
 
 		KeycloakIdentityProviderFactory keycloakIdentityProviderFactory = new KeycloakIdentityProviderFactory(this);
@@ -75,6 +75,16 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 	 */
 	@Override
 	public void postProcessEngineBuild(ProcessEngine processEngine) {
+		// always add the configured administrator group to the engine configuration
+		String administratorGroupId = null;
+		if (!StringUtils.isEmpty(administratorGroupName)) {
+			// query the real group ID
+			Group administratorGroup = processEngine.getIdentityService().createGroupQuery().groupName(administratorGroupName).singleResult();
+			administratorGroupId = administratorGroup != null ? administratorGroup.getId() : administratorGroupName;
+			((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAdminGroups().add(administratorGroupId);
+		}
+		
+		// need to prepare administrator authorizations only in case authorization has been enabled in the configuration 
 		if(!authorizationEnabled) {
 			return;
 		}
@@ -82,9 +92,6 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 		final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
 		if (!StringUtils.isEmpty(administratorGroupName)) {
-			// query the real group ID
-			Group administratorGroup = processEngine.getIdentityService().createGroupQuery().groupName(administratorGroupName).singleResult();
-			String administratorGroupId = administratorGroup != null ? administratorGroup.getId() : administratorGroupName;
 			// create ADMIN authorizations on all built-in resources for configured admin group
 			for (Resource resource : Resources.values()) {
 				if(authorizationService.createAuthorizationQuery().groupIdIn(administratorGroupId).resourceType(resource).resourceId(ANY).count() == 0) {
@@ -99,17 +106,17 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			}
 		}
 
-		if (!StringUtils.isEmpty(administratorUserName)) {
+		if (!StringUtils.isEmpty(administratorUserId)) {
 			// create ADMIN authorizations on all built-in resources for configured admin user
 			for (Resource resource : Resources.values()) {
-				if(authorizationService.createAuthorizationQuery().userIdIn(administratorUserName).resourceType(resource).resourceId(ANY).count() == 0) {
+				if(authorizationService.createAuthorizationQuery().userIdIn(administratorUserId).resourceType(resource).resourceId(ANY).count() == 0) {
 					AuthorizationEntity adminUserAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
-					adminUserAuth.setUserId(administratorUserName);
+					adminUserAuth.setUserId(administratorUserId);
 					adminUserAuth.setResource(resource);
 					adminUserAuth.setResourceId(ANY);
 					adminUserAuth.addPermission(ALL);
 					authorizationService.saveAuthorization(adminUserAuth);
-					LOG.grantUserPermissions(administratorUserName, resource.resourceName());
+					LOG.grantUserPermissions(administratorUserId, resource.resourceName());
 				}
 			}
 		}

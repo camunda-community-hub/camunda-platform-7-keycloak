@@ -31,12 +31,12 @@ public class KeycloakConfiguration {
 	 * on all built-in resources. */
 	protected String administratorGroupName;
 
-	/** The name of the administrator user.
+	/** The ID of the administrator user.
 	 *
-	 * If this name is set to a non-null and non-empty value,
+	 * If this ID is set to a non-null and non-empty value,
 	 * the plugin will create user-level Administrator authorizations
 	 * on all built-in resources. */
-	protected String administratorUserName;
+	protected String administratorUserId;
 	
 	/** Whether to enable Camunda authorization checks for groups and users. */
 	protected boolean authorizationCheckEnabled = true;
@@ -136,17 +136,17 @@ public class KeycloakConfiguration {
 	}
 
 	/**
-	 * @return the administratorUserName
+	 * @return the administratorUserId
 	 */
-	public String getAdministratorUserName() {
-		return administratorUserName;
+	public String getAdministratorUserId() {
+		return administratorUserId;
 	}
 
 	/**
-	 * @param administratorUserName the administratorUserName to set
+	 * @param administratorUserId the administratorUserId to set
 	 */
-	public void setAdministratorUserName(String administratorUserName) {
-		this.administratorUserName = administratorUserName;
+	public void setAdministratorUserId(String administratorUserId) {
+		this.administratorUserId = administratorUserId;
 	}
 
 	/**

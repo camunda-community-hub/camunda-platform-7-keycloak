@@ -6,6 +6,7 @@ import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -19,7 +20,11 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.GroupQueryProperty;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
+import org.camunda.bpm.engine.impl.UserQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -203,6 +208,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
 		}
 
+		if (query.getOrderingProperties().size() > 0) {
+			userList.sort(new UserComparator(query.getOrderingProperties()));
+		}
+		
 		return userList;
 	}
 
@@ -277,6 +286,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
 		}
 
+		if (query.getOrderingProperties().size() > 0) {
+			userList.sort(new UserComparator(query.getOrderingProperties()));
+		}
+		
 		return userList;
 	}
 
@@ -362,6 +375,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 	}
 
+	/**
+	 * Maps a Keycloak JSON result to a User object
+	 * @param result the Keycloak JSON result
+	 * @return the User object
+	 * @throws JSONException in case of errors
+	 */
 	protected UserEntity transformUser(JSONObject result) throws JSONException {
 		UserEntity user = new UserEntity();
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
@@ -376,6 +395,64 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 		user.setEmail(getStringValue(result, "email"));
 		return user;
+	}
+
+	/**
+	 * Helper for client side user ordering.
+	 */
+	private static class UserComparator implements Comparator<User> {
+		private final static int USER_ID = 0;
+		private final static int EMAIL = 1;
+		private final static int FIRST_NAME = 2;
+		private final static int LAST_NAME = 3;
+		private int[] order;
+		private boolean[] desc;
+		public UserComparator(List<QueryOrderingProperty> orderList) {
+			// Prepare query ordering
+			this.order = new int[orderList.size()];
+			this.desc = new boolean[orderList.size()];
+			for (int i = 0; i< orderList.size(); i++) {
+				QueryOrderingProperty qop = orderList.get(i);
+				if (qop.getQueryProperty().equals(UserQueryProperty.USER_ID)) {
+					order[i] = USER_ID;
+				} else if (qop.getQueryProperty().equals(UserQueryProperty.EMAIL)) {
+					order[i] = EMAIL;
+				} else if (qop.getQueryProperty().equals(UserQueryProperty.FIRST_NAME)) {
+					order[i] = FIRST_NAME;
+				} else if (qop.getQueryProperty().equals(UserQueryProperty.LAST_NAME)) {
+					order[i] = LAST_NAME;
+				} else {
+					order[i] = -1;
+				}
+				desc[i] = Direction.DESCENDING.equals(qop.getDirection());
+			}
+		}
+		@Override
+		public int compare(User u1, User u2) {
+			int c = 0;
+			for (int i = 0; i < order.length; i ++) {
+				switch (order[i]) {
+					case USER_ID:
+						c = KeycloakIdentityProviderSession.compare(u1.getId(), u2.getId());
+						break;
+					case EMAIL:
+						c = KeycloakIdentityProviderSession.compare(u1.getEmail(), u2.getEmail());
+						break;
+					case FIRST_NAME:
+						c = KeycloakIdentityProviderSession.compare(u1.getFirstName(), u2.getFirstName());
+						break;
+					case LAST_NAME:
+						c = KeycloakIdentityProviderSession.compare(u1.getLastName(), u2.getLastName());
+						break;
+					default:
+						// do nothing
+				}
+				if (c != 0) {
+					return desc[i] ? -c : c;
+				}
+			}
+			return c;
+		}
 	}
 	
 	//-------------------------------------------------------------------------
@@ -580,6 +657,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
 		}
 
+		if (query.getOrderingProperties().size() > 0) {
+			groupList.sort(new GroupComparator(query.getOrderingProperties()));
+		}
+
 		return groupList;
 	}
 	
@@ -641,6 +722,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
 		}
 
+		if (query.getOrderingProperties().size() > 0) {
+			groupList.sort(new GroupComparator(query.getOrderingProperties()));
+		}
+		
 		return groupList;
 	}
 
@@ -660,6 +745,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 	}
 	
+	/**
+	 * Maps a Keycloak JSON result to a Group object
+	 * @param result the Keycloak JSON result
+	 * @return the Group object
+	 * @throws JSONException in case of errors
+	 */
 	protected GroupEntity transformGroup(JSONObject result) throws JSONException {
 		GroupEntity group = new GroupEntity();
 		group.setId(result.getString("id"));
@@ -672,6 +763,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return group;
 	}
 
+	/**
+	 * Checks whether a Keycloak JSON result represents a SYSTEM group.
+	 * @param result the Keycloak JSON result
+	 * @return {@code true} in case the result is a SYSTEM group.
+	 */
 	private boolean isSystemGroup(JSONObject result) {
 		String name = result.getString("name");
 		if (Groups.CAMUNDA_ADMIN.equals(name) || 
@@ -689,6 +785,59 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			return false;
 		}
 		return false;
+	}
+	
+	/**
+	 * Helper for client side group ordering.
+	 */
+	private static class GroupComparator implements Comparator<Group> {
+		private final static int GROUP_ID = 0;
+		private final static int NAME = 1;
+		private final static int TYPE = 2;
+		private int[] order;
+		private boolean[] desc;
+		public GroupComparator(List<QueryOrderingProperty> orderList) {
+			// Prepare query ordering
+			this.order = new int[orderList.size()];
+			this.desc = new boolean[orderList.size()];
+			for (int i = 0; i< orderList.size(); i++) {
+				QueryOrderingProperty qop = orderList.get(i);
+				if (qop.getQueryProperty().equals(GroupQueryProperty.GROUP_ID)) {
+					order[i] = GROUP_ID;
+				} else if (qop.getQueryProperty().equals(GroupQueryProperty.NAME)) {
+					order[i] = NAME;
+				} else if (qop.getQueryProperty().equals(GroupQueryProperty.TYPE)) {
+					order[i] = TYPE;
+				} else {
+					order[i] = -1;
+				}
+				desc[i] = Direction.DESCENDING.equals(qop.getDirection());
+			}
+		}
+
+		@Override
+		public int compare(Group g1, Group g2) {
+			int c = 0;
+			for (int i = 0; i < order.length; i ++) {
+				switch (order[i]) {
+					case GROUP_ID:
+						c = KeycloakIdentityProviderSession.compare(g1.getId(), g2.getId());
+						break;
+					case NAME:
+						c = KeycloakIdentityProviderSession.compare(g1.getName(), g2.getName());
+						break;
+					case TYPE:
+						c = KeycloakIdentityProviderSession.compare(g1.getType(), g2.getType());
+						break;
+					default:
+						// do nothing
+				}
+				if (c != 0) {
+					return desc[i] ? -c : c;
+				}
+			}
+			return c;
+		}
 	}
 	
 	//-------------------------------------------------------------------------
@@ -761,7 +910,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	protected boolean matchesLike(String queryParameter, String attribute) {
 		return queryParameter == null || attribute.matches(queryParameter.replaceAll("[%\\*]", ".*"));
 	}
-
+	
 	/**
 	 * @return true if the passed-in user is currently authenticated
 	 */
@@ -783,6 +932,25 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
 		return !keycloakConfiguration.isAuthorizationCheckEnabled() || org.camunda.bpm.engine.impl.context.Context
 				.getCommandContext().getAuthorizationManager().isAuthorized(permission, resource, resourceId);
+	}
+
+	/**
+	 * Null safe compare of two strings.
+	 * @param str1 string 1
+	 * @param str2 string 2
+	 * @return 0 if both strings are equal; -1 if string 1 is less, +1 if string 1 is greater than string 2
+	 */
+	protected static int compare(final String str1, final String str2) {
+		if (str1 == str2) {
+			return 0;
+		}
+		if (str1 == null) {
+			return -1;
+		}
+		if (str2 == null) {
+			return 1;
+		}
+		return str1.compareTo(str2);
 	}
 
 }
