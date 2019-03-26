@@ -18,7 +18,9 @@ import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Keycloak Identity Provider Session Factory.
@@ -62,6 +64,9 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 		}
 		factory.setHttpClient(httpClient.build());
 		restTemplate.setRequestFactory(factory);
+
+		// replace ISO-8859-1 encoding with UTF-8
+		restTemplate.getMessageConverters().add(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
 		// Create Keycloak context provider for access token handling
 		keycloakContextProvider = new KeycloakContextProvider(keycloakConfiguration, restTemplate);
