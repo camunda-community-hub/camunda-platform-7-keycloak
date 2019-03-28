@@ -144,6 +144,14 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			LOG.missingConfigurationParameter("clientSecret");
 			missing.add("clientSecret");
 		}
+		if(isUseEmailAsCamundaUserId() && isUseNameAsCamundaUserId()) {
+			LOG.activationError(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName(),
+					"cannot use 'email' AND 'username' as 'id' at the same time");
+			throw new IllegalStateException("Unable to initialize plugin "
+					+ getClass().getSimpleName()
+					+ ": - cannot use 'email' AND 'username' as 'id' at the same time");
+		}
+
 		if (missing.size() > 0) {
 			LOG.activationError(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName(),
 					"missing mandatory configuration parameters " + missing.toString());
