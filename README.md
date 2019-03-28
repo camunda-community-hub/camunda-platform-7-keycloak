@@ -44,7 +44,7 @@ Known limitations:
 5.  You can mark groups as Camunda SYSTEM groups by adding an attribute named ``type`` with value ``SYSTEM``. The designated administrator group (see configuration parameter ``administratorGroupName``) is automatically of type SYSTEM. All other groups will be treated as workflow groups.
 -->
 
-## Usage with Camuna Spring Boot
+## Usage with Camunda Spring Boot
 
 Maven Dependencies:
 
