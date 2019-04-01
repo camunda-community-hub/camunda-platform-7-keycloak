@@ -23,7 +23,12 @@ public class KeycloakConfiguration {
 	 * Whether to use the email attribute as Camunda user ID. Activate this when not using SSO.
 	 */
 	protected boolean useEmailAsCamundaUserId = false;
-	
+
+	/**
+	 * Whether to use the name attribute as Camunda user ID. Set keycloak.principal-attribute=preferred_username*
+	 */
+	protected boolean useNameAsCamundaUserId = false;
+
 	/** The name of the administrator group.
 	 *
 	 * If this name is set to a non-null and non-empty value,
@@ -120,6 +125,22 @@ public class KeycloakConfiguration {
 	public void setUseEmailAsCamundaUserId(boolean useEmailAsCamundaUserId) {
 		this.useEmailAsCamundaUserId = useEmailAsCamundaUserId;
 	}
+
+
+	/**
+	 * @return the useNameAsCamundaUserId
+	 */
+	public boolean isUseNameAsCamundaUserId() {
+		return useNameAsCamundaUserId;
+	}
+
+	/**
+	 * @param useNameAsCamundaUserId the useNameAsCamundaUserId to set
+	 */
+	public void setUseNameAsCamundaUserId(boolean useNameAsCamundaUserId) {
+		this.useNameAsCamundaUserId = useNameAsCamundaUserId;
+	}
+
 
 	/**
 	 * @return the administratorGroupName
