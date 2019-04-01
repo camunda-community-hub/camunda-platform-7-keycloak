@@ -167,7 +167,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 						StringUtils.isEmpty(getStringValue(keycloakUser, "email"))) {
 					continue;
 				}
-				if (keycloakConfiguration.isUseNameAsCamundaUserId() &&
+				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
 						StringUtils.isEmpty(getStringValue(keycloakUser, "username"))) {
 					continue;
 				}
@@ -254,7 +254,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 						StringUtils.isEmpty(getStringValue(keycloakUser, "email"))) {
 					continue;
 				}
-				if (keycloakConfiguration.isUseNameAsCamundaUserId() &&
+				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
 						StringUtils.isEmpty(getStringValue(keycloakUser, "username"))) {
 					continue;
 				}
@@ -352,10 +352,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	protected ResponseEntity<String> requestUserById(String userId) throws RestClientException {
 		try {
 			String userSearch;
-
 			if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 				userSearch="/users?email=" + userId;
-			} else if (keycloakConfiguration.isUseNameAsCamundaUserId()) {
+			} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
 				userSearch="/users?username=" + userId;
 			} else {
 				userSearch= "/users/" + userId;
@@ -364,7 +363,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-			String result = (keycloakConfiguration.isUseEmailAsCamundaUserId() || keycloakConfiguration.isUseNameAsCamundaUserId())
+			String result = (keycloakConfiguration.isUseEmailAsCamundaUserId() || keycloakConfiguration.isUseUsernameAsCamundaUserId())
 					? response.getBody()
 					: "[" + response.getBody() + "]";
 			return new ResponseEntity<String>(result, response.getHeaders(), response.getStatusCode());
@@ -378,23 +377,25 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	protected String getKeycloakUserID(String userId) throws KeycloakUserNotFoundException, RestClientException {
-
-
-		String searchString;
-		if(keycloakConfiguration.isUseEmailAsCamundaUserId())
-			searchString="email";
-		else if(keycloakConfiguration.isUseNameAsCamundaUserId())
-			searchString="username";
-		else
+		String userSearch;
+		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
+			userSearch="/users?email=" + userId;
+		} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
+			userSearch="/users?username=" + userId;
+		} else {
 			return userId;
-
+		}
+		
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/users?"+searchString+"=" + userId, HttpMethod.GET,
+					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
 			return new JSONArray(response.getBody()).getJSONObject(0).getString("id");
 		} catch (JSONException je) {
-			throw new KeycloakUserNotFoundException(userId + " not found - "+searchString+" unknown", je);
+			throw new KeycloakUserNotFoundException(userId + 
+					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
+					? " not found - email unknown" 
+					: " not found - username unknown"), je);
 		}
 	}
 
@@ -457,14 +458,14 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		UserEntity user = new UserEntity();
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 			user.setId(getStringValue(result, "email"));
-		} else if (keycloakConfiguration.isUseNameAsCamundaUserId()) {
+		} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
 			user.setId(getStringValue(result, "username"));
 		} else {
 			user.setId(result.getString("id"));
 		}
 		user.setFirstName(getStringValue(result, "firstName"));
 		user.setLastName(getStringValue(result, "lastName"));
-		if (StringUtils.isEmpty(user.getFirstName())) {
+		if (StringUtils.isEmpty(user.getFirstName()) && StringUtils.isEmpty(user.getLastName())) {
 			user.setFirstName(getStringValue(result, "username"));
 		}
 		user.setEmail(getStringValue(result, "email"));
@@ -584,6 +585,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	protected String getKeycloakUsername(String userId) throws KeycloakUserNotFoundException, RestClientException {
+		if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
+			return userId;
+		}
 		try {
 			if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 				ResponseEntity<String> response = restTemplate.exchange(

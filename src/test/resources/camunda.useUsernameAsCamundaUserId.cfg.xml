@@ -38,7 +38,7 @@
     <property name="clientSecret" value="%clientSecret%" />
 
     <property name="disableSSLCertificateValidation" value="true" />
-    <property name="useEmailAsCamundaUserId" value="false" />
+    <property name="useUsernameAsCamundaUserId" value="true" />
   </bean>
 
 </beans>

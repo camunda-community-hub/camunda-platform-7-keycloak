@@ -25,9 +25,9 @@ public class KeycloakConfiguration {
 	protected boolean useEmailAsCamundaUserId = false;
 
 	/**
-	 * Whether to use the name attribute as Camunda user ID. Set keycloak.principal-attribute=preferred_username*
+	 * Whether to use the username attribute as Camunda user ID. Set keycloak.principal-attribute=preferred_username*
 	 */
-	protected boolean useNameAsCamundaUserId = false;
+	protected boolean useUsernameAsCamundaUserId = false;
 
 	/** The name of the administrator group.
 	 *
@@ -126,19 +126,18 @@ public class KeycloakConfiguration {
 		this.useEmailAsCamundaUserId = useEmailAsCamundaUserId;
 	}
 
-
 	/**
-	 * @return the useNameAsCamundaUserId
+	 * @return the useUsernameAsCamundaUserId
 	 */
-	public boolean isUseNameAsCamundaUserId() {
-		return useNameAsCamundaUserId;
+	public boolean isUseUsernameAsCamundaUserId() {
+		return useUsernameAsCamundaUserId;
 	}
 
 	/**
-	 * @param useNameAsCamundaUserId the useNameAsCamundaUserId to set
+	 * @param useUsernameAsCamundaUserId the useUsernameAsCamundaUserId to set
 	 */
-	public void setUseNameAsCamundaUserId(boolean useNameAsCamundaUserId) {
-		this.useNameAsCamundaUserId = useNameAsCamundaUserId;
+	public void setUseUsernameAsCamundaUserId(boolean useUsernameAsCamundaUserId) {
+		this.useUsernameAsCamundaUserId = useUsernameAsCamundaUserId;
 	}
 
 

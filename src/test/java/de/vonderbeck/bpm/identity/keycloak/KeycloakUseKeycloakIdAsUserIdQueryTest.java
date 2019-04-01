@@ -12,12 +12,12 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 /**
  * User query test for the Keycloak identity provider.
  */
-public class KeycloakDontUseEmailAsUserIdQueryTest extends KeycloakIdentityProviderTest {
+public class KeycloakUseKeycloakIdAsUserIdQueryTest extends KeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {
 		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.dontUseEmailAsCamundaUserId.cfg.xml");
+				.createProcessEngineConfigurationFromResource("camunda.useKeycloakIdAsCamundaUserId.cfg.xml");
 		config.getProcessEnginePlugins().forEach(p -> {
 			if (p instanceof KeycloakIdentityProviderPlugin) {
 				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
