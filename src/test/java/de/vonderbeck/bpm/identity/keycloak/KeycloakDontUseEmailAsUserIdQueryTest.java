@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin;
 
 /**
- * User query test for the Auth0 identity provider.
+ * User query test for the Keycloak identity provider.
  */
 public class KeycloakDontUseEmailAsUserIdQueryTest extends KeycloakIdentityProviderTest {
 

@@ -376,6 +376,55 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	/**
+	 * Get the user ID of the configured admin user. Enable configuration using username / email as well,
+	 * even if it is described differently in the documentation. Prevents common configuration pitfalls.
+	 * 
+	 * @param configuredAdminUserId the originally configured admin user ID
+	 * @return the corresponding keycloak user ID to use: either internal keycloak ID or email, depending on config
+	 */
+	public String getKeycloakAdminUserId(String configuredAdminUserId) {
+		try {
+			// check whether configured admin user ID can be resolved as a real keycloak user ID
+			try {
+				ResponseEntity<String> response = restTemplate.exchange(
+						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + configuredAdminUserId, HttpMethod.GET,
+						keycloakContextProvider.createApiRequestEntity(), String.class);
+				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
+					return new JSONObject(response.getBody()).getString("email");
+				}
+				return new JSONObject(response.getBody()).getString("id");
+			} catch (RestClientException | JSONException ex) {
+				// user ID not found: fall through
+			}
+			// check whether configured admin user ID can be resolved as email address
+			if (keycloakConfiguration.isUseEmailAsCamundaUserId() && configuredAdminUserId.contains("@")) {
+				try {
+					getKeycloakUserID(configuredAdminUserId);
+					return configuredAdminUserId;
+				} catch (KeycloakUserNotFoundException e) {
+					// email not found: fall through
+				}
+			}
+			// check whether configured admin user ID can be resolved as username
+			try {
+				ResponseEntity<String> response = restTemplate.exchange(
+						keycloakConfiguration.getKeycloakAdminUrl() + "/users?username=" + configuredAdminUserId, HttpMethod.GET,
+						keycloakContextProvider.createApiRequestEntity(), String.class);
+				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
+					return new JSONArray(response.getBody()).getJSONObject(0).getString("email");
+				}
+				return new JSONArray(response.getBody()).getJSONObject(0).getString("id");
+			} catch (JSONException je) {
+				// username not found: fall through
+			}
+			// keycloak admin user does not exist :-(
+			throw new IdentityProviderException("Configured administratorUserId " + configuredAdminUserId + " does not exist.");
+		} catch (RestClientException rce) {
+			throw new IdentityProviderException("Unable to read data of configured administratorUserId " + configuredAdminUserId, rce);
+		}
+	}
+	
+	/**
 	 * Maps a Keycloak JSON result to a User object
 	 * @param result the Keycloak JSON result
 	 * @return the User object

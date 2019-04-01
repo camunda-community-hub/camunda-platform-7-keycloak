@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import de.vonderbeck.bpm.identity.keycloak.KeycloakConfiguration;
 import de.vonderbeck.bpm.identity.keycloak.KeycloakIdentityProviderFactory;
+import de.vonderbeck.bpm.identity.keycloak.KeycloakIdentityProviderSession;
 import de.vonderbeck.bpm.identity.keycloak.util.KeycloakPluginLogger;
 
 /**
@@ -33,6 +34,8 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 	private final static KeycloakPluginLogger LOG = KeycloakPluginLogger.INSTANCE;
 	
 	private boolean authorizationEnabled;
+	
+	private KeycloakIdentityProviderFactory keycloakIdentityProviderFactory = null;
 
 	/**
 	 * {@inheritDoc}
@@ -53,10 +56,10 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			if (processEngineConfiguration.getAdminUsers() == null) {
 				processEngineConfiguration.setAdminUsers(new ArrayList<String>());
 			}
-			processEngineConfiguration.getAdminUsers().add(administratorUserId);
+			// add the configured administrator to the engine configuration later: potentially needs translation to user ID
 		}
 
-		KeycloakIdentityProviderFactory keycloakIdentityProviderFactory = new KeycloakIdentityProviderFactory(this);
+		keycloakIdentityProviderFactory = new KeycloakIdentityProviderFactory(this);
 		processEngineConfiguration.setIdentityProviderSessionFactory(keycloakIdentityProviderFactory);
 
 		LOG.pluginActivated(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName());
@@ -82,6 +85,14 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			Group administratorGroup = processEngine.getIdentityService().createGroupQuery().groupName(administratorGroupName).singleResult();
 			administratorGroupId = administratorGroup != null ? administratorGroup.getId() : administratorGroupName;
 			((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAdminGroups().add(administratorGroupId);
+		}
+		
+		// always add the configured administrator user to the engine configuration
+		if (!StringUtils.isEmpty(administratorUserId)) {
+			// query the real user ID
+			administratorUserId = ((KeycloakIdentityProviderSession) keycloakIdentityProviderFactory.openSession()).
+					getKeycloakAdminUserId(administratorUserId);
+			((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAdminUsers().add(administratorUserId);
 		}
 		
 		// need to prepare administrator authorizations only in case authorization has been enabled in the configuration 
