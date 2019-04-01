@@ -83,7 +83,7 @@ Configuration in `application.yaml` will then look as follows:
 	  useEmailAsCamundaUserId: true
 	  administratorGroupName: camunda-admin
 
-Hint: the engine must **not** create a user upon startup. Hence you must not configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup, the `admin-user` part must be deleted in order to work properly. 
+Hint: the engine must **not** create a user upon startup. Hence you must not configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
 
 	camunda.bpm:
 	  admin-user:
@@ -91,7 +91,7 @@ Hint: the engine must **not** create a user upon startup. Hence you must not con
 	    password: demo
 	    firstName: Camunda
 
-The recommended procedure for creating the admin user and admin group in Keycloak is to have the deployment pipeline do this during the environment setup phase.
+The `admin-user` part must be deleted in order to work properly. The recommended procedure for creating the admin user and admin group in Keycloak is to have the deployment pipeline do this during the environment setup phase.
     
 A complete list of configuration options can be found below:
 
