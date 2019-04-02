@@ -11,6 +11,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 
 /**
  * User query test for the Keycloak identity provider.
+ * Flag useUsernameAsCamundaUserId enabled.
  */
 public class KeycloakUseUsernameAsUserIdQueryTest extends KeycloakIdentityProviderTest {
 
@@ -49,11 +50,6 @@ public class KeycloakUseUsernameAsUserIdQueryTest extends KeycloakIdentityProvid
 		User user = identityService.createUserQuery().userId("hans.mustermann").singleResult();
 		assertNotNull(user);
 
-		identityService.createUserQuery().userId("camunda").list().forEach(u -> System.err.println(u.getId()));
-		// ERROR!! result = 2 entries: 
-		// - camunda
-		// - service-account-camunda-identity-service !!
-		
 		user = identityService.createUserQuery().userId("camunda").singleResult();
 		assertNotNull(user);
 

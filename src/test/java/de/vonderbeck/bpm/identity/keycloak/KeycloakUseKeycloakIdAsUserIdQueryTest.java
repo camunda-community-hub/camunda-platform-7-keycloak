@@ -11,6 +11,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 
 /**
  * User query test for the Keycloak identity provider.
+ * Flags useEmailAsCamundaUserId and useUsernameAsCamundaUserId disabled.
  */
 public class KeycloakUseKeycloakIdAsUserIdQueryTest extends KeycloakIdentityProviderTest {
 

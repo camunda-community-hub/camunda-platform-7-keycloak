@@ -263,6 +263,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 				// client side check of further query filters
 				if (idSearch) {
+					// result of ID search with username potentially includes virtual service-account users, 
+					// seems to be more a search with 'like' :-(
+					if (keycloakConfiguration.isUseUsernameAsCamundaUserId() && (!matches(query.getId(), user.getId()))) continue;
+
 					if (!matches(query.getEmail(), user.getEmail())) continue;
 					if (!matches(query.getFirstName(), user.getFirstName())) continue;
 					if (!matches(query.getLastName(), user.getLastName())) continue;
