@@ -404,11 +404,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	/**
-	 * Get the user ID of the configured admin user. Enable configuration using username / email as well,
-	 * even if it is described differently in the documentation. Prevents common configuration pitfalls.
+	 * Get the user ID of the configured admin user. Enable configuration using username / email as well.
+	 * This prevents common configuration pitfalls and makes it consistent to other configuration options
+	 * like the flags 'useUsernameAsCamundaUserId' and 'useEmailAsCamundaUserId'.
 	 * 
 	 * @param configuredAdminUserId the originally configured admin user ID
-	 * @return the corresponding keycloak user ID to use: either internal keycloak ID or email, depending on config
+	 * @return the corresponding keycloak user ID to use: either internal keycloak ID, username or email, depending on config
 	 */
 	public String getKeycloakAdminUserId(String configuredAdminUserId) {
 		try {

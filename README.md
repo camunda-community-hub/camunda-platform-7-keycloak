@@ -20,7 +20,7 @@ Features:
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
 
-Current version: `0.5.0-SNAPSHOT`<br >
+Current version: `0.6.0-SNAPSHOT`<br >
 Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.3-ee`
 
 Known limitations:
@@ -51,7 +51,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>de.vonderbeck.bpm.identity</groupId>
 			<artifactId>camunda-identity-keycloak</artifactId>
-			<version>0.5.0-SNAPSHOT</version>
+			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
 
 
