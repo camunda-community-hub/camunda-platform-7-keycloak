@@ -13,7 +13,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
  * User query test for the Keycloak identity provider.
  * Flag useUsernameAsCamundaUserId enabled.
  */
-public class KeycloakUseUsernameAsUserIdQueryTest extends KeycloakIdentityProviderTest {
+public class KeycloakUseUsernameAsUserIdQueryTest extends AbstractKeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {

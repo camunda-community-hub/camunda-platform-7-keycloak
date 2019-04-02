@@ -16,7 +16,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
  * Admin user configuration test for the Keycloak identity provider.
  * Use Keycloak internal ID as administratorUserId and flag useEmailAsCamundaUserId enabled.
  */
-public class KeycloakConfigureAdminUserIdAndUseMailAsIdTest extends KeycloakIdentityProviderTest {
+public class KeycloakConfigureAdminUserIdAndUseMailAsIdTest extends AbstractKeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {

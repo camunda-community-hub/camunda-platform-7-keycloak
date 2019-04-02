@@ -16,7 +16,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 /**
  * Admin group configuration test for the Keycloak identity provider.
  */
-public class KeycloakConfigureAdminGroupTest extends KeycloakIdentityProviderTest {
+public class KeycloakConfigureAdminGroupTest extends AbstractKeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {

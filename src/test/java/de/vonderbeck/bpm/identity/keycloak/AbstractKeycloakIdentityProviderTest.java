@@ -38,7 +38,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 /**
  * Super class for all Identity Provider Tests.
  */
-public abstract class KeycloakIdentityProviderTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProcessEngineTestCase {
 
 	// TODO: read this from properties file
 	private static final String KEYCLOAK_URL = "https://localhost:9001/auth";

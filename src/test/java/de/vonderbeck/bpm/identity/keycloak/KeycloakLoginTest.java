@@ -3,7 +3,7 @@ package de.vonderbeck.bpm.identity.keycloak;
 /**
  * Keycloak login test.
  */
-public class KeycloakLoginTest extends KeycloakIdentityProviderTest {
+public class KeycloakLoginTest extends AbstractKeycloakIdentityProviderTest {
   
 	public void testKeycloakLoginSuccess() {
 		assertTrue(identityService.checkPassword("camunda@accso.de", "camunda1!"));

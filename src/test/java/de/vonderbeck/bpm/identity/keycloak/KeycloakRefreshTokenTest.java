@@ -7,7 +7,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 /**
  * Refresh access token test.
  */
-public class KeycloakRefreshTokenTest extends KeycloakIdentityProviderTest {
+public class KeycloakRefreshTokenTest extends AbstractKeycloakIdentityProviderTest {
 
 	/**
 	 * Tests refreshing access token.

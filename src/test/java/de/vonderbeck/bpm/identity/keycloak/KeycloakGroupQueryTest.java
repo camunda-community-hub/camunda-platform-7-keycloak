@@ -12,7 +12,7 @@ import org.camunda.bpm.engine.identity.Group;
 /**
  * Tests group queries.
  */
-public class KeycloakGroupQueryTest extends KeycloakIdentityProviderTest {
+public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest {
 
 	public void testQueryNoFilter() {
 		List<Group> groupList = identityService.createGroupQuery().list();

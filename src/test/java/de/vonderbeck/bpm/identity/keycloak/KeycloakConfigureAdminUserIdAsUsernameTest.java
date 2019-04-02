@@ -16,7 +16,7 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
  * Admin user configuration test for the Keycloak identity provider.
  * Use username as administratorUserId.
  */
-public class KeycloakConfigureAdminUserIdAsUsernameTest extends KeycloakIdentityProviderTest {
+public class KeycloakConfigureAdminUserIdAsUsernameTest extends AbstractKeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {

@@ -13,7 +13,7 @@ import org.camunda.bpm.engine.identity.User;
 /**
  * User query test for the Keycloak identity provider.
  */
-public class KeycloakUserQueryTest extends KeycloakIdentityProviderTest {
+public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest {
 
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
