@@ -14,19 +14,17 @@ import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin
 
 /**
  * Admin user configuration test for the Keycloak identity provider.
- * Use Keycloak internal ID as administratorUserId and flag useEmailAsCamundaUserId enabled.
+ * Use username as administratorUserId and flag useEmailAsCamundaUserId enabled.
  */
-public class KeycloakConfigureAdminUserIdAndUseMailAsIdTest extends KeycloakIdentityProviderTest {
+public class KeycloakConfigureAdminUserIdAsUsernameAndUseUsernameAsIdTest extends KeycloakIdentityProviderTest {
 
 	@Override
 	protected void initializeProcessEngine() {
 		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserIdAndUseMailAsId.cfg.xml");
+				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserIdAsUsernameAndUseUsernameAsId.cfg.xml");
 		config.getProcessEnginePlugins().forEach(p -> {
 			if (p instanceof KeycloakIdentityProviderPlugin) {
-				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
-				kcp.setClientSecret(CLIENT_SECRET);
-				kcp.setAdministratorUserId(USER_ID_CAMUNDA_ADMIN);
+				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
 			}
 		});
 		processEngine = config.buildProcessEngine();
@@ -58,7 +56,7 @@ public class KeycloakConfigureAdminUserIdAndUseMailAsIdTest extends KeycloakIden
 		List<String> camundaAdminUsers = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAdminUsers();
 		assertEquals(1, camundaAdminUsers.size());
 		String adminUserId = camundaAdminUsers.get(0);
-		assertEquals("camunda@accso.de", adminUserId);
+		assertEquals("camunda", adminUserId);
 		
 		// check that authorizations have been created
 		assertTrue(processEngine.getAuthorizationService().createAuthorizationQuery()
@@ -75,7 +73,7 @@ public class KeycloakConfigureAdminUserIdAndUseMailAsIdTest extends KeycloakIden
 		// query user data
 		User user = processEngine.getIdentityService().createUserQuery().userId(adminUserId).singleResult();
 		assertNotNull(user);
-		assertEquals("camunda@accso.de", user.getId());
+		assertEquals("camunda", user.getId());
 		assertEquals("camunda@accso.de", user.getEmail());
 		
 		// query groups

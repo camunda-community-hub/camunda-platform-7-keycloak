@@ -420,6 +420,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 					return new JSONObject(response.getBody()).getString("email");
 				}
+				if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
+					return new JSONObject(response.getBody()).getString("username");
+				}
 				return new JSONObject(response.getBody()).getString("id");
 			} catch (RestClientException | JSONException ex) {
 				// user ID not found: fall through
@@ -440,6 +443,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 					return new JSONArray(response.getBody()).getJSONObject(0).getString("email");
+				}
+				if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
+					return new JSONArray(response.getBody()).getJSONObject(0).getString("username");
 				}
 				return new JSONArray(response.getBody()).getJSONObject(0).getString("id");
 			} catch (JSONException je) {
