@@ -230,6 +230,12 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 Keep in mind that Keycloak's `ID` is definitely unique which might not always be the case for the `email` attribute, depending on your setup.
 Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
 
+In case you have activated the flag `useUsernameAsCamundaUserId` the extraction in Authentication provider must be changed in a similar way and can be implemented as follows:
+
+	// Extract username from Keycloak authentication result - which is part of the requested user info
+	@SuppressWarnings("unchecked")
+	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username");
+
 ## Unit testing the plugin
 
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
