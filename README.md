@@ -76,8 +76,8 @@ Configuration in `application.yaml` will then look as follows:
 	    enabled: true
 	
 	plugin.identity.keycloak:
-	  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]
-	  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/[master|<realm-name>]
+	  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/<realm-name>
+	  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/<realm-name>
 	  clientId: camunda-identity-service
 	  clientSecret: 42aa42bb-1234-4242-a24a-42a2b420cde0
 	  useEmailAsCamundaUserId: true
@@ -215,11 +215,11 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 	    client:
 	      client-id: camunda-identity-service
 	      client-secret: yyy2121abc21def2121ghi212132121abc21def2121ghi2121eyyy
-	      accessTokenUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/token
-	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/auth
+	      accessTokenUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/token
+	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/auth
 	      scope: openid profile email
 	    resource:
-	      userInfoUri: https://<your-keycloak-server>/auth/realms/[master|<realm-name>]/protocol/openid-connect/userinfo
+	      userInfoUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/userinfo
 
 **Beware**: SSO will only work that way in case you have the KeycloakIdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
 
