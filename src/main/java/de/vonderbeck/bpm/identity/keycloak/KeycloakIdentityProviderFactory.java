@@ -3,11 +3,13 @@ package de.vonderbeck.bpm.identity.keycloak;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -48,8 +50,9 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 				SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
 				        .loadTrustMaterial(null, acceptingTrustStrategy)
 				        .build();
+				HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
 				Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-				        .<ConnectionSocketFactory> create().register("https", new SSLConnectionSocketFactory(sslContext))
+				        .<ConnectionSocketFactory> create().register("https", new SSLConnectionSocketFactory(sslContext, allowAllHosts))
 				        .build();
 				final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
 				connectionManager.setMaxTotal(keycloakConfiguration.getMaxHttpConnections());
