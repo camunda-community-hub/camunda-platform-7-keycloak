@@ -148,6 +148,8 @@ Insert a KeycloakAuthenticationProvider as follows:
 	        // Extract user ID from Keycloak authentication result - which is part of the requested user info
 	        @SuppressWarnings("unchecked")
 	        String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("sub");
+	        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email"); // useEmailAsCamundaUserId = true
+	        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username"); // useUsernameAsCamundaUserId = true
 	        if (StringUtils.isEmpty(userId)) {
 	            return AuthenticationResult.unsuccessful();
 	        }
@@ -181,7 +183,7 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 	    @Override
 	    protected void configure(HttpSecurity http) throws Exception {
 	    	http
-	    	.csrf().ignoringRequestMatchers(request -> request.getRequestURI().startsWith("/api"))
+	    	.csrf().ignoringAntMatchers("/api/**")
 	    	.and()
 	        .antMatcher("/**")
 	        .authorizeRequests()
@@ -235,6 +237,10 @@ In case you have activated the flag `useUsernameAsCamundaUserId` the extraction 
 	// Extract username from Keycloak authentication result - which is part of the requested user info
 	@SuppressWarnings("unchecked")
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username");
+
+## Sample Project
+
+A sample project using this plugin can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/VonDerBeck/camunda-showcase-keycloak).
 
 ## Unit testing the plugin
 
