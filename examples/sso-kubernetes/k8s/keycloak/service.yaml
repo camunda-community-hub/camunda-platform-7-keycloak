@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: keycloak-server-service
+   labels:
+      app: keycloak-server
+spec:
+   type: ClusterIP
+   ports: 
+   - port: 8080
+     name: http
+     targetPort: 8080
+   - port: 8443
+     name: https
+     targetPort: 8443
+   selector:
+      app: keycloak-server

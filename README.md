@@ -20,8 +20,8 @@ Features:
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
 
-Current version: `0.6.1-SNAPSHOT`<br >
-Tested with: Keycloak `4.8.3.Final`, Camunda `7.10.0` and Camunda `7.10.3-ee`
+Current version: `1.0.0-SNAPSHOT`<br >
+Tested with: Keycloak `4.8.3.Final`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 Known limitations:
 
@@ -49,9 +49,9 @@ Known limitations:
 Maven Dependencies:
 
 		<dependency>
-			<groupId>de.vonderbeck.bpm.identity</groupId>
-			<artifactId>camunda-identity-keycloak</artifactId>
-			<version>0.6.1-SNAPSHOT</version>
+			<groupId>org.camunda.bpm.extension</groupId>
+			<artifactId>camunda-bpm-identity-keycloak</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
 
@@ -61,7 +61,7 @@ Add the following class to your Camunda Spring Boot application in order to acti
 	
 	import org.springframework.boot.context.properties.ConfigurationProperties;
 	import org.springframework.stereotype.Component;
-	import de.vonderbeck.bpm.identity.keycloak.plugin.KeycloakIdentityProviderPlugin;
+	import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
 	
 	@Component
 	@ConfigurationProperties(prefix="plugin.identity.keycloak")
@@ -83,7 +83,7 @@ Configuration in `application.yaml` will then look as follows:
 	  useEmailAsCamundaUserId: true
 	  administratorGroupName: camunda-admin
 
-Hint: the engine must **not** create a user upon startup. Hence you must not configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
+Hint: the engine must **not** create a user upon startup. Hence you must **not** configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
 
 	camunda.bpm:
 	  admin-user:
@@ -200,7 +200,7 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 	
 	        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
 	        filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
-	        filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "de.accso.camunda.showcase.sso.KeycloakAuthenticationProvider"));
+	        filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "<your-package>.sso.KeycloakAuthenticationProvider"));
 	        filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
 	        filterRegistration.addUrlPatterns("/app/*");
 	        return filterRegistration;
@@ -211,8 +211,6 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 Finally configure Spring Security with your Keycloak Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
 
 	security:
-	  basic:
-	    enabled: false
 	  oauth2:
 	    client:
 	      client-id: camunda-identity-service
@@ -238,9 +236,9 @@ In case you have activated the flag `useUsernameAsCamundaUserId` the extraction 
 	@SuppressWarnings("unchecked")
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username");
 
-## Sample Project
+## Sample Project with SSO on Kubernetes
 
-A sample project using this plugin can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/VonDerBeck/camunda-showcase-keycloak).
+A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/examples/sso-kubernetes). See directory `examples`.
 
 ## Unit testing the plugin
 
@@ -258,9 +256,19 @@ In order to run the unit tests I have used a local docker setup of Keycloak with
 	      KEYCLOAK_USER: keycloak
 	      KEYCLOAK_PASSWORD: keycloak1!
 	    ports:
-	      - "9001:8443"
+	      - "8443:8443"
 
 For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
+
+### Maven test setup
+
+Running unit tests from Maven requires configuring the details of a running Keycloak server. This can be achieved by setting the following environment variables:
+
+| *Environment Variable* | *Description* |
+| --- | --- |
+| `KEYCLOAK_URL` | Keycloak server URL.<br />Default value: `https://localhost:8443/auth` |
+| `KEYCLOAK_ADMIN_USER` | The admin user of the Keycloak server.<br />Default value: `keycloak` |
+| `KEYCLOAK_ADMIN_PASSWORD` | The admin password of the Keycloak server.<br />Default value: `keycloak1!` |
 
 ------------------------------------------------------------
 

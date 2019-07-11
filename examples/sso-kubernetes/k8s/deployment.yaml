@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: keycloak-showcase-deployment
+spec:
+   replicas: 3
+   selector:
+      matchLabels:
+         app: keycloak-showcase
+   minReadySeconds: 10
+   strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxUnavailable: 1
+         maxSurge: 1
+   template:
+      metadata:
+         labels:
+            app: keycloak-showcase
+      spec:
+         containers:
+         - name: keycloak-showcase
+           image: gunnaraccso/camunda-showcase-keycloak
+           ports:
+           - containerPort: 8080
+           env:
+           - name: JDBC_URL
+             value: jdbc:postgresql://postgres-service:5432/camunda
+           - name: JDBC_USER
+             value: camunda
+           - name: JDBC_PASSWORD
+             value: camunda1!
+           - name: KEYCLOAK_URL_CLIENT
+             value: http://armstrong02
+           - name: KEYCLOAK_URL_TOKEN
+             value: http://keycloak-server-service:8080
+           - name: KEYCLOAK_URL_PLUGIN
+             value: https://keycloak-server-service:8443
+             

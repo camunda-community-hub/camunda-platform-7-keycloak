@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: postgres-deployment
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: postgres
+   minReadySeconds: 60
+   template:
+      metadata:
+         labels:
+            app: postgres
+      spec:
+         containers:
+         - name: postgres
+           image: postgres:11.4-alpine
+           ports:
+           - containerPort: 5432
+           env:
+           - name: POSTGRES_DB
+             value: camunda
+           - name: POSTGRES_USER
+             value: camunda
+           - name: POSTGRES_PASSWORD
+             value: camunda1!
+           - name: POSTGRES_ROLE
+             value: camunda
+             

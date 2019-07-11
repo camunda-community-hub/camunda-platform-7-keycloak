@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: keycloak-showcase-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "300"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
+
+spec:
+  rules:
+  - host: armstrong02
+    http:
+      paths:
+        - path: /camunda
+          backend:
+            serviceName: keycloak-showcase-service
+            servicePort: 8080
+        - path: /auth
+          backend:
+            serviceName: keycloak-server-service
+            servicePort: 8080
+            

@@ -44,7 +44,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	// Keycloak configuration
 	// - in your maven build set as environment variables in order to override defaults
 	// - if not available defaults will be taken from keycloak-default.properties
-	private static final String KEYCLOAK_URL; // expected "https://<myhost:myport>/auth
+	private static final String KEYCLOAK_URL; // expected format "https://<myhost:myport>/auth
 	private static final String KEYCLOAK_ADMIN_USER;
 	private static final String KEYCLOAK_ADMIN_PASSWORD;
 
@@ -69,11 +69,10 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	// creates Keycloak setup only once per test run
 	static {
 		// read keycloak configuration
-		ResourceBundle config = ResourceBundle.getBundle("keycloak-config");
 		ResourceBundle defaults = ResourceBundle.getBundle("keycloak-default");
-		KEYCLOAK_URL = getConfigValue(config, defaults, "keycloak.url");
-		KEYCLOAK_ADMIN_USER = getConfigValue(config, defaults, "keycloak.admin.user");
-		KEYCLOAK_ADMIN_PASSWORD = getConfigValue(config, defaults, "keycloak.admin.password");
+		KEYCLOAK_URL = getConfigValue(defaults, "keycloak.url");
+		KEYCLOAK_ADMIN_USER = getConfigValue(defaults, "keycloak.admin.user");
+		KEYCLOAK_ADMIN_PASSWORD = getConfigValue(defaults, "keycloak.admin.password");
 		
 		// setup 
 		try {
@@ -94,26 +93,28 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	}
 
 	/**
-	 * Helper class for getting configuration values.
-	 * @param config the environment configuration from maven
+	 * Helper class for reading configuration values from environment variables and system properties.
+	 * 
 	 * @param defaults the default configuration
 	 * @param key the key
 	 * @return the value of the key - falls back to default in case environment variable hasn't been set
 	 */
-	private static String getConfigValue(ResourceBundle config, ResourceBundle defaults, String key) {
+	private static String getConfigValue(ResourceBundle defaults, String key) {
 		String val = null;
 		boolean useDefault = false;
-		try {
-			val = config.getString(key);
-			if (val.isEmpty() || val.startsWith("${")) {
+		String envVarName = key.toUpperCase().replace('.', '_');
+		// 1.) check for environment variable
+		val = System.getenv(envVarName);
+		if (StringUtils.isEmpty(val)) {
+			// 2.) check for system property
+			val = System.getProperty(envVarName);
+			if (StringUtils.isEmpty(val)) { 
+				// 3.) fall back to keycloak-default.properties
 				useDefault = true;
 				val = defaults.getString(key);
 			}
-		} catch (MissingResourceException e) {
-			useDefault = true;
-			val = defaults.getString(key);
 		}
-		LOG.info("Configuration {}: '{}' {}", key.toUpperCase().replace('.', '_'), val, 
+		LOG.info("Configuration {}: '{}' {}", envVarName, val, 
 				useDefault ? "[Environment variable not set - using default]" : "");
 		return val;
 	}

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: keycloak-server-deployment
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: keycloak-server
+   minReadySeconds: 60
+   strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxUnavailable: 1
+         maxSurge: 1
+   template:
+      metadata:
+         labels:
+            app: keycloak-server
+      spec:
+         containers:
+         - name: keycloak-server
+           image: gunnaraccso/keycloak.server:5.0.0 # jboss.keycloak
+           ports:
+           - containerPort: 8080
+             name: http
+           - containerPort: 8443
+             name: https
+           env:
+           - name:  PROXY_ADDRESS_FORWARDING
+             value: "true"
+           - name: TZ
+             value: Europe/Berlin
+           - name: KEYCLOAK_USER
+             value: keycloak
+           - name: KEYCLOAK_PASSWORD
+             value: keycloak1!
