@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.security.cert.X509Certificate;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
 
@@ -39,10 +41,12 @@ import org.springframework.web.client.RestTemplate;
  */
 public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProcessEngineTestCase {
 
-	// TODO: read this from properties file
-	private static final String KEYCLOAK_URL = "https://localhost:9001/auth";
-	private static final String KEYCLOAK_ADMIN_USER = "keycloak";
-	private static final String KEYCLOAK_ADMIN_PWD = "keycloak1!";
+	// Keycloak configuration
+	// - in your maven build set as environment variables in order to override defaults
+	// - if not available defaults will be taken from keycloak-default.properties
+	private static final String KEYCLOAK_URL; // expected "https://<myhost:myport>/auth
+	private static final String KEYCLOAK_ADMIN_USER;
+	private static final String KEYCLOAK_ADMIN_PASSWORD;
 
 	// ------------------------------------------------------------------------
 	
@@ -64,6 +68,14 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	
 	// creates Keycloak setup only once per test run
 	static {
+		// read keycloak configuration
+		ResourceBundle config = ResourceBundle.getBundle("keycloak-config");
+		ResourceBundle defaults = ResourceBundle.getBundle("keycloak-default");
+		KEYCLOAK_URL = getConfigValue(config, defaults, "keycloak.url");
+		KEYCLOAK_ADMIN_USER = getConfigValue(config, defaults, "keycloak.admin.user");
+		KEYCLOAK_ADMIN_PASSWORD = getConfigValue(config, defaults, "keycloak.admin.password");
+		
+		// setup 
 		try {
 			setupRestTemplate();
 			setupKeycloak();
@@ -79,6 +91,31 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 				}
 			}
 		});
+	}
+
+	/**
+	 * Helper class for getting configuration values.
+	 * @param config the environment configuration from maven
+	 * @param defaults the default configuration
+	 * @param key the key
+	 * @return the value of the key - falls back to default in case environment variable hasn't been set
+	 */
+	private static String getConfigValue(ResourceBundle config, ResourceBundle defaults, String key) {
+		String val = null;
+		boolean useDefault = false;
+		try {
+			val = config.getString(key);
+			if (val.isEmpty() || val.startsWith("${")) {
+				useDefault = true;
+				val = defaults.getString(key);
+			}
+		} catch (MissingResourceException e) {
+			useDefault = true;
+			val = defaults.getString(key);
+		}
+		LOG.info("Configuration {}: '{}' {}", key.toUpperCase().replace('.', '_'), val, 
+				useDefault ? "[Environment variable not set - using default]" : "");
+		return val;
 	}
 	
 	/**
@@ -208,7 +245,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString());
 	    HttpEntity<String> request = new HttpEntity<>(
 	    		"client_id=admin-cli"
-	    		+ "&username=" + KEYCLOAK_ADMIN_USER + "&password=" + KEYCLOAK_ADMIN_PWD
+	    		+ "&username=" + KEYCLOAK_ADMIN_USER + "&password=" + KEYCLOAK_ADMIN_PASSWORD
 	    		+ "&grant_type=password",
 				headers);
 	    ResponseEntity<String> response = restTemplate.postForEntity(KEYCLOAK_URL + "/realms/master/protocol/openid-connect/token", request, String.class);
