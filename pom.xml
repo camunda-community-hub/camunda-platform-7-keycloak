@@ -25,10 +25,10 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.10.0</version.camunda>
-	<version.camundaSpringBoot>3.2.0</version.camundaSpringBoot>
-	<version.springBoot>2.1.1.RELEASE</version.springBoot>
-	<version.springSecurityOauth2>2.1.2.RELEASE</version.springSecurityOauth2>
+	<version.camunda>7.11.0</version.camunda>
+	<version.camundaSpringBoot>3.3.1</version.camundaSpringBoot>
+	<version.springBoot>2.1.5.RELEASE</version.springBoot>
+	<version.springSecurityOauth2>2.1.5.RELEASE</version.springSecurityOauth2>
   </properties>
 
   <licenses>

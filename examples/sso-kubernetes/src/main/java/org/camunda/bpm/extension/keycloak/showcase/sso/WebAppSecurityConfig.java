@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.web.context.request.RequestContextListener;
 
 /**
  * Camunda Web application SSO configuration for usage with Auth0IdentityProviderPlugin.
@@ -46,5 +47,9 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
         filterRegistration.addUrlPatterns("/app/*");
         return filterRegistration;
     }
-    
+ 
+	@Bean
+	public RequestContextListener requestContextListener() {
+	    return new RequestContextListener();
+	}
 }

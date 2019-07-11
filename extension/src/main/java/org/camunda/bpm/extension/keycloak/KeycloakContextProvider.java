@@ -1,8 +1,8 @@
 package org.camunda.bpm.extension.keycloak;
 
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
-import org.camunda.bpm.engine.impl.util.json.JSONException;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JSONException;
+import org.camunda.bpm.extension.keycloak.json.JSONObject;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpEntity;
