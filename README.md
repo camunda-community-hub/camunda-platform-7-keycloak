@@ -122,7 +122,7 @@ In order to setup Spring Boot's OAuth2 security add the following Maven dependen
 		<dependency>
 			<groupId>org.springframework.security.oauth.boot</groupId>
 			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
-			<version>2.1.2.RELEASE</version>
+			<version>2.1.5.RELEASE</version>
 		</dependency>
 
 Insert a KeycloakAuthenticationProvider as follows:
