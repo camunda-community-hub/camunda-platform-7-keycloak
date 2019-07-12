@@ -286,4 +286,3 @@ Brought to you by:
 ![Accso](doc/ACCSO-Logo.png "https://accso.de/")
 
 [Gunnar von der Beck](https://www.xing.com/profile/Gunnar_vonderBeck/portfolio "XING Profile"), [Accso - Accelerated Solutions GmbH](https://accso.de/ "https://accso.de/")
-
