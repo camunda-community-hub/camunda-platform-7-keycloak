@@ -206,6 +206,10 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 	        return filterRegistration;
 	    }
 	
+		@Bean
+		public RequestContextListener requestContextListener() {
+			return new RequestContextListener();
+		}
 	}
 	
 Finally configure Spring Security with your Keycloak Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
