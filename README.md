@@ -83,9 +83,10 @@ Configuration in `application.yaml` will then look as follows:
 	  useEmailAsCamundaUserId: true
 	  administratorGroupName: camunda-admin
 
-Hint: the engine must **not** create a user upon startup. Hence you must **not** configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
+Hint: the engine must **not** create a user upon startup - the plugin is a *ReadOnly*IdentityProvider. Hence you must **not** configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
 
 	camunda.bpm:
+      # DON'T DO THIS
 	  admin-user:
 	    id: demo
 	    password: demo
