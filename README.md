@@ -243,7 +243,7 @@ In case you have activated the flag `useUsernameAsCamundaUserId` the extraction 
 
 ## Sample Project with SSO on Kubernetes
 
-A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/examples/sso-kubernetes). See directory `examples`.
+A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/sso-kubernetes). See directory `examples`.
 
 ## Unit testing the plugin
 
