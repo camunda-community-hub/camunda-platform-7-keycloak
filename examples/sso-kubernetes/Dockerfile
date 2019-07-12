@@ -48,5 +48,5 @@ PATH="/opt/java/openjdk/bin:$PATH"
 
 # add spring boot application
 VOLUME /tmp
-COPY --from=MAVEN_TOOL_CHAIN /tmp/target/camunda-showcase-keycloak*.jar ./app.jar
+COPY --from=MAVEN_TOOL_CHAIN /tmp/target/camunda-bpm-identity-keycloak-examples-sso-kubernetes*.jar ./app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
