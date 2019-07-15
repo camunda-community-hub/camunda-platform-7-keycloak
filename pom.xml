@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
+    <version>3.7</version>
     <relativePath />
   </parent>
 
@@ -39,9 +39,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com:camunda/camunda-bpm-mail.git</connection>
-    <url>scm:git:git@github.com:camunda/camunda-bpm-mail.git</url>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-mail.git</developerConnection>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</connection>
+    <url>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</url>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
