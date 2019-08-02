@@ -24,8 +24,8 @@
 		<version.camunda>7.11.0</version.camunda>
 		<!-- <version.camunda>7.11.1-ee</version.camunda> -->
 		<version.camundaSpringBoot>3.3.1</version.camundaSpringBoot>
-		<version.springBoot>2.1.5.RELEASE</version.springBoot>
-		<version.springSecurityOauth2>2.1.5.RELEASE</version.springSecurityOauth2>
+		<version.springBoot>2.1.6.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.1.6.RELEASE</version.springSecurityOauth2>
 	</properties>
 
     <dependencyManagement>
@@ -79,10 +79,30 @@
 			<version>${version.springSecurityOauth2}</version>
 		</dependency>
 
+		<!-- Redis Session Cache -->
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
 		<!-- Keycloak Identity Prover Plugin  -->
 		<dependency>
 	        <groupId>org.camunda.bpm.extension</groupId>
 	        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+		</dependency>
+
+		<!-- Database -->
+		<dependency>
+		  <groupId>org.springframework.boot</groupId>
+		  <artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
 		</dependency>
 
 		<dependency>

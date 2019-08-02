@@ -36,4 +36,7 @@ spec:
              value: http://keycloak-server-service:8080
            - name: KEYCLOAK_URL_PLUGIN
              value: https://keycloak-server-service:8443
-             
+           - name: SESSION_STORE_TYPE
+             value: redis
+           - name: REDIS_HOST
+             value: redis-service             
