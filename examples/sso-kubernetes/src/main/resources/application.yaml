@@ -9,7 +9,7 @@ spring:
     application-path: engine-rest
   session:
     store-type: ${SESSION_STORE_TYPE:none}
-    redis:      flush-mode: immediate
+    redis.flush-mode: immediate
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
