@@ -20,7 +20,7 @@ public class KeycloakConfigureAdminUserIdAsUsernameTest extends AbstractKeycloak
 	@Override
 	protected void initializeProcessEngine() {
 		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserIdAsUserName.cfg.xml");
+				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserIdAsUsername.cfg.xml");
 		config.getProcessEnginePlugins().forEach(p -> {
 			if (p instanceof KeycloakIdentityProviderPlugin) {
 				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
