@@ -8,13 +8,9 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.web.context.request.RequestContextListener;
 
 /**
@@ -64,9 +60,11 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * @param redisConnectionFactory the Redis Connection Factoryf
 	 * @return Redis prepared TokenStore
 	 */
+	/* Redis Session Cache not yet in use
 	@Bean
 	@Primary
 	public TokenStore tokenStore(RedisConnectionFactory redisConnectionFactory) {
 	    return new RedisTokenStore(redisConnectionFactory);
 	}
+	*/
 }
