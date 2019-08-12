@@ -21,7 +21,7 @@ Features:
 *   Compatible with Spring Boot OAuth2 SSO
 
 Current version: `1.0.0-SNAPSHOT`<br >
-Tested with: Keycloak `4.8.3.Final`, Camunda >= `7.10.0`, `7.10.0-ee`
+Tested with: Keycloak >= `4.8.3.Final`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 Known limitations:
 
