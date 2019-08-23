@@ -339,19 +339,6 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return "";
 	}
 	
-	/**
-	 * Adds a single argument to search filter
-	 * @param filter the current filter
-	 * @param name the name of the attribute
-	 * @param value the value to search
-	 */
-	protected void addArgument(StringBuilder filter, String name, String value) {
-		if (filter.length() > 0) {
-			filter.append("&");
-		}
-		filter.append(name).append('=').append(value);
-	}
-	
 	protected ResponseEntity<String> requestUserById(String userId) throws RestClientException {
 		try {
 			String userSearch;
@@ -767,7 +754,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			if (!StringUtils.isEmpty(query.getId())) {
 				response = requestGroupById(query.getId());
 			} else {
-				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/groups", HttpMethod.GET,
+				String groupFilter = createGroupSearchFilter(query); // only pre-filter of names possible
+				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/groups" + groupFilter, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 			}
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
@@ -815,6 +803,28 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 		
 		return groupList;
+	}
+
+	/**
+	 * Creates an Keycloak group search filter query
+	 * @param query the group query
+	 * @return request query
+	 */
+	protected String createGroupSearchFilter(KeycloakGroupQuery query) {
+		StringBuilder filter = new StringBuilder();
+		if (!StringUtils.isEmpty(query.getName())) {
+			addArgument(filter, "search", query.getName());
+		}
+		if (!StringUtils.isEmpty(query.getNameLike())) {
+			addArgument(filter, "search", query.getNameLike().replaceAll("[%,\\*]", ""));
+		}
+		if (filter.length() > 0) {
+			filter.insert(0, "?");
+			String result = filter.toString();
+			KeycloakPluginLogger.INSTANCE.groupQueryFilter(result);
+			return result;
+		}
+		return "";
 	}
 
 	protected ResponseEntity<String> requestGroupById(String groupId) throws RestClientException {
@@ -966,6 +976,19 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		} catch (JSONException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Adds a single argument to search filter
+	 * @param filter the current filter
+	 * @param name the name of the attribute
+	 * @param value the value to search
+	 */
+	protected void addArgument(StringBuilder filter, String name, String value) {
+		if (filter.length() > 0) {
+			filter.append("&");
+		}
+		filter.append(name).append('=').append(value);
 	}
 
 	/**

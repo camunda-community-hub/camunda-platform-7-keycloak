@@ -48,6 +48,10 @@ public class KeycloakPluginLogger extends BaseLogger {
 		logDebug("021", "FIND user with query {}", filter);
 	}
 	
+	public void groupQueryFilter(String filter) {
+		logDebug("022", "FIND group with query {}", filter);
+	}
+
 	public void groupQueryResult(String summary) {
 		// log sensitive data only on FINE
 		logDebug("050", summary);

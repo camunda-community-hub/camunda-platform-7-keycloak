@@ -116,6 +116,15 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		group = identityService.createGroupQuery().groupNameLike("what*").singleResult();
 		assertNull(group);
 	}
+	
+	public void testFilterByGroupNameAndGroupNameLike() {
+		Group group = identityService.createGroupQuery().groupNameLike("ma*").groupName("manager").singleResult();
+		assertNotNull(group);
+
+		// validate result
+		assertEquals(GROUP_ID_MANAGER, group.getId());
+		assertEquals("manager", group.getName());
+	}
 
 	public void testFilterByGroupMember() {
 		List<Group> list = identityService.createGroupQuery().groupMember("camunda@accso.de").list();
