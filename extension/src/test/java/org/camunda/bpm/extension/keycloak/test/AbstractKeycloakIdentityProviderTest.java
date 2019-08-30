@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.security.cert.X509Certificate;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
@@ -57,11 +56,18 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	protected static String GROUP_ID_MANAGER;
 	protected static String GROUP_ID_ADMIN;
 	protected static String GROUP_ID_SYSTEM_READONLY;
-	
+
 	protected static String USER_ID_CAMUNDA_ADMIN;
 	protected static String USER_ID_TEAMLEAD;
 	protected static String USER_ID_MANAGER;
 
+	protected static String GROUP_ID_HIERARCHY_ROOT;
+	protected static String GROUP_ID_HIERARCHY_CHILD1;
+	protected static String GROUP_ID_HIERARCHY_CHILD2;
+	protected static String GROUP_ID_HIERARCHY_SUBCHILD1;
+
+	protected static String USER_ID_HIERARCHY;
+	
 	private static final RestTemplate restTemplate = new RestTemplate();
 	
 	protected static String CLIENT_SECRET = null;
@@ -188,7 +194,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		GROUP_ID_TEAMLEAD = createGroup(headers, realm, "teamlead", false);
 		GROUP_ID_MANAGER = createGroup(headers, realm, "manager", false);
 		GROUP_ID_SYSTEM_READONLY = createGroup(headers, realm, "cam-read-only", true);
-
+		
 		// Create Users
 		USER_ID_CAMUNDA_ADMIN = createUser(headers, realm, "camunda", "Admin", "Camunda", "camunda@accso.de", "camunda1!");
 		assignUserGroup(headers, realm, USER_ID_CAMUNDA_ADMIN, GROUP_ID_ADMIN);
@@ -199,6 +205,17 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		USER_ID_MANAGER = createUser(headers, realm, "gunnar.von-der-beck@accso.de", "Gunnar", "von der Beck", "gunnar.von-der-beck@accso.de", null);
 		assignUserGroup(headers, realm, USER_ID_MANAGER, GROUP_ID_MANAGER);
 		assignUserGroup(headers, realm, USER_ID_MANAGER, GROUP_ID_TEAMLEAD);
+
+		// Create additional group hierarchy
+		GROUP_ID_HIERARCHY_ROOT = createGroup(headers, realm, "root", false);
+		GROUP_ID_HIERARCHY_CHILD1 = createGroup(headers, realm, "child1", false, GROUP_ID_HIERARCHY_ROOT);
+		GROUP_ID_HIERARCHY_CHILD2 = createGroup(headers, realm, "child2", false, GROUP_ID_HIERARCHY_ROOT);
+		GROUP_ID_HIERARCHY_SUBCHILD1 = createGroup(headers, realm, "subchild1", false, GROUP_ID_HIERARCHY_CHILD1);
+
+		// Create user with access to parts of hierarchy
+		USER_ID_HIERARCHY = createUser(headers, realm, "johnfoo", "John", "Foo", "johnfoo@gmail.com", null);
+		assignUserGroup(headers, realm, USER_ID_HIERARCHY, GROUP_ID_HIERARCHY_CHILD2);
+		assignUserGroup(headers, realm, USER_ID_HIERARCHY, GROUP_ID_HIERARCHY_SUBCHILD1);
 	}
 	
 	/**
@@ -405,25 +422,51 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @throws JSONException in case of errors
 	 */
 	private static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup) throws JSONException {
+		// create group without parent
+		return createGroup(headers, realm, groupName, isSystemGroup, null);
+	}
+	
+	/**
+	 * Creates a child group
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param groupName the name of the group
+	 * @param isSystemGroup {@code true} in case of system groups, {@code false} for workflow groups
+	 * @param parentGroupId the group ID of the parent group
+	 * @return the group ID
+	 * @throws JSONException in case of errors
+	 */
+	private static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup, String parentGroupId) throws JSONException {
 		// create group
-	    String camundaAdmin = "{\"id\":null,\"name\":\"" + groupName + "\",\"path\":\"/" + groupName + "\",\"attributes\":{" + 
-	    		(isSystemGroup ? "\"type\":[\"SYSTEM\"]" : "") + 
+	    String camundaAdmin = "{\"id\":null,\"name\":\"" + groupName + "\",\"attributes\":{" + (isSystemGroup ? "\"type\":[\"SYSTEM\"]" : "") + 
 	    		"},\"realmRoles\":[],\"clientRoles\":{},\"subGroups\":[],\"access\":{\"view\":true,\"manage\":true,\"manageMembership\":true}}";
 	    HttpEntity<String> request = new HttpEntity<>(camundaAdmin, headers);
-	    ResponseEntity<String> response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups", request, String.class);
+	    ResponseEntity<String> response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups" + (parentGroupId != null ? "/" + parentGroupId + "/children" : ""), request, String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
 	    // get the group id
 	    response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups?search="+groupName, HttpMethod.GET, new HttpEntity<>(headers), String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	    JSONArray groups = new JSONArray(response.getBody());
+	    JSONObject group = findGroupInHierarchy(groups, groupName);
+	    if (group != null) {
+	    	return group.getString("id");
+	    }
+	    throw new IllegalStateException("Error creating group " + groupName);
+	}
+
+	private static JSONObject findGroupInHierarchy(JSONArray groups, String groupName) throws JSONException {
 	    for (int i = 0; i < groups.length(); i++) {
 	    	JSONObject group = groups.getJSONObject(i);
 	    	if (group.getString("name").equals(groupName)) {
 	    		LOG.info("Created group {}", groupName);
-	    		return group.getString("id");
+	    		return group;
+	    	}
+	    	JSONObject subGroup = findGroupInHierarchy(group.getJSONArray("subGroups"), groupName);
+	    	if (subGroup != null) {
+	    		return subGroup;
 	    	}
 	    }
-	    throw new IllegalStateException("Error creating group " + groupName);
+	    return null;
 	}
 	
 	/**

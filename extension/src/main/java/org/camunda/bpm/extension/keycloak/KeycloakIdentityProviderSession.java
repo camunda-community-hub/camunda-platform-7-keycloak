@@ -139,6 +139,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 	//------------------- user query implementation ---------------------------
 	
+	/**
+	 * Requests users of a specific group.
+	 * @param query the user query - including a groupId criteria
+	 * @return list of matching users
+	 */
 	protected List<User> requestUsersByGroupId(KeycloakUserQuery query) {
 		String groupId = query.getGroupId();
 		List<User> userList = new ArrayList<>();
@@ -218,6 +223,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return userList;
 	}
 
+	/**
+	 * Requests users.
+	 * @param query the user query - not including a groupId criteria
+	 * @return list of matching users
+	 */
 	protected List<User> requestUsersWithoutGroupId(KeycloakUserQuery query) {
 		List<User> userList = new ArrayList<>();
 
@@ -339,6 +349,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return "";
 	}
 	
+	/**
+	 * Requests a user by its userId.
+	 * @param userId the userId
+	 * @return response consisting of a list containing the one user
+	 * @throws RestClientException
+	 */
 	protected ResponseEntity<String> requestUserById(String userId) throws RestClientException {
 		try {
 			String userSearch;
@@ -366,6 +382,13 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 	}
 
+	/**
+	 * Gets the Keycloak internal ID of an user.
+	 * @param userId the userId as sent by the client
+	 * @return the Keycloak internal ID
+	 * @throws KeycloakUserNotFoundException in case the user cannot be found
+	 * @throws RestClientException in case of technical errors
+	 */
 	protected String getKeycloakUserID(String userId) throws KeycloakUserNotFoundException, RestClientException {
 		String userSearch;
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
@@ -581,6 +604,13 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 	}
 
+	/**
+	 * Gets the Keycloak internal username of an user.
+	 * @param userId the userId as sent by the client (when checking password)
+	 * @return the Keycloak internal username
+	 * @throws KeycloakUserNotFoundException in case the user cannot be found
+	 * @throws RestClientException in case of technical errors
+	 */
 	protected String getKeycloakUsername(String userId) throws KeycloakUserNotFoundException, RestClientException {
 		if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
 			return userId;
@@ -598,7 +628,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				return new JSONObject(response.getBody()).getString("username");
 			}
 		} catch (JSONException je) {
-			throw new KeycloakUserNotFoundException(userId + " not found - email unknown", je);
+			throw new KeycloakUserNotFoundException(userId + 
+					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
+					? " not found - email unknown" 
+					: " not found - ID unknown"), je);
 		} catch (HttpClientErrorException hcee) {
 			if (hcee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
 				throw new KeycloakUserNotFoundException(userId + " not found", hcee);
@@ -662,6 +695,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 	//------------------- group query implementation --------------------------
 
+	/**
+	 * Requests groups of a specific user.
+	 * @param query the group query - including a userId criteria
+	 * @return list of matching groups
+	 */
 	protected List<Group> requestGroupsByUserId(KeycloakGroupQuery query) {
 		String userId = query.getUserId();
 		List<Group> groupList = new ArrayList<>();
@@ -681,7 +719,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				return groupList;
 			}
 
-			// get members of this group
+			// get groups of this user
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + keyCloakID + "/groups", HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
@@ -732,6 +770,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
 		}
 
+		// sort groups according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
 			groupList.sort(new GroupComparator(query.getOrderingProperties()));
 		}
@@ -739,6 +778,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return groupList;
 	}
 	
+	/**
+	 * Requests groups.
+	 * @param query the group query - not including a userId criteria
+	 * @return list of matching groups
+	 */
 	protected List<Group> requestGroupsWithoutUserId(KeycloakGroupQuery query) {
 		List<Group> groupList = new ArrayList<>();
 
@@ -748,7 +792,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 
 		try {
-			// get members of this group
+			// get groups according to search criteria
 			ResponseEntity<String> response = null;
 
 			if (!StringUtils.isEmpty(query.getId())) {
@@ -764,7 +808,13 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONArray searchResult = new JSONArray(response.getBody());
+			JSONArray searchResult = null;
+			if (!StringUtils.isEmpty(query.getId())) {
+				searchResult = new JSONArray(response.getBody());
+			} else {
+				// for non ID queries search in subgroups as well
+				searchResult = flattenSubGroups(new JSONArray(response.getBody()), new JSONArray());
+			}
 			for (int i = 0; i < searchResult.length(); i++) {
 				JSONObject keycloakGroup = searchResult.getJSONObject(i);
 				Group group = transformGroup(keycloakGroup);
@@ -798,6 +848,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
 		}
 
+		// sort groups according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
 			groupList.sort(new GroupComparator(query.getOrderingProperties()));
 		}
@@ -827,12 +878,42 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return "";
 	}
 
+	/**
+	 * Converts a result consisting of a potential hierarchy of groups into a flattened list of groups.
+	 * @param groups the original structured hierarchy of groups
+	 * @param result recursive result
+	 * @return flattened list of all groups in this hierarchy
+	 * @throws JSONException in case of errors
+	 */
+	private JSONArray flattenSubGroups(JSONArray groups, JSONArray result) throws JSONException {
+		if (groups == null) return result;
+	    for (int i = 0; i < groups.length(); i++) {
+	    	JSONObject group = groups.getJSONObject(i);
+	    	JSONArray subGroups;
+			try {
+				subGroups = group.getJSONArray("subGroups");
+		    	group.remove("subGroups");
+		    	result.put(group);
+		    	flattenSubGroups(subGroups, result);
+			} catch (JSONException e) {
+				result.put(group);
+			}
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Requests data of single group.
+	 * @param groupId the ID of the requested group
+	 * @return response consisting of a list containing the one group
+	 * @throws RestClientException
+	 */
 	protected ResponseEntity<String> requestGroupById(String groupId) throws RestClientException {
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + groupId, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-			String result = "[" + response.getBody() + "]}";
+			String result = "[" + response.getBody() + "]";
 			return new ResponseEntity<String>(result, response.getHeaders(), response.getStatusCode());
 		} catch (HttpClientErrorException hcee) {
 			if (hcee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {

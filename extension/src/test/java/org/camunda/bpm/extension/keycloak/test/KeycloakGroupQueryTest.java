@@ -16,7 +16,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testQueryNoFilter() {
 		List<Group> groupList = identityService.createGroupQuery().list();
-		assertEquals(4, groupList.size());
+		assertEquals(8, groupList.size());
 	}
 
 	public void testFilterByGroupId() {
@@ -139,26 +139,32 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testOrderByGroupId() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupId().desc().list();
-		assertEquals(4, groupList.size());
+		assertEquals(8, groupList.size());
 		assertTrue(groupList.get(0).getId().compareTo(groupList.get(1).getId()) > 0);
 		assertTrue(groupList.get(1).getId().compareTo(groupList.get(2).getId()) > 0);
 		assertTrue(groupList.get(2).getId().compareTo(groupList.get(3).getId()) > 0);
+		assertTrue(groupList.get(5).getId().compareTo(groupList.get(6).getId()) > 0);
+		assertTrue(groupList.get(6).getId().compareTo(groupList.get(7).getId()) > 0);
 	}
 
 	public void testOrderByGroupName() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupName().list();
-		assertEquals(4, groupList.size());
+		assertEquals(8, groupList.size());
 		assertTrue(groupList.get(0).getName().compareTo(groupList.get(1).getName()) < 0);
 		assertTrue(groupList.get(1).getName().compareTo(groupList.get(2).getName()) < 0);
 		assertTrue(groupList.get(2).getName().compareTo(groupList.get(3).getName()) < 0);
+		assertTrue(groupList.get(5).getName().compareTo(groupList.get(6).getName()) < 0);
+		assertTrue(groupList.get(6).getName().compareTo(groupList.get(7).getName()) < 0);
 	}
 
 	public void testOrderByGroupType() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupType().desc().list();
-		assertEquals(4, groupList.size());
+		assertEquals(8, groupList.size());
 		assertTrue(groupList.get(0).getType().compareTo(groupList.get(1).getType()) >= 0);
 		assertTrue(groupList.get(1).getType().compareTo(groupList.get(2).getType()) >= 0);
 		assertTrue(groupList.get(2).getType().compareTo(groupList.get(3).getType()) >= 0);
+		assertTrue(groupList.get(5).getType().compareTo(groupList.get(6).getType()) >= 0);
+		assertTrue(groupList.get(6).getType().compareTo(groupList.get(7).getType()) >= 0);
 	}
 
 	protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
