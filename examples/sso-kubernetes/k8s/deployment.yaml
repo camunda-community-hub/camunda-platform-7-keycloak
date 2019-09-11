@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-showcase
-           image: gunnaraccso/camunda-showcase-keycloak
+           image: gunnaraccso/camunda-showcase-keycloak:1.1.0-SNAPSHOT
            ports:
            - containerPort: 8080
            env:
@@ -36,6 +36,10 @@ spec:
              value: http://keycloak-server-service:8080
            - name: KEYCLOAK_URL_PLUGIN
              value: https://keycloak-server-service:8443
+         hostAliases:
+         - ip: 10.0.75.1
+           hostnames:
+           - armstrong02
 # Redis Session Cache not yet in use
 #           - name: SESSION_STORE_TYPE
 #             value: redis
