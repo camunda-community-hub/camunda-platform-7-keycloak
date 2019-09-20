@@ -10,32 +10,41 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Admin group configuration test for the Keycloak identity provider.
  */
 public class KeycloakConfigureAdminGroupTest extends AbstractKeycloakIdentityProviderTest {
 
-	@Override
-	protected void initializeProcessEngine() {
-		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.configureAdminGroup.cfg.xml");
-		config.getProcessEnginePlugins().forEach(p -> {
-			if (p instanceof KeycloakIdentityProviderPlugin) {
-				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
-			}
-		});
-		processEngine = config.buildProcessEngine();
+	public static Test suite() {
+	    return new TestSetup(new TestSuite(KeycloakConfigureAdminGroupTest.class)) {
+
+	    	// @BeforeClass
+	        protected void setUp() throws Exception {
+	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+	    				.createProcessEngineConfigurationFromResource("camunda.configureAdminGroup.cfg.xml");
+	    		config.getProcessEnginePlugins().forEach(p -> {
+	    			if (p instanceof KeycloakIdentityProviderPlugin) {
+	    				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
+	    			}
+	    		});
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = config.buildProcessEngine();
+	        }
+	        
+	        // @AfterClass
+	        protected void tearDown() throws Exception {
+	    		PluggableProcessEngineTestCase.cachedProcessEngine.close();
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = null;
+	        }
+	    };
 	}
 
-	@Override
-	protected void closeDownProcessEngine() {
-		super.closeDownProcessEngine();
-		processEngine.close();
-		processEngine = null;
-	}
-	
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
@@ -44,7 +53,7 @@ public class KeycloakConfigureAdminGroupTest extends AbstractKeycloakIdentityPro
 			processEngine.getAuthorizationService().deleteAuthorization(a.getId());
 		});
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Test configuration
 	// ------------------------------------------------------------------------

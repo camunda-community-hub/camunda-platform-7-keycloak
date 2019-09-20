@@ -6,7 +6,12 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * User query test for the Keycloak identity provider.
@@ -14,25 +19,29 @@ import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
  */
 public class KeycloakUseKeycloakIdAsUserIdQueryTest extends AbstractKeycloakIdentityProviderTest {
 
-	@Override
-	protected void initializeProcessEngine() {
-		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.useKeycloakIdAsCamundaUserId.cfg.xml");
-		config.getProcessEnginePlugins().forEach(p -> {
-			if (p instanceof KeycloakIdentityProviderPlugin) {
-				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
-			}
-		});
-		processEngine = config.buildProcessEngine();
+	public static Test suite() {
+	    return new TestSetup(new TestSuite(KeycloakUseKeycloakIdAsUserIdQueryTest.class)) {
+
+	    	// @BeforeClass
+	        protected void setUp() throws Exception {
+	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+	    				.createProcessEngineConfigurationFromResource("camunda.useKeycloakIdAsCamundaUserId.cfg.xml");
+	    		config.getProcessEnginePlugins().forEach(p -> {
+	    			if (p instanceof KeycloakIdentityProviderPlugin) {
+	    				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
+	    			}
+	    		});
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = config.buildProcessEngine();
+	        }
+	        
+	        // @AfterClass
+	        protected void tearDown() throws Exception {
+	    		PluggableProcessEngineTestCase.cachedProcessEngine.close();
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = null;
+	        }
+	    };
 	}
 
-	@Override
-	protected void closeDownProcessEngine() {
-		super.closeDownProcessEngine();
-		processEngine.close();
-		processEngine = null;
-	}
-	
 	// ------------------------------------------------------------------------
 	// Authorization tests
 	// ------------------------------------------------------------------------

@@ -9,7 +9,12 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Admin user configuration test for the Keycloak identity provider.
@@ -17,27 +22,31 @@ import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
  */
 public class KeycloakConfigureAdminUserIdTest extends AbstractKeycloakIdentityProviderTest {
 
-	@Override
-	protected void initializeProcessEngine() {
-		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserId.cfg.xml");
-		config.getProcessEnginePlugins().forEach(p -> {
-			if (p instanceof KeycloakIdentityProviderPlugin) {
-				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
-				kcp.setClientSecret(CLIENT_SECRET);
-				kcp.setAdministratorUserId(USER_ID_CAMUNDA_ADMIN);
-			}
-		});
-		processEngine = config.buildProcessEngine();
+	public static Test suite() {
+	    return new TestSetup(new TestSuite(KeycloakConfigureAdminUserIdTest.class)) {
+
+	    	// @BeforeClass
+	        protected void setUp() throws Exception {
+	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+	    				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserId.cfg.xml");
+	    		config.getProcessEnginePlugins().forEach(p -> {
+	    			if (p instanceof KeycloakIdentityProviderPlugin) {
+	    				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
+	    				kcp.setClientSecret(CLIENT_SECRET);
+	    				kcp.setAdministratorUserId(USER_ID_CAMUNDA_ADMIN);
+	    			}
+	    		});
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = config.buildProcessEngine();
+	        }
+	        
+	        // @AfterClass
+	        protected void tearDown() throws Exception {
+	    		PluggableProcessEngineTestCase.cachedProcessEngine.close();
+	    		PluggableProcessEngineTestCase.cachedProcessEngine = null;
+	        }
+	    };
 	}
 
-	@Override
-	protected void closeDownProcessEngine() {
-		super.closeDownProcessEngine();
-		processEngine.close();
-		processEngine = null;
-	}
-	
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
@@ -46,11 +55,10 @@ public class KeycloakConfigureAdminUserIdTest extends AbstractKeycloakIdentityPr
 			processEngine.getAuthorizationService().deleteAuthorization(a.getId());
 		});
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Test configuration
 	// ------------------------------------------------------------------------
-	
 
 	public void testAdminUserConfiguration() {
 		// check engine configuration

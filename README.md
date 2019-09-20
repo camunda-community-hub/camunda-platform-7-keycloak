@@ -30,6 +30,13 @@ Known limitations:
 *   Sort criteria for queries are implemented on the client side - the Keycloak REST API does not allow result ordering.
 *   Tenants are currently not supported.
 
+#### Feature Roadmap
+
+Version 1.1.0 will add the following features:
+
+* Ability to read group hierarchies
+* New option `useGroupPathAsCamundaGroupId` for readable group IDs. Helps when configuring authorizations.
+
 ## Prerequisites in your Keycloak realm
 
 1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
@@ -104,6 +111,7 @@ A complete list of configuration options can be found below:
 | `clientSecret` | The Client Secret of your application. |
 | `useEmailAsCamundaUserId` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br /><br />This is option is a fallback in case you don't use SSO and want to login using Camunda's web interface with your mail address and not the cryptic internal Keycloak ID. Keep in mind that you will only be able to login without SSO with Keycloak's internally managed users and users managed by the LDAP / Keberos User federation.|
 | `useUsernameAsCamundaUserId` | Whether to use the Keycloak username attribute as Camunda's user ID. Default is `false`. In the default case the plugin will use the internal Keyclaok ID as Camunda's user ID.|
+| `useGroupPathAsCamundaGroupId` | Whether to use the Keycloak group path as Camunda's group ID. Default is `false`. In the default case the plugin will use the internal Keyclaok ID as Camunda's group ID.<br />This is particularly useful in case you want to have human readable group IDs and e.g. use them in Camunda's authorization configuration.<br />*Since  1.1.0* |
 | `administratorGroupName` | The name of the administrator group. If this name is set and engine authorization is enabled, the plugin will create group-level Administrator authorizations on all built-in resources. |
 | `administratorUserId` | The ID of the administrator user. If this ID is set and engine authorization is enabled, the plugin will create user-level Administrator authorizations on all built-in resources. |
 | `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Keycloak users or groups we advise to set this property to false to improve the performance of the user and group query. |

@@ -154,9 +154,18 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 
 		try {
+			//  get Keycloak specific groupID
+			String keyCloakID;
+			try {
+				keyCloakID = getKeycloakGroupID(groupId);
+			} catch (KeycloakGroupNotFoundException e) {
+				// group not found: empty search result
+				return userList;
+			}
+
 			// get members of this group
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + groupId + "/members", HttpMethod.GET,
+					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members", HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
@@ -910,8 +919,15 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 */
 	protected ResponseEntity<String> requestGroupById(String groupId) throws RestClientException {
 		try {
+			String groupSearch;
+			if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
+				groupSearch = "/group-by-path/" + groupId;
+			} else {
+				groupSearch = "/groups/" + groupId;
+			}
+
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + groupId, HttpMethod.GET,
+					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
 			String result = "[" + response.getBody() + "]";
 			return new ResponseEntity<String>(result, response.getHeaders(), response.getStatusCode());
@@ -923,6 +939,88 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			throw hcee;
 		}
 	}
+
+	/**
+	 * Gets the Keycloak internal ID of a group.
+	 * @param groupId the userId as sent by the client
+	 * @return the Keycloak internal ID
+	 * @throws KeycloakGroupNotFoundException in case the group cannot be found
+	 * @throws RestClientException in case of technical errors
+	 */
+	protected String getKeycloakGroupID(String groupId) throws KeycloakGroupNotFoundException, RestClientException {
+		String groupSearch;
+		if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
+			groupSearch = "/group-by-path/" + groupId;
+		} else {
+			return groupId;
+		}
+		
+		try {
+			ResponseEntity<String> response = restTemplate.exchange(
+					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET,
+					keycloakContextProvider.createApiRequestEntity(), String.class);
+			return new JSONObject(response.getBody()).getString("id");
+		} catch (JSONException je) {
+			throw new KeycloakGroupNotFoundException(groupId + " not found - path unknown", je);
+		}
+	}
+
+	/**
+	 * Get the group ID of the configured admin group. Enable configuration using group path as well.
+	 * This prevents common configuration pitfalls and makes it consistent to other configuration options
+	 * like the flag 'useGroupPathAsCamundaGroupId'.
+	 * 
+	 * @param configuredAdminGroupName the originally configured admin group name
+	 * @return the corresponding keycloak group ID to use: either internal keycloak ID or path, depending on config
+	 */
+	public String getKeycloakAdminGroupId(String configuredAdminGroupName) {
+		try {
+			// check whether configured admin group can be resolved as path
+			try {
+				ResponseEntity<String> response = restTemplate.exchange(
+						keycloakConfiguration.getKeycloakAdminUrl() + "/group-by-path/" + configuredAdminGroupName, HttpMethod.GET,
+						keycloakContextProvider.createApiRequestEntity(), String.class);
+				if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
+					return new JSONObject(response.getBody()).getString("path");
+				}
+				return new JSONObject(response.getBody()).getString("id");
+			} catch (RestClientException | JSONException ex) {
+				// group not found: fall through
+			}
+			
+			// check whether configured admin group can be resolved as group name
+			try {
+				ResponseEntity<String> response = restTemplate.exchange(
+						keycloakConfiguration.getKeycloakAdminUrl() + "/groups?search=" + configuredAdminGroupName, HttpMethod.GET,
+						keycloakContextProvider.createApiRequestEntity(), String.class);
+				// filter search result for exact group name, including subgroups
+				JSONArray result = flattenSubGroups(new JSONArray(response.getBody()), new JSONArray());
+				JSONArray groups = new JSONArray();
+				for (int i = 0; i < result.length(); i++) {
+					JSONObject keycloakGroup = result.getJSONObject(i);
+					if (keycloakGroup.getString("name").equals(configuredAdminGroupName)) {
+						groups.put(keycloakGroup);
+					}
+				}
+				if (groups.length() == 1) {
+					if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
+						return groups.getJSONObject(0).getString("path");
+					}
+					return groups.getJSONObject(0).getString("id");
+				} else if (groups.length() > 0) {
+					throw new IdentityProviderException("Configured administratorGroupName " + configuredAdminGroupName + " is not unique. Please configure exact group path.");
+				}
+				// groups size == 0: fall through
+			} catch (JSONException je) {
+				// group not found: fall through
+			}
+
+			// keycloak admin group does not exist :-(
+			throw new IdentityProviderException("Configured administratorGroupName " + configuredAdminGroupName + " does not exist.");
+		} catch (RestClientException rce) {
+			throw new IdentityProviderException("Unable to read data of configured administratorGroupName " + configuredAdminGroupName, rce);
+		}
+	}
 	
 	/**
 	 * Maps a Keycloak JSON result to a Group object
@@ -932,7 +1030,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 */
 	protected GroupEntity transformGroup(JSONObject result) throws JSONException {
 		GroupEntity group = new GroupEntity();
-		group.setId(result.getString("id"));
+		if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
+			group.setId(result.getString("path").substring(1)); // remove trailing '/'
+		} else {
+			group.setId(result.getString("id"));
+		}
 		group.setName(result.getString("name"));
 		if (isSystemGroup(result)) {
 			group.setType(Groups.GROUP_TYPE_SYSTEM);

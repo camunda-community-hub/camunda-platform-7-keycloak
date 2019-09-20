@@ -6,9 +6,9 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
-    <property name="processEngineName" value="KeycloakAdminGroup-engine" />
+    <property name="processEngineName" value="KeycloakGroupPathAsCamundaGroupId-engine" />
   
-    <property name="jdbcUrl" value="jdbc:h2:mem:KeycloakAdminGroup;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:KeycloakGroupPathAsCamundaGroupId;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
@@ -22,7 +22,6 @@
     
     <property name="createDiagramOnDeploy" value="true" />
     
-    <property name="authorizationEnabled" value="true"/>
     <property name="processEnginePlugins">
       <list>
         <ref bean="keycloakIdentityProviderPlugin" />
@@ -39,9 +38,8 @@
     <property name="clientSecret" value="%clientSecret%" />
 
     <property name="disableSSLCertificateValidation" value="true" />
-    <property name="useEmailAsCamundaUserId" value="false" />
-
-    <property name="administratorGroupName" value="camunda-admin" />
+    <property name="useEmailAsCamundaUserId" value="true" />
+    <property name="useGroupPathAsCamundaGroupId" value="true" />
   </bean>
 
 </beans>

@@ -29,6 +29,12 @@ public class KeycloakConfiguration {
 	 */
 	protected boolean useUsernameAsCamundaUserId = false;
 
+	/**
+	 * Whether to use the group's path as Camunda group ID. Makes sense in case you want to have human readable group IDs
+	 * and e.g. use them in Camunda's authorization configuration.
+	 */
+	protected boolean useGroupPathAsCamundaGroupId = false;
+	
 	/** The name of the administrator group.
 	 *
 	 * If this name is set to a non-null and non-empty value,
@@ -140,6 +146,19 @@ public class KeycloakConfiguration {
 		this.useUsernameAsCamundaUserId = useUsernameAsCamundaUserId;
 	}
 
+	/**
+	 * @return the useGroupPathAsCamundaGroupId
+	 */
+	public boolean isUseGroupPathAsCamundaGroupId() {
+		return useGroupPathAsCamundaGroupId;
+	}
+
+	/**
+	 * @param useGroupPathAsCamundaGroupId the useGroupPathAsCamundaGroupId to set
+	 */
+	public void setUseGroupPathAsCamundaGroupId(boolean useGroupPathAsCamundaGroupId) {
+		this.useGroupPathAsCamundaGroupId = useGroupPathAsCamundaGroupId;
+	}
 
 	/**
 	 * @return the administratorGroupName

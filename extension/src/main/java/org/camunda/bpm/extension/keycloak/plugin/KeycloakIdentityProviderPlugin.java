@@ -81,8 +81,8 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 		String administratorGroupId = null;
 		if (!StringUtils.isEmpty(administratorGroupName)) {
 			// query the real group ID
-			Group administratorGroup = processEngine.getIdentityService().createGroupQuery().groupName(administratorGroupName).singleResult();
-			administratorGroupId = administratorGroup != null ? administratorGroup.getId() : administratorGroupName;
+			administratorGroupId = ((KeycloakIdentityProviderSession) keycloakIdentityProviderFactory.openSession()).
+					getKeycloakAdminGroupId(administratorGroupName);
 			((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAdminGroups().add(administratorGroupId);
 		}
 		
