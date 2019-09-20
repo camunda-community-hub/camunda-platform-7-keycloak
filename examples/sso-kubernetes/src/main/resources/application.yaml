@@ -50,5 +50,6 @@ plugin.identity.keycloak:
   clientSecret: 7d3c845d-f652-4bed-9797-d6d20b7623da
   useEmailAsCamundaUserId: true
   useUsernameAsCamundaUserId: false
+  useGroupPathAsCamundaGroupId: true
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true

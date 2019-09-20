@@ -87,6 +87,12 @@ public class KeycloakConfigureAdminGroupAsPathAndUsePathAsId extends AbstractKey
 		assertNotNull(group);
 		assertEquals("root/child2", group.getId());
 		assertEquals("child2", group.getName());
+
+		// query groups using group member
+		List<Group> groups = processEngine.getIdentityService().createGroupQuery().groupMember(user.getId()).list();
+		assertNotNull(groups);
+		assertEquals("Wrong number of groups for admin", 2, groups.size());
+		
 	}
 
 }

@@ -981,7 +981,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 						keycloakConfiguration.getKeycloakAdminUrl() + "/group-by-path/" + configuredAdminGroupName, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 				if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
-					return new JSONObject(response.getBody()).getString("path");
+					return new JSONObject(response.getBody()).getString("path").substring(1); // remove trailing '/'
 				}
 				return new JSONObject(response.getBody()).getString("id");
 			} catch (RestClientException | JSONException ex) {
@@ -1004,7 +1004,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				}
 				if (groups.length() == 1) {
 					if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
-						return groups.getJSONObject(0).getString("path");
+						return groups.getJSONObject(0).getString("path").substring(1); // remove trailing '/'
 					}
 					return groups.getJSONObject(0).getString("id");
 				} else if (groups.length() > 0) {
