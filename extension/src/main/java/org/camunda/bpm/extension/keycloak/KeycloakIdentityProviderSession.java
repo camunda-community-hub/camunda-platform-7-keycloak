@@ -249,10 +249,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			// get members of this group
 			ResponseEntity<String> response = null;
 
-			boolean idSearch = false;
 			if (!StringUtils.isEmpty(query.getId())) {
 				response = requestUserById(query.getId());
-				idSearch = true;
 			} else {
 				// Create user search filter
 				String userFilter = createUserSearchFilter(query);
