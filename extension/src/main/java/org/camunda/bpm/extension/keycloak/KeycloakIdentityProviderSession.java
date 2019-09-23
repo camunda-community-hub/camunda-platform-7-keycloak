@@ -280,15 +280,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				UserEntity user = transformUser(keycloakUser);
 
 				// client side check of further query filters
-				if (idSearch) {
-					// result of ID search with username potentially includes virtual service-account users, 
-					// seems to be more a search with 'like' :-(
-					if (keycloakConfiguration.isUseUsernameAsCamundaUserId() && (!matches(query.getId(), user.getId()))) continue;
-
-					if (!matches(query.getEmail(), user.getEmail())) continue;
-					if (!matches(query.getFirstName(), user.getFirstName())) continue;
-					if (!matches(query.getLastName(), user.getLastName())) continue;
-				}
+				// beware: looks like most attributes are treated as 'like' queries on Keycloak
+				//         and must therefore be seen as a sort of pre-filter only
+				if (!matches(query.getId(), user.getId())) continue;
+				if (!matches(query.getEmail(), user.getEmail())) continue;
+				if (!matches(query.getFirstName(), user.getFirstName())) continue;
+				if (!matches(query.getLastName(), user.getLastName())) continue;
 				if (!matches(query.getIds(), user.getId())) continue;
 				if (!matchesLike(query.getEmailLike(), user.getEmail())) continue;
 				if (!matchesLike(query.getFirstNameLike(), user.getFirstName())) continue;

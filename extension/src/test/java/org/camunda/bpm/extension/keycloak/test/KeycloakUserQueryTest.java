@@ -51,7 +51,7 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     user = identityService.createUserQuery().userFirstName("non-existing").singleResult();
     assertNull(user);
   }
-
+  
   public void testFilterByFirstnameLike() {
     User user = identityService.createUserQuery().userFirstNameLike("Gun*").singleResult();
     assertNotNull(user);
@@ -90,6 +90,18 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
 
 	  user = identityService.createUserQuery()
 			  .userFirstNameLike("*n%").userLastNameLike("non-exist*")
+			  .singleResult();
+	  assertNull(user);
+  }
+
+  public void testFilterByFirstLastNameEmailUsingPartsOfNames() {
+	  User user = identityService.createUserQuery()
+			  .userFirstNameLike("Gun*").userLastNameLike("von*").userEmailLike("*accso.de")
+			  .singleResult();
+	  assertNotNull(user);
+
+	  user = identityService.createUserQuery()
+			  .userFirstName("Gun").userLastName("von").userEmail("accso.de")
 			  .singleResult();
 	  assertNull(user);
   }
