@@ -101,7 +101,17 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
 	  assertNotNull(user);
 
 	  user = identityService.createUserQuery()
-			  .userFirstName("Gun").userLastName("von").userEmail("accso.de")
+			  .userFirstName("Gun")
+			  .singleResult();
+	  assertNull(user);
+
+	  user = identityService.createUserQuery()
+			  .userLastName("von")
+			  .singleResult();
+	  assertNull(user);
+
+	  user = identityService.createUserQuery()
+			  .userEmail("accso.de")
 			  .singleResult();
 	  assertNull(user);
   }
