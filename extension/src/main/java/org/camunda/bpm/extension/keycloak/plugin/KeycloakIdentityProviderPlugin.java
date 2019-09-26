@@ -4,6 +4,7 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -154,6 +154,10 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			LOG.missingConfigurationParameter("clientSecret");
 			missing.add("clientSecret");
 		}
+		if (StringUtils.isEmpty(charset)) {
+			LOG.missingConfigurationParameter("charset");
+			missing.add("charset");
+		}
 		if (missing.size() > 0) {
 			LOG.activationError(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName(),
 					"missing mandatory configuration parameters " + missing.toString());
@@ -162,14 +166,18 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 											+ ": - missing mandatory configuration parameters: " 
 											+ missing.toString());
 		}
-		if(isUseEmailAsCamundaUserId() && isUseUsernameAsCamundaUserId()) {
+		if (isUseEmailAsCamundaUserId() && isUseUsernameAsCamundaUserId()) {
 			LOG.activationError(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName(),
 					"cannot use configuration parameters 'useUsernameAsCamundaUserId' AND 'useEmailAsCamundaUserId' at the same time");
 			throw new IllegalStateException("Unable to initialize plugin "
 											+ getClass().getSimpleName()
 											+ ": - cannot use configuration parameters 'useUsernameAsCamundaUserId' AND 'useEmailAsCamundaUserId' at the same time");
 		}
-
+		if (!Charset.isSupported(charset)) {
+			throw new IllegalStateException("Unable to initialize plugin "
+											+ getClass().getSimpleName()
+											+ ": charset '" + charset + "' not supported in your JVM");
+		}
 	}
 	
 }

@@ -1,5 +1,7 @@
 package org.camunda.bpm.extension.keycloak;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * <p>Java Bean holding Keycloak configuration</p>
  */
@@ -57,6 +59,9 @@ public class KeycloakConfiguration {
 	
 	/** Maximum number of HTTP connections of the Keycloak specific connection pool. */
 	protected int maxHttpConnections = 50;
+	
+	/** Charset to use for REST communication with Keycloak. */
+	protected String charset = StandardCharsets.UTF_8.name();
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -228,6 +233,20 @@ public class KeycloakConfiguration {
 	 */
 	public void setMaxHttpConnections(int maxHttpConnections) {
 		this.maxHttpConnections = maxHttpConnections;
+	}
+
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * @param charset the charset to set
+	 */
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
 	//-------------------------------------------------------------------------
