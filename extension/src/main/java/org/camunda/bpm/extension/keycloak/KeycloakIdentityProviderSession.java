@@ -4,6 +4,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -590,7 +592,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		    		"client_id=" + keycloakConfiguration.getClientId()
     	    		+ "&client_secret=" + keycloakConfiguration.getClientSecret()
     	    		+ "&username=" + userName
-    	    		+ "&password=" + password
+    	    		+ "&password=" + URLEncoder.encode(password, keycloakConfiguration.getCharset())
     	    		+ "&grant_type=password",
     	    		headers);
 			restTemplate.postForEntity(keycloakConfiguration.getKeycloakIssuerUrl() + "/protocol/openid-connect/token", request, String.class);
@@ -604,6 +606,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		} catch (RestClientException rce) {
 			throw new IdentityProviderException("Unable to authenticate user at " + keycloakConfiguration.getKeycloakIssuerUrl(),
 					rce);
+		} catch (UnsupportedEncodingException uee) {
+			throw new IdentityProviderException("Unable to authenticate user at " + keycloakConfiguration.getKeycloakIssuerUrl(),
+					uee);
 		}
 
 	}
