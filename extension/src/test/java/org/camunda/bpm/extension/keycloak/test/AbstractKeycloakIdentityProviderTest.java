@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
 
@@ -32,6 +33,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -252,6 +254,13 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    		.build();
 		factory.setHttpClient(httpClient);
 		restTemplate.setRequestFactory(factory);		
+
+		for (int i = 0; i < restTemplate.getMessageConverters().size(); i++) {
+			if (restTemplate.getMessageConverters().get(i) instanceof StringHttpMessageConverter) {
+				restTemplate.getMessageConverters().set(i, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -276,7 +285,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 
 		// Create REST request header
 		headers = new HttpHeaders();
-	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString() + ";charset="+StandardCharsets.UTF_8.name());
 		headers.add(HttpHeaders.AUTHORIZATION, tokenType + " " + accessToken);
 
 		return headers;
