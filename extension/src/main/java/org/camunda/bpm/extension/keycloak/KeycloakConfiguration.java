@@ -60,7 +60,7 @@ public class KeycloakConfiguration {
 	/** Maximum number of HTTP connections of the Keycloak specific connection pool. */
 	protected int maxHttpConnections = 50;
 	
-	/** Charset to use for REST communication with Keycloak. */
+	/** Charset to use for REST communication with Keycloak. Leave at UTF-8 for standard installation. */
 	protected String charset = StandardCharsets.UTF_8.name();
 	
 	//-------------------------------------------------------------------------

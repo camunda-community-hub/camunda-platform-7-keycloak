@@ -62,7 +62,7 @@ public class KeycloakContextProvider {
 			String tokenType = json.getString("token_type");
 			String refreshToken = json.getString("refresh_token");
 			long expiresInMillis = json.getLong("expires_in") * 1000;
-			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken);
+			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken, keycloakConfiguration.getCharset());
 
 		} catch (RestClientException rce) {
 			LOG.requestTokenFailed(rce);
@@ -100,7 +100,7 @@ public class KeycloakContextProvider {
 			String tokenType = json.getString("token_type");
 			String refreshToken = json.getString("refresh_token");
 			long expiresInMillis = json.getLong("expires_in") * 1000;
-			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken);
+			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken, keycloakConfiguration.getCharset());
 
 		} catch (RestClientException rce) {
 			LOG.refreshTokenFailed(rce);

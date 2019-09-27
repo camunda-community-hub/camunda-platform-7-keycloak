@@ -15,9 +15,9 @@ public class KeycloakContext {
 	
 	String refreshToken;
 	
-	public KeycloakContext(String accessToken, String tokenType, long expiresInMillis, String refreshToken) {
+	public KeycloakContext(String accessToken, String tokenType, long expiresInMillis, String refreshToken, String charset) {
 		headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON);
+		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON + ";charset="+charset);
 		headers.add(HttpHeaders.AUTHORIZATION, tokenType + " " + accessToken);
 		expiresAt = System.currentTimeMillis() + expiresInMillis - 2000;
 		this.refreshToken = refreshToken;
