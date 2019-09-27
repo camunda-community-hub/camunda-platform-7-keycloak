@@ -121,7 +121,10 @@ A complete list of configuration options can be found below:
 | `authorizationCheckEnabled` |  If this property is set to true, then authorization checks are performed when querying for users or groups. Otherwise authorization checks are not performed when querying for users or groups. Default: `true`.<br />*Note*: If you have a huge amount of Keycloak users or groups we advise to set this property to false to improve the performance of the user and group query. |
 | `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `50`|
 | `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. |
+
+<!--
 | `charset` | Charset to use for REST communication with Keycloak Server. Default: `UTF-8`.<br />*Since 1.1.0* |
+-->
 
 ## Activating Single Sign On
 
