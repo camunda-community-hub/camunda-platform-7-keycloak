@@ -42,7 +42,7 @@ public class KeycloakContextProvider {
 	 */
 	private KeycloakContext openAuthorizationContext() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED);
+		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED + ";charset=" + keycloakConfiguration.getCharset());
 		HttpEntity<String> request = new HttpEntity<String>(
 	    		"client_id=" + keycloakConfiguration.getClientId()
 	    		+ "&client_secret=" + keycloakConfiguration.getClientSecret()
@@ -79,7 +79,7 @@ public class KeycloakContextProvider {
 	 */
 	private KeycloakContext refreshToken() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED);
+		headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED + ";charset=" + keycloakConfiguration.getCharset());
 		HttpEntity<String> request = new HttpEntity<String>(
 	    		"client_id=" + keycloakConfiguration.getClientId()
 	    		+ "&client_secret=" + keycloakConfiguration.getClientSecret()
