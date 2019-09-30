@@ -27,5 +27,9 @@ public class KeycloakLoginTest extends AbstractKeycloakIdentityProviderTest {
 	public void testKeycloakLoginEmptyPassword() {
 		assertFalse(identityService.checkPassword("camunda@accso.de", ""));
 	}
+	
+	public void testKeycloakLoginSpecialCharacterPassword() {
+		assertTrue(identityService.checkPassword("johnfoo", "!§$%&/()=?#'-_.:,;+*~@€"));
+	}
 
 }
