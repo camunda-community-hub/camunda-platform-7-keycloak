@@ -14,14 +14,21 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Features:
+Current version: `1.1.0`<br >
+Tested with: Keycloak >= `5.0.0`, Camunda >= `7.10.0`, `7.10.0-ee`
+
+#### Features
+
+New in Version `1.1.0`:
+
+* Ability to read group hierarchies.
+* New option `useGroupPathAsCamundaGroupId` for readable group IDs. Helps when configuring authorizations.
+
+Version `1.0.0`:
 
 *   ReadOnlyIdentityProvider
 *   Broad support for user and group queries
 *   Compatible with Spring Boot OAuth2 SSO
-
-Current version: `1.0.0`<br >
-Tested with: Keycloak >= `4.8.3.Final`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 Known limitations:
 
@@ -30,12 +37,7 @@ Known limitations:
 *   Sort criteria for queries are implemented on the client side - the Keycloak REST API does not allow result ordering.
 *   Tenants are currently not supported.
 
-#### Feature Roadmap
-
-Version `1.1.0` will add the following features:
-
-* Ability to read group hierarchies.
-* New option `useGroupPathAsCamundaGroupId` for readable group IDs. Helps when configuring authorizations.
+#### Roadmap
 
 Version `1.2.0` will add the following features:
 
@@ -62,7 +64,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>org.camunda.bpm.extension</groupId>
 			<artifactId>camunda-bpm-identity-keycloak</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 
 
