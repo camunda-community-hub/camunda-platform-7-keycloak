@@ -332,19 +332,19 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			addArgument(filter, "email", query.getEmail());
 		}
 		if (!StringUtils.isEmpty(query.getEmailLike())) {
-			addArgument(filter, "search", query.getEmailLike().replaceAll("[%,\\*]", ""));
+			addArgument(filter, "email", query.getEmailLike().replaceAll("[%,\\*]", ""));
 		}
 		if (!StringUtils.isEmpty(query.getFirstName())) {
 			addArgument(filter, "firstName", query.getFirstName());
 		}
 		if (!StringUtils.isEmpty(query.getFirstNameLike())) {
-			addArgument(filter, "search", query.getFirstNameLike().replaceAll("[%,\\*]", ""));
+			addArgument(filter, "firstName", query.getFirstNameLike().replaceAll("[%,\\*]", ""));
 		}
 		if (!StringUtils.isEmpty(query.getLastName())) {
 			addArgument(filter, "lastName", query.getLastName());
 		}
 		if (!StringUtils.isEmpty(query.getLastNameLike())) {
-			addArgument(filter, "search", query.getLastNameLike().replaceAll("[%,\\*]", ""));
+			addArgument(filter, "lastName", query.getLastNameLike().replaceAll("[%,\\*]", ""));
 		}
 		if (filter.length() > 0) {
 			filter.insert(0, "?");
