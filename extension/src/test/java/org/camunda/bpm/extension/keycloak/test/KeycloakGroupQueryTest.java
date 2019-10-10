@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.User;
 
 /**
  * Tests group queries.
@@ -17,6 +18,24 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	public void testQueryNoFilter() {
 		List<Group> groupList = identityService.createGroupQuery().list();
 		assertEquals(8, groupList.size());
+	}
+
+	public void testQueryPaging() {
+		// First page
+		List<Group> result = identityService.createGroupQuery().listPage(0, 3);
+		assertEquals(3, result.size());
+
+		// Next page
+		List<Group> resultNext = identityService.createGroupQuery().listPage(3, 3);
+		assertEquals(3, resultNext.size());
+
+		// Next page
+		List<Group> resultLast = identityService.createGroupQuery().listPage(6, 10);
+		assertEquals(2, resultLast.size());
+
+		// unique results
+		assertEquals(0, result.stream().filter(group -> resultNext.contains(group)).count());
+		assertEquals(0, result.stream().filter(group -> resultLast.contains(group)).count());
 	}
 
 	public void testFilterByGroupId() {

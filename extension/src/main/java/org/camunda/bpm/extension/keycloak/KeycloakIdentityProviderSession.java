@@ -227,8 +227,15 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
 		}
 
+		// sort users according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
 			userList.sort(new UserComparator(query.getOrderingProperties()));
+		}
+
+		// paging
+		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
+			userList = userList.subList(query.getFirstResult(), 
+					Math.min(userList.size(), query.getFirstResult() + query.getMaxResults()));
 		}
 		
 		return userList;
@@ -314,8 +321,15 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
 		}
 
+		// sort users according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
 			userList.sort(new UserComparator(query.getOrderingProperties()));
+		}
+		
+		// paging
+		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
+			userList = userList.subList(query.getFirstResult(), 
+					Math.min(userList.size(), query.getFirstResult() + query.getMaxResults()));
 		}
 		
 		return userList;
@@ -784,6 +798,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			groupList.sort(new GroupComparator(query.getOrderingProperties()));
 		}
 
+		// paging
+		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
+			groupList = groupList.subList(query.getFirstResult(), 
+					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
+		}
+
 		return groupList;
 	}
 	
@@ -861,7 +881,13 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		if (query.getOrderingProperties().size() > 0) {
 			groupList.sort(new GroupComparator(query.getOrderingProperties()));
 		}
-		
+
+		// paging
+		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
+			groupList = groupList.subList(query.getFirstResult(), 
+					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
+		}
+
 		return groupList;
 	}
 

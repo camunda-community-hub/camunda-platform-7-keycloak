@@ -20,6 +20,19 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     assertEquals(4, result.size());
   }
 
+  public void testQueryPaging() {
+	  // First page
+	  List<User> result = identityService.createUserQuery().listPage(0, 2);
+	  assertEquals(2, result.size());
+	  
+	  // Next page
+	  List<User> resultNext = identityService.createUserQuery().listPage(2, 10);
+	  assertEquals(2, resultNext.size());
+	  
+	  // unique results
+	  assertEquals(0, result.stream().filter(user -> resultNext.contains(user)).count());
+  }
+
   public void testFilterByUserId() {
     User user = identityService.createUserQuery().userId("camunda@accso.de").singleResult();
     assertNotNull(user);
