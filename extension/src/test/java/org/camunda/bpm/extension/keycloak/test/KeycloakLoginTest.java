@@ -30,6 +30,7 @@ public class KeycloakLoginTest extends AbstractKeycloakIdentityProviderTest {
 	
 	public void testKeycloakLoginSpecialCharacterPassword() {
 		assertTrue(identityService.checkPassword("johnfoo", "!§$%&/()=?#'-_.:,;+*~@€"));
+		assertTrue(identityService.checkPassword("hans.mustermann", "äöüÄÖÜ"));
 	}
 
 }

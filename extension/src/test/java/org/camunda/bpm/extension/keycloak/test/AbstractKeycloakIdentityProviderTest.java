@@ -203,7 +203,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		USER_ID_CAMUNDA_ADMIN = createUser(headers, realm, "camunda", "Admin", "Camunda", "camunda@accso.de", "camunda1!");
 		assignUserGroup(headers, realm, USER_ID_CAMUNDA_ADMIN, GROUP_ID_ADMIN);
 		
-		USER_ID_TEAMLEAD = createUser(headers, realm, "hans.mustermann","Hans", "Mustermann", "hans.mustermann@tradermail.info", null);
+		USER_ID_TEAMLEAD = createUser(headers, realm, "hans.mustermann","Hans", "Mustermann", "hans.mustermann@tradermail.info", "äöüÄÖÜ");
 		assignUserGroup(headers, realm, USER_ID_TEAMLEAD, GROUP_ID_TEAMLEAD);
 		
 		USER_ID_MANAGER = createUser(headers, realm, "gunnar.von-der-beck@accso.de", "Gunnar", "von der Beck", "gunnar.von-der-beck@accso.de", null);
