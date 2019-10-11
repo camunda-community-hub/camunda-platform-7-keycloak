@@ -42,7 +42,7 @@ Known limitations:
 Version `1.2.0` will be a bug fix release:
 
 *   Optimized and correct searches in Keycloak mass data
-*   Add missing paging functionality
+*   Add missing paging functionality to queries
 
 Version `1.3.0` will add the following features:
 
