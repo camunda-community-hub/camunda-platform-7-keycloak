@@ -39,9 +39,14 @@ Known limitations:
 
 #### Roadmap
 
-Version `1.2.0` will add the following features:
+Version `1.2.0` will be a bug fix release:
 
-* Optional group import filter in order to not import the whole security realm but just the relevant groups and their users.
+*   Optimized and correct searches in Keycloak mass data
+*   Add missing paging functionality
+
+Version `1.3.0` will add the following features:
+
+*   Optional group import filter in order to not import the whole security realm but just the relevant groups and their users.
 
 ## Prerequisites in your Keycloak realm
 
