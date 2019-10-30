@@ -764,7 +764,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				if (!matchesLike(query.getNameLike(), group.getName())) continue;
 				if (!matches(query.getType(), group.getType())) continue;
 
-				if (isAuthorized(READ, GROUP, group.getId())) {
+				if (isAuthenticatedUser(userId) || isAuthorized(READ, GROUP, group.getId())) {
 					groupList.add(group);
 
 					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
@@ -1235,13 +1235,20 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 * @return true if the passed-in user is currently authenticated
 	 */
 	protected boolean isAuthenticatedUser(UserEntity user) {
-		if (user.getId() == null) {
-			return false;
-		}
-		return user.getId().equalsIgnoreCase(
-				org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
+		return isAuthenticatedUser(user.getId());
 	}
 
+	/**
+	 * @return true if the passed-in userId matches the currently authenticated user
+	 */
+	protected boolean isAuthenticatedUser(String userId) {
+		if (userId == null) {
+			return false;
+		}
+		return userId.equalsIgnoreCase(
+				org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
+	}
+	
 	/**
 	 * Checks if the current is user is authorized to access a specific resource
 	 * @param permission the permission, e.g. READ

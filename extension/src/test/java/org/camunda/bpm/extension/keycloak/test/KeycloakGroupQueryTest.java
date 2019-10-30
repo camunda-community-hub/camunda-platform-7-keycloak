@@ -55,6 +55,20 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		List<Group> result = identityService.createGroupQuery().groupMember("camunda@accso.de").list();
 		assertEquals(1, result.size());
 	}
+
+	public void testAuthenticatedUserCanQueryOwnGroups() {
+		try {
+			processEngineConfiguration.setAuthorizationEnabled(true);
+			identityService.setAuthenticatedUserId("johnfoo@gmail.com");
+
+			assertEquals(0, identityService.createGroupQuery().groupMember("camunda@accso.de").count());
+			assertEquals(2, identityService.createGroupQuery().groupMember("johnfoo@gmail.com").count());
+
+		} finally {
+			processEngineConfiguration.setAuthorizationEnabled(false);
+			identityService.clearAuthentication();
+		}
+	}
 	
 	/* The REST API of Keycloak (get list(!) of groups) does not deliver group attributes :-(
 	public void testFilterByGroupType() {
