@@ -764,7 +764,10 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				if (!matchesLike(query.getNameLike(), group.getName())) continue;
 				if (!matches(query.getType(), group.getType())) continue;
 
-				if (isAuthenticatedUser(userId) || isAuthorized(READ, GROUP, group.getId())) {
+				// authenticated user is always allowed to query his own groups
+				// otherwise READ authentication is required
+				boolean isAuthenticatedUser = isAuthenticatedUser(userId);
+				if (isAuthenticatedUser || isAuthorized(READ, GROUP, group.getId())) {
 					groupList.add(group);
 
 					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
