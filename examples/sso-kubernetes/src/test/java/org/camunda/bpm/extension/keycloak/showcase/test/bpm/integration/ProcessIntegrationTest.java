@@ -37,7 +37,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * the BPM process.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 public class ProcessIntegrationTest {

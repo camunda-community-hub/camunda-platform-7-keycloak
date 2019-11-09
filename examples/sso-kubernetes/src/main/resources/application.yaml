@@ -6,7 +6,8 @@ spring.datasource:
 
 spring:
   jersey:
-    application-path: engine-rest
+    application-path: /engine-rest
+
 # Redis Session Cache not yet in use
 #  session:
 #    store-type: ${SESSION_STORE_TYPE:none}
@@ -34,20 +35,20 @@ security:
   oauth2:
     client:
       client-id: camunda-identity-service
-      client-secret: 7d3c845d-f652-4bed-9797-d6d20b7623da
-      accessTokenUri: ${keycloak.url.token}/auth/realms/master/protocol/openid-connect/token
-      userAuthorizationUri: ${keycloak.url.client}/auth/realms/master/protocol/openid-connect/auth
+      client-secret: 0ca35c49-c721-44dd-a6c2-a5e825e13c84
+      accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+      userAuthorizationUri: ${keycloak.url.client}/auth/realms/camunda/protocol/openid-connect/auth
       scope: openid profile email
     resource:
-      userInfoUri: ${keycloak.url.client}/auth/realms/master/protocol/openid-connect/userinfo
+      userInfoUri: ${keycloak.url.client}/auth/realms/camunda/protocol/openid-connect/userinfo
 
 logging.level.org.springframework.security: DEBUG
 
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/master
-  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/master
+  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
+  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
   clientId: camunda-identity-service
-  clientSecret: 7d3c845d-f652-4bed-9797-d6d20b7623da
+  clientSecret: 0ca35c49-c721-44dd-a6c2-a5e825e13c84
   useEmailAsCamundaUserId: true
   useUsernameAsCamundaUserId: false
   useGroupPathAsCamundaGroupId: true

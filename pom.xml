@@ -26,9 +26,9 @@
     
     <!-- versions -->
 	<version.camunda>7.11.0</version.camunda>
-	<version.camundaSpringBoot>3.3.1</version.camundaSpringBoot>
-	<version.springBoot>2.1.6.RELEASE</version.springBoot>
-	<version.springSecurityOauth2>2.1.6.RELEASE</version.springSecurityOauth2>
+	<version.camundaSpringBoot>3.3.5</version.camundaSpringBoot>
+	<version.springBoot>2.1.9.RELEASE</version.springBoot>
+	<version.springSecurityOauth2>2.1.9.RELEASE</version.springSecurityOauth2>
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
