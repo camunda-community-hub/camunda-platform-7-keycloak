@@ -25,7 +25,7 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
     	
     	http
-    	.csrf().ignoringAntMatchers("/api/**")
+    	.csrf().ignoringAntMatchers("/api/**", "/engine-rest/**")
     	.and()
         .antMatcher("/**")
         .authorizeRequests()
