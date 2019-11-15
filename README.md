@@ -57,6 +57,8 @@ Version `1.3.0` will add the following features:
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
 4.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
+5. Create group `camunda-admin` in section Manage > Groups: ![CreateAdminGroup](doc/identity-service_create-group.png "Create camunda-admin group")
+6. Go to `camunda-admin` group (double click) and then go to tab "Role Mappings". Choose `camunda-identity-service` in "Client Roles" and move `camunda-admin` from "Available Roles" to "Assigned Roles" ![RoleMappings](doc/identity-service_role-mappings.png "Admin role mappings")
 
 <!--
 5.  You can mark groups as Camunda SYSTEM groups by adding an attribute named ``type`` with value ``SYSTEM``. The designated administrator group (see configuration parameter ``administratorGroupName``) is automatically of type SYSTEM. All other groups will be treated as workflow groups.
