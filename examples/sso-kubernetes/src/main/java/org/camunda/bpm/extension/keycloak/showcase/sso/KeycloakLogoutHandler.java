@@ -14,6 +14,7 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * Keycloak Logout Handler.
@@ -34,9 +35,11 @@ public class KeycloakLogoutHandler implements LogoutSuccessHandler {
 	 * Default constructor.
 	 * @param oauth2UserAuthorizationUri configured keycloak authorization URI
 	 */
-	public KeycloakLogoutHandler(@Value("${security.oauth2.client.user-authorization-uri}") String oauth2UserAuthorizationUri) {
-		// in order to get the valid logout uri: simply replace "/auth" at the end of the user authorization uri with "/logout"
-		this.oauth2UserLogoutUri = oauth2UserAuthorizationUri.replace("openid-connect/auth", "openid-connect/logout");
+	public KeycloakLogoutHandler(@Value("${security.oauth2.client.user-authorization-uri:}") String oauth2UserAuthorizationUri) {
+		if (!StringUtils.isEmpty(oauth2UserAuthorizationUri)) {
+			// in order to get the valid logout uri: simply replace "/auth" at the end of the user authorization uri with "/logout"
+			this.oauth2UserLogoutUri = oauth2UserAuthorizationUri.replace("openid-connect/auth", "openid-connect/logout");
+		}
 	}
 
 	/**
