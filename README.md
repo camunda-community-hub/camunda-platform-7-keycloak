@@ -57,10 +57,8 @@ Version `1.3.0` will add the following features:
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
 4.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
-
-<!--
-5.  You can mark groups as Camunda SYSTEM groups by adding an attribute named ``type`` with value ``SYSTEM``. The designated administrator group (see configuration parameter ``administratorGroupName``) is automatically of type SYSTEM. All other groups will be treated as workflow groups.
--->
+5.  Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated Camunda admin group or Camunda admin user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
+	![KeycloakGroups](doc/keycloak-groups.png "Keycloak Realm Groups")
 
 ## Usage with Camunda Spring Boot
 
