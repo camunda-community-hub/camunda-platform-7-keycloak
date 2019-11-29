@@ -48,15 +48,17 @@ public class KeycloakLogoutHandler implements LogoutSuccessHandler {
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-		// Calculate redirect URI for Keycloak, something like http://<host:port>/camunda/login
-		String requestUrl = request.getRequestURL().toString();
-		String redirectUri = requestUrl.substring(0, requestUrl.indexOf("/app")) + "/login";
-		// Complete logout URL
-		String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
-
-		// Do logout by redirecting to Keycloak logout
-		LOG.debug("Redirecting to logout URL {}", logoutUrl);
-		redirectStrategy.sendRedirect(request, response, logoutUrl);
+		if (!StringUtils.isEmpty(oauth2UserLogoutUri)) {
+			// Calculate redirect URI for Keycloak, something like http://<host:port>/camunda/login
+			String requestUrl = request.getRequestURL().toString();
+			String redirectUri = requestUrl.substring(0, requestUrl.indexOf("/app")) + "/login";
+			// Complete logout URL
+			String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
+	
+			// Do logout by redirecting to Keycloak logout
+			LOG.debug("Redirecting to logout URL {}", logoutUrl);
+			redirectStrategy.sendRedirect(request, response, logoutUrl);
+		}
 	}	
 	
 }
