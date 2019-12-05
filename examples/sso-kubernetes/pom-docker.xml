@@ -21,11 +21,11 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-		<version.camunda>7.11.0</version.camunda>
-		<!-- <version.camunda>7.11.3-ee</version.camunda> -->
-		<version.camundaSpringBoot>3.3.5</version.camundaSpringBoot>
-		<version.springBoot>2.1.9.RELEASE</version.springBoot>
-		<version.springSecurityOauth2>2.1.9.RELEASE</version.springSecurityOauth2>
+		<version.camunda>7.12.0</version.camunda>
+		<!-- <version.camunda>7.12.0-ee</version.camunda> -->
+		<version.camundaSpringBoot>3.4.0</version.camundaSpringBoot>
+		<version.springBoot>2.2.1.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.2.1.RELEASE</version.springSecurityOauth2>
 	</properties>
 
     <dependencyManagement>
@@ -133,19 +133,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- TODO Upgrade to newer BPM assert version
-		     See: https://docs.camunda.org/manual/7.11/user-guide/testing/#migration-from-community-versions
-		  -->
 		<dependency>
-			<groupId>org.camunda.bpm.extension</groupId>
+			<groupId>org.camunda.bpm.assert</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>1.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>1.7.1</version>
+			<version>4.0.0</version>
 			<scope>test</scope>
 		</dependency>
 

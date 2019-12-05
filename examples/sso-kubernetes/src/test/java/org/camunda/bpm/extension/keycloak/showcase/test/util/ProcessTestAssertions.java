@@ -1,7 +1,9 @@
 package org.camunda.bpm.extension.keycloak.showcase.test.util;
 
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions;
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
+import org.camunda.bpm.engine.test.assertions.bpmn.ProcessInstanceAssert;
 
 /**
  * Assert methods for process tests.
@@ -43,7 +45,7 @@ public abstract class ProcessTestAssertions {
 		 * @return this {@link WaitAssert}
 		 */
 		public WaitAssert hasPassed(String activityId) {
-			waitForRunWithoutAssertionError(() -> ProcessEngineAssertions.assertThat(actual).hasPassed(activityId));
+			waitForAssertion(() -> BpmnAwareTests.assertThat(actual).hasPassed(activityId));
 			return this;
 		}
 
@@ -55,7 +57,7 @@ public abstract class ProcessTestAssertions {
 		 * @return this {@link WaitAssert}
 		 */
 		public WaitAssert isWaitingFor(String... messageNames) {
-			waitForRunWithoutAssertionError(() -> ProcessEngineAssertions.assertThat(actual).isWaitingFor(messageNames));
+			waitForAssertion(() -> BpmnAwareTests.assertThat(actual).isWaitingFor(messageNames));
 			return this;
 		}
 
@@ -77,8 +79,8 @@ public abstract class ProcessTestAssertions {
 		 * @return this {@link WaitAssert}
 		 */
 		public WaitAssert hasStartedSubProcess(String processDefinitionKey) {
-			waitForRunWithoutAssertionError(
-					() -> ProcessEngineAssertions.assertThat(actual).calledProcessInstance(processDefinitionKey).isActive());
+			waitForAssertion(
+					() -> BpmnAwareTests.assertThat(actual).calledProcessInstance(processDefinitionKey).isActive());
 			return this;
 		}
 
@@ -88,7 +90,7 @@ public abstract class ProcessTestAssertions {
 		 * @return this {@link WaitAssert}
 		 */
 		public WaitAssert isEnded() {
-			waitForRunWithoutAssertionError(() -> ProcessEngineAssertions.assertThat(actual).isEnded());
+			waitForAssertion(() -> BpmnAwareTests.assertThat(actual).isEnded());
 			return this;
 		}
 
@@ -125,16 +127,16 @@ public abstract class ProcessTestAssertions {
 		 * @param runnable the assertion to execute
 		 */
 		public void hasNoAssertionErrorFor(Runnable runnable) {
-			waitForRunWithoutAssertionError(runnable);
+			waitForAssertion(runnable);
 		}
 		
 		/**
-		 * Periodically (with intervalMillis as interval time) executes the runnable until it finishes wihout throwing an AssertionError or
-		 * the total wait time duration timeOutMillis has been reached.
+		 * Periodically (with intervalMillis as interval time) executes the runnable until it finishes without 
+		 * throwing an AssertionError or the total wait time duration timeOutMillis has been reached.
 		 * 
 		 * @param runnable the Runnable to execute
 		 */
-		protected void waitForRunWithoutAssertionError(Runnable runnable) { // NOPMD
+		protected void waitForAssertion(Runnable runnable) { // NOPMD
 			final long maxWait = System.currentTimeMillis() + timeOutMillis;
 			boolean finished = false;
 			while (!finished) {
@@ -183,8 +185,8 @@ public abstract class ProcessTestAssertions {
 		 * @return this {@link WaitAssert}
 		 */
 		public JobAssert hasRetries(int expectedRetries) {
-			waitForRunWithoutAssertionError(
-					() -> ProcessEngineAssertions.assertThat(actual).job(jobActivityId).hasRetries(expectedRetries));
+			waitForAssertion(
+					() -> BpmnAwareTests.assertThat(actual).job(jobActivityId).hasRetries(expectedRetries));
 			return this;
 		}
 	}
@@ -197,5 +199,80 @@ public abstract class ProcessTestAssertions {
 	 */
 	public static WaitAssert waitUntil(ProcessInstance actual) {
 		return new WaitAssert(actual);
+	}
+	
+	/**
+	 * Wait until... the given ProcessInstance meets your expectations.
+	 * 
+	 * @param actual HistoricProcessInstance under test
+	 * @return Assert object offering ProcessInstance specific wait assertions.
+	 */
+	public static WaitAssert waitUntil(HistoricProcessInstance hpi) {
+		return new WaitAssert(new ProcessInstanceBridge(hpi));
+	}
+	
+	/**
+	 * Assertions for historic process instances.
+	 * @param hpi the historic process instance
+	 * @return wrapped ProcessInstanceAssert
+	 */
+	public static ProcessInstanceAssert assertThat(HistoricProcessInstance hpi) {
+		return BpmnAwareTests.assertThat(new ProcessInstanceBridge(hpi));
+	}
+	
+	/**
+	 * Helper class bridgin Historic ProcessInstances and ProcessInstances.
+	 */
+	private static final class ProcessInstanceBridge implements ProcessInstance {
+		private HistoricProcessInstance hpi;
+
+		public ProcessInstanceBridge(HistoricProcessInstance hpi) {
+			this.hpi = hpi;
+		}
+		
+		@Override
+		public boolean isEnded() {
+			return hpi.getEndTime() != null;
+		}
+		
+		@Override
+		public String getTenantId() {
+			return hpi.getTenantId();
+		}
+		
+		@Override
+		public String getProcessInstanceId() {
+			return hpi.getId();
+		}
+		
+		@Override
+		public String getId() {
+			return hpi.getId();
+		}
+		
+		@Override
+		public boolean isSuspended() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String getRootProcessInstanceId() {
+			return hpi.getRootProcessInstanceId();
+		}
+		
+		@Override
+		public String getProcessDefinitionId() {
+			return hpi.getProcessDefinitionId();
+		}
+		
+		@Override
+		public String getCaseInstanceId() {
+			return hpi.getCaseInstanceId();
+		}
+		
+		@Override
+		public String getBusinessKey() {
+			return hpi.getBusinessKey();
+		}
 	}
 }
