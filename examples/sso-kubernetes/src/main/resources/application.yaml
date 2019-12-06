@@ -27,28 +27,39 @@ server:
   port: 8080
   servlet.context-path: /camunda
 
-keycloak.url.client: ${KEYCLOAK_URL_CLIENT:http://localhost:9000}
-keycloak.url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
-keycloak.url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+# Externalized Keycloak configuration
+keycloak:
+  # SSO Authentication requests. Send by application as redirect to the browser
+  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
+  # SSO Token requests. Send from the application to Keycloak
+  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
+  # Keycloak access for the Identity Provider plugin.
+  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
 
+  # Keycloak Camunda Identity Client
+  client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:0ca35c49-c721-44dd-a6c2-a5e825e13c84}
+
+# Spring Boot SSO OAuth2 Security
 security:
   oauth2:
     client:
-      client-id: camunda-identity-service
-      client-secret: 0ca35c49-c721-44dd-a6c2-a5e825e13c84
+      client-id: ${keycloak.client.id}
+      client-secret: ${keycloak.client.secret}
       accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-      userAuthorizationUri: ${keycloak.url.client}/auth/realms/camunda/protocol/openid-connect/auth
+      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
       scope: openid profile email
     resource:
-      userInfoUri: ${keycloak.url.client}/auth/realms/camunda/protocol/openid-connect/userinfo
+      userInfoUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
 
 logging.level.org.springframework.security: DEBUG
 
+# Camunda Keycloak Identity Provider Plugin
 plugin.identity.keycloak:
   keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
   keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
-  clientId: camunda-identity-service
-  clientSecret: 0ca35c49-c721-44dd-a6c2-a5e825e13c84
+  clientId: ${keycloak.client.id}
+  clientSecret: ${keycloak.client.secret}
   useEmailAsCamundaUserId: true
   useUsernameAsCamundaUserId: false
   useGroupPathAsCamundaGroupId: true

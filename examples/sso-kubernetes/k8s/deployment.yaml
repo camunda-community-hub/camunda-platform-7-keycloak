@@ -30,12 +30,16 @@ spec:
              value: camunda
            - name: JDBC_PASSWORD
              value: camunda1!
-           - name: KEYCLOAK_URL_CLIENT
+           - name: KEYCLOAK_URL_AUTH
              value: http://armstrong02
            - name: KEYCLOAK_URL_TOKEN
              value: http://keycloak-server-service:8080
            - name: KEYCLOAK_URL_PLUGIN
              value: https://keycloak-server-service:8443
+           - name: KEYCLOAK_CLIENT_ID
+             value: camunda-identity-service
+           - name: KEYCLOAK_CLIENT_SECRET
+             value: 0ca35c49-c721-44dd-a6c2-a5e825e13c84
          hostAliases:
          - ip: 10.0.75.1
            hostnames:
