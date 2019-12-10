@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import org.springframework.web.context.request.RequestContextListener;
 @ConditionalOnMissingClass("org.springframework.test.context.junit4.SpringJUnit4ClassRunner")
 @Configuration
 @EnableOAuth2Sso
+@Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
 public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Inject
