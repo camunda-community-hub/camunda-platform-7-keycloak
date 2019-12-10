@@ -74,7 +74,7 @@ Use a ``docker-compose.yml`` file as follows:
 
 The image ``gunnaraccso/keycloak.server`` has been derived from the original ``jboss/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker image](https://hub.docker.com/r/jboss/keycloak/).
 
-The only thing you have to adapt is the **Redirect URI** of the Camuna Identity Service Client. Login at the [Keycloak Admin Console](https://localhost:9001/auth/admin/master/console/#/) using user/password as configured above and set ``http://localhost:8080/camunda/login`` as Valid Redirect URI configuration:
+The only thing you have to adapt for local tests is the **Redirect URI** of the Camuna Identity Service Client. Login at the [Keycloak Admin Console](https://localhost:9001/auth/admin/master/console/#/) using user/password as configured above and set ``http://localhost:8080/camunda/login`` as Valid Redirect URI configuration at the Camunda Identity Service client:
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
@@ -82,7 +82,7 @@ For further details on how to setup a Keycloak Camunda Identity Service Client s
 
 ### Keycloak Identity Provider Plugin
 
-``KeycloakIdentityProvider.java`` in package ``org.camunda.bpm.extension.keycloak.showcase.plugin`` will activate the plugin.
+The class ``KeycloakIdentityProvider.java`` in package ``org.camunda.bpm.extension.keycloak.showcase.plugin`` will activate the plugin.
 
 The main configuration part in ``applicaton.yaml`` is as follows:
 
@@ -111,7 +111,7 @@ For configuration details of the plugin see documentation of [Keycloak Identity 
 
 ### OAuth2 SSO Configuration
 
-See package ``org.camunda.bpm.extension.keycloak.showcase.sso``.
+For OAuth2 SSO configuration see package ``org.camunda.bpm.extension.keycloak.showcase.sso``.
 
 The additional configuration parts in ``applicaton.yaml`` are as follows:
 
@@ -136,7 +136,13 @@ The additional configuration parts in ``applicaton.yaml`` are as follows:
 
 ### Optional Security for the Camunda REST Api
 
-In order to secure Camunda's REST Api we're using JWT combined with Keycloaks JWKS capabilities.
+In order to secure Camunda's REST Api we're using standard JWT combined with Keycloaks JWKS capabilities. Which implies
+
+* In order to use the engine's REST interface a client must first obtain a token from the Keycloak server
+* This token must be included in the REST request as authentication header
+* The job of the REST Api Security is to validate the token and then extract user id and groupIds
+* The token signature is checked by requesting the corresponding public key from Keycloak using its JWKS endpoint
+* Further token validation includes expiry and audience claims
 
 The additional configuration in ``application.yaml`` is simple and self explaining:
 
@@ -146,18 +152,20 @@ The additional configuration in ``application.yaml`` is simple and self explaini
 	  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
 	  required-audience: camunda-rest-api
 
-In order to get the required audience delivered within the tokens from Keycloak we configure a custom Client Scope named ``camunda-rest-api``:
+To induce keycloak to include the expected audience claim in delivered tokens, we configure a custom Client Scope named ``camunda-rest-api``:
 ![KeycloakClientScope](docs/Keycloak-Client-Scope.PNG)
 
-We need to add a mapper with type ``Audience`` and custom audience ``camunda-rest-api``
+We need to add a mapper with type ``Audience`` and configure the required audience ``camunda-rest-api``
 ![KeycloakClientScopeMapper](docs/Keycloak-Client-Scope-Mapper.PNG)
 
-Finally we assign the created Client Scope to the Camunda-Identity-Service:
+Finally we assign the created Client Scope to our existing Camunda-Identity-Service used for authentication:
 ![KeycloakClientScopeAssignment](docs/Keycloak-Client-Scope-Assignment.PNG)
 
-This ensures, that only user authenticated at the Camunda-Identity-Service are allowed to access Camunda's REST API. Fine grained configuration of the authorization rights can be achieved by adding rules to Camunda's Authorization configuration.
+This ensures, that only users authenticated at the Camunda-Identity-Service are allowed to access Camunda's REST API. Fine grained configuration of the authorization rights can be achieved by adding rules to Camunda's Authorization configuration.
 
-The security configuration classes for the REST Api part can be found in package ``org.camunda.bpm.extension.keycloak.showcase.rest``. Besides a typical implementation of a ``ResourceServerConfigurerAdapter`` we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. Its job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
+The security implementation snippets for the REST Api part can be found in package ``org.camunda.bpm.extension.keycloak.showcase.rest``. 
+
+Besides a typical implementation of a ``ResourceServerConfigurerAdapter`` we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. It's job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -182,6 +190,8 @@ The security configuration classes for the REST Api part can be found in package
         	identityService.clearAuthentication();
         }
 	}
+
+A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore it is ignored as standard.
 
 ## Kubernetes Setup
 
