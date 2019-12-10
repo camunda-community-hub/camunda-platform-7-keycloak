@@ -78,51 +78,110 @@ The only thing you have to adapt is the **Redirect URI** of the Camuna Identity 
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
-**Beware**: This is a first basic test setup which currently still uses the Master realm. For production I would strongly encourage you to setup your own realm and use Master only for administration purposes. In a future version this showcase will be modified as well.
-
-For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak)
+For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
 
 ### Keycloak Identity Provider Plugin
 
 ``KeycloakIdentityProvider.java`` in package ``org.camunda.bpm.extension.keycloak.showcase.plugin`` will activate the plugin.
 
-The configuration part in ``applicaton.yaml`` is as follows:
+The main configuration part in ``applicaton.yaml`` is as follows:
 
-	keycloak.url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+	# Externalized Keycloak configuration
+	keycloak:
+	  # Keycloak access for the Identity Provider plugin.
+	  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
 
+	  # Keycloak Camunda Identity Client
+	  client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
+	  client.secret: ${KEYCLOAK_CLIENT_SECRET:42xx42xx-a17b-c63d-e26f-42xx42xx42xx42xx}
+
+	# Camunda Keycloak Identity Provider Plugin
 	plugin.identity.keycloak:
-	  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/master
-	  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/master
-	  clientId: camunda-identity-service
-	  clientSecret: 7d3c845d-f652-4bed-9797-d6d20b7623da
+	  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
+	  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+	  clientId: ${keycloak.client.id}
+	  clientSecret: ${keycloak.client.secret}
 	  useEmailAsCamundaUserId: true
 	  useUsernameAsCamundaUserId: false
+	  useGroupPathAsCamundaGroupId: true
 	  administratorGroupName: camunda-admin
 	  disableSSLCertificateValidation: true
-	  
+  
 For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) 
 
 ### OAuth2 SSO Configuration
 
 See package ``org.camunda.bpm.extension.keycloak.showcase.sso``.
 
-The main configuration part in ``applicaton.yaml`` is as follows:
+The additional configuration parts in ``applicaton.yaml`` are as follows:
 
-	keycloak.url.client: ${KEYCLOAK_URL_CLIENT:http://localhost:9000}
-	keycloak.url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
+	# Externalized Keycloak configuration
+	keycloak:
+	  # SSO Authentication requests. Send by application as redirect to the browser
+	  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
+	  # SSO Token requests. Send from the application to Keycloak
+	  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
 
+	# Spring Boot SSO OAuth2 Security
 	security:
-	  basic:
-	    enabled: false
 	  oauth2:
 	    client:
-	      client-id: camunda-identity-service
-	      client-secret: 7d3c845d-f652-4bed-9797-d6d20b7623da
-	      accessTokenUri: ${keycloak.url.token}/auth/realms/master/protocol/openid-connect/token
-	      userAuthorizationUri: ${keycloak.url.client}/auth/realms/master/protocol/openid-connect/auth
+	      client-id: ${keycloak.client.id}
+	      client-secret: ${keycloak.client.secret}
+	      accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+	      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
 	      scope: openid profile email
 	    resource:
-	      userInfoUri: ${keycloak.url.client}/auth/realms/master/protocol/openid-connect/userinfo
+	      userInfoUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+
+### Optional Security for the Camunda REST Api
+
+In order to secure Camunda's REST Api we're using JWT combined with Keycloaks JWKS capabilities.
+
+The additional configuration in ``application.yaml`` is simple and self explaining:
+
+	# Camunda Rest API
+	rest.security:
+	  enabled: true
+	  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+	  required-audience: camunda-rest-api
+
+In order to get the required audience delivered within the tokens from Keycloak we configure a custom Client Scope named ``camunda-rest-api``:
+![KeycloakClientScope](docs/Keycloak-Client-Scope.PNG)
+
+We need to add a mapper with type ``Audience`` and custom audience ``camunda-rest-api``
+![KeycloakClientScopeMapper](docs/Keycloak-Client-Scope-Mapper.PNG)
+
+Finally we assign the created Client Scope to the Camunda-Identity-Service:
+![KeycloakClientScopeAssignment](docs/Keycloak-Client-Scope-Assignment.PNG)
+
+This ensures, that only user authenticated at the Camunda-Identity-Service are allowed to access Camunda's REST API. Fine grained configuration of the authorization rights can be achieved by adding rules to Camunda's Authorization configuration.
+
+The security configuration classes for the REST Api part can be found in package ``org.camunda.bpm.extension.keycloak.showcase.rest``. Besides a typical implementation of a ``ResourceServerConfigurerAdapter`` we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. Its job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+
+        // Get the Bearer Token and extract claims
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+        String accessToken = details.getTokenValue();
+        String claims = JwtHelper.decode(accessToken).getClaims();
+        
+        // Extract user ID from Token claims -depending on Keycloak Identity Provider configuration
+        // String userId = Spin.JSON(claims).prop("sub").stringValue();
+        String userId = Spin.JSON(claims).prop("email").stringValue(); // useEmailAsCamundaUserId = true
+        // String userId = Spin.JSON(claims).prop("preferred_username").stringValue(); // useUsernameAsCamundaUserId = true
+        LOG.debug("Extracted userId from bearer token: {}", userId);
+
+        try {
+        	identityService.setAuthentication(userId, getUserGroups(userId));
+        	chain.doFilter(request, response);
+        } finally {
+        	identityService.clearAuthentication();
+        }
+	}
 
 ## Kubernetes Setup
 
@@ -180,7 +239,7 @@ In order to make Keycloak run with Kubernetes you have to be aware of two things
 * Activate ``nginx.ingress.kubernetes.io/ssl-redirect`` in your ingress service.
 * The Redirect URI within Keycloak's Camunda-Identity-Service Client should be ``/camunda/login/*``.
 
-Keep in mind that the included ``keycloak/deployment.yaml`` is only a test setup. Adapt to your own needs. For production I would strongly encourage you to setup your own realm and use Master only for administration purposes.
+Keep in mind that the included ``keycloak/deployment.yaml`` is only a test setup. Adapt to your own needs.
 
 After setting up your Keycloak server you can start the deployment of the showcase.
 
