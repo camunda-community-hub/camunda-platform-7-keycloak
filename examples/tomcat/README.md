@@ -3,9 +3,7 @@ This document describes the installation of the **Keycloak Camunda Identity Prov
 
 ## Camunda Installation on Apache Tomcat
 
-For information on how to install Camunda on Apache Tomcat carefully read  and follow the installation reference within the Camunda Docs: 
-
-[https://docs.camunda.org/manual/latest/installation/full/tomcat/](https://docs.camunda.org/manual/latest/installation/full/tomcat/)
+For information on how to install Camunda on Apache Tomcat carefully read  and follow the installation reference within the Camunda Docs: [https://docs.camunda.org/manual/latest/installation/full/tomcat/](https://docs.camunda.org/manual/latest/installation/full/tomcat/)
 
 ## Install the Keycloak Identity Provider Plugin
 
@@ -25,7 +23,7 @@ For the records - included dependencies are:
 
 ## Configure the Keycloak Identity Provider Plugin
 
-Then last step is to edit the ``bpm-platform.xml`` file inside the folder ``$TOMCAT_HOME/conf`` and configure the plugin. A sample configuration looks as follows:
+The last step is to edit the ``bpm-platform.xml`` file inside the folder ``$TOMCAT_HOME/conf`` and configure the plugin. A sample configuration looks as follows:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<bpm-platform xmlns="http://www.camunda.org/schema/1.0/BpmPlatform"

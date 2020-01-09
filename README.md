@@ -256,9 +256,13 @@ In case you have activated the flag `useUsernameAsCamundaUserId` the extraction 
 	@SuppressWarnings("unchecked")
 	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username");
 
-## Sample Project with SSO on Kubernetes
+## Sample Spring Boot Project with SSO on Kubernetes
 
 A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/sso-kubernetes). See directory `examples`.
+
+## Installation on Apache Tomcat with Shared Process Engine
+
+Even if from an architectural point of view Spring Boot is currently the most recommended approach for cloud scenarios, it is of course possible to install the plugin in other Camunda distributions as well. A description on how to install the plugin on an Apache Tomcat full distribution can be found under [Installation on Tomcat](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/tomcat). See directory `examples`.
 
 ## Unit testing the plugin
 
