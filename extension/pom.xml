@@ -72,7 +72,22 @@
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 				</configuration>
 			</plugin>
-		</plugins>
+		    <plugin>
+		      <artifactId>maven-assembly-plugin</artifactId>
+		      <configuration>
+			      <descriptor>assembly-all.xml</descriptor>
+		      </configuration>
+		      <executions>
+		        <execution>
+		          <id>make-assembly</id>
+		          <phase>package</phase>
+		          <goals>
+		            <goal>single</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+    	</plugins>
 	</build>
 
 </project>

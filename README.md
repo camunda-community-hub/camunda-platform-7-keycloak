@@ -42,12 +42,6 @@ Known limitations:
 *   Sort criteria for queries are implemented on the client side - the Keycloak REST API does not allow result ordering.
 *   Tenants are currently not supported.
 
-#### Roadmap
-
-Version `1.3.0` will add the following features:
-
-*   Optional group import filter in order to not import the whole security realm but just the relevant groups and their users.
-
 ## Prerequisites in your Keycloak realm
 
 1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").

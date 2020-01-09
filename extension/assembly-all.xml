@@ -1,0 +1,26 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>all</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+      <includes>
+      	  <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
+	      <include>org.springframework:spring-web</include>
+	      <include>org.springframework:spring-beans</include>
+	      <include>org.springframework:spring-core</include>
+	      <include>org.springframework:spring-jcl</include>
+	      <include>org.apache.httpcomponents:httpclient</include>
+	      <include>org.apache.httpcomponents:httpcore</include>
+	      <include>commons-codec:commons-codec</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>
