@@ -9,7 +9,7 @@ For information on how to install Camunda on Apache Tomcat carefully read  and f
 
 In order to install the Keycloak Identity Provider Plugin you have to download the library ``camunda-bpm-identity-keycloak-all-x.y.z.jar`` and copy it to ``$TOMCAT_HOME/lib``.
 
-Please be aware that you must use the provided ``*-all-x.y.z.jar`` packaged with the "**-all**" classifier including transitive dependencies. The additional library is available since version ``1.3.0``.
+Please be aware that you must use the provided ``*-all-x.y.z.jar`` (fat jar, packaged with the "**-all**" extension) including transitive dependencies. The additional library is available since version ``1.3.0``.
 
 For the records - included dependencies are:
 
@@ -20,6 +20,8 @@ For the records - included dependencies are:
 * org.apache.httpcomponents:httpclient
 * org.apache.httpcomponents:httpcore
 * commons-codec:commons-codec
+
+The dependencies are shaded into the ``keycloakjar`` package namespace.
 
 ## Configure the Keycloak Identity Provider Plugin
 

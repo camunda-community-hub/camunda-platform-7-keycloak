@@ -24,10 +24,22 @@
 			<groupId>org.camunda.bpm.extension</groupId>
 			<artifactId>camunda-bpm-identity-keycloak</artifactId>
 		</dependency>
+
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- assemble -all.jar with the extension itself -->
 		    <plugin>
 		      <artifactId>maven-assembly-plugin</artifactId>
 		      <configuration>
@@ -44,6 +56,41 @@
 		        </execution>
 		      </executions>
 		    </plugin>
+			<!-- shade required dependencies into the extension -->
+			<plugin>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>true</createDependencyReducedPom>
+							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+							<artifactSet>
+								<excludes>
+									<exclude>org.camunda.commons:*</exclude>
+									<exclude>org.slf4j:*</exclude>
+								</excludes>
+							</artifactSet>
+ 							<relocations>
+								<relocation>
+									<pattern>org.springframework</pattern>
+									<shadedPattern>keycloakjar.org.springframework</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.apache</pattern>
+									<shadedPattern>keycloakjar.org.apache</shadedPattern>
+								</relocation>
+							</relocations>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

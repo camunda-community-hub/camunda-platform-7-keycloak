@@ -14,13 +14,6 @@
       <scope>compile</scope>
       <includes>
       	  <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
-	      <include>org.springframework:spring-web</include>
-	      <include>org.springframework:spring-beans</include>
-	      <include>org.springframework:spring-core</include>
-	      <include>org.springframework:spring-jcl</include>
-	      <include>org.apache.httpcomponents:httpclient</include>
-	      <include>org.apache.httpcomponents:httpcore</include>
-	      <include>commons-codec:commons-codec</include>
       </includes>
     </dependencySet>
   </dependencySets>
