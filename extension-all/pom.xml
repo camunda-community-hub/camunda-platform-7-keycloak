@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+	  <groupId>org.camunda.bpm.extension</groupId>
+	  <artifactId>camunda-bpm-identity-keycloak-root</artifactId>
+	  <version>1.3.0-SNAPSHOT</version>
+	</parent>
+
+    <artifactId>camunda-bpm-identity-keycloak-all</artifactId>
+
+	<packaging>jar</packaging>
+    <name>camunda BPM - engine plugins - identity - keycloak - extension - all</name>
+	<description>Camunda Keycloak Identity Provider Plugin including all transitive dependencies</description>
+
+	<properties>
+		<maven.compiler.source>${version.java}</maven.compiler.source>
+		<maven.compiler.target>${version.java}</maven.compiler.target>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.camunda.bpm.extension</groupId>
+			<artifactId>camunda-bpm-identity-keycloak</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+		    <plugin>
+		      <artifactId>maven-assembly-plugin</artifactId>
+		      <configuration>
+			      <appendAssemblyId>false</appendAssemblyId>
+			      <descriptor>assembly-all.xml</descriptor>
+		      </configuration>
+		      <executions>
+		        <execution>
+		          <id>make-assembly</id>
+		          <phase>package</phase>
+		          <goals>
+		            <goal>single</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		</plugins>
+	</build>
+
+</project>
