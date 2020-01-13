@@ -136,7 +136,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.assert</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>4.0.0</version>
+			<version>5.0.0</version>
 			<scope>test</scope>
 		</dependency>
 
