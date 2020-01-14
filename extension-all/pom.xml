@@ -41,6 +41,7 @@
 		<plugins>
 			<!-- assemble -all.jar with the extension itself -->
 		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
 		      <artifactId>maven-assembly-plugin</artifactId>
 		      <configuration>
 			      <appendAssemblyId>false</appendAssemblyId>
@@ -58,6 +59,7 @@
 		    </plugin>
 			<!-- shade required dependencies into the extension -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<executions>
 					<execution>
