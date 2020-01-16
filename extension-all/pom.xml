@@ -104,7 +104,7 @@
 					<includeDependencySources>true</includeDependencySources>
 					<includeTransitiveDependencySources>true</includeTransitiveDependencySources>
 					<dependencySourceIncludes>
-						<include>org.camunda.bpm.extension:*</include>
+						<include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
 					</dependencySourceIncludes>
 					<additionalDependencies>
 						<additionalDependency>
