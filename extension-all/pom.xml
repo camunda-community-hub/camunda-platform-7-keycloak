@@ -72,6 +72,7 @@
 						<configuration>
 							<createDependencyReducedPom>true</createDependencyReducedPom>
 							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+							<createSourcesJar>true</createSourcesJar>
 							<artifactSet>
 								<excludes>
 									<exclude>org.camunda.commons:*</exclude>
@@ -94,6 +95,25 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<!-- make sure javadocs are generated for camunda-bpm-identity-keycloak-all -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<includeDependencySources>true</includeDependencySources>
+					<includeTransitiveDependencySources>true</includeTransitiveDependencySources>
+					<dependencySourceIncludes>
+						<include>org.camunda.bpm.extension:*</include>
+					</dependencySourceIncludes>
+					<additionalDependencies>
+						<additionalDependency>
+							<groupId>junit</groupId>
+							<artifactId>junit</artifactId>
+							<version>4.12</version>
+						</additionalDependency>
+					</additionalDependencies>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
