@@ -11,6 +11,14 @@ public class KeycloakUserNotFoundException extends Exception {
 	/**
 	 * Creates a new KeycloakUserNotFoundException.
 	 * @param message the message
+	 */
+	public KeycloakUserNotFoundException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Creates a new KeycloakUserNotFoundException.
+	 * @param message the message
 	 * @param cause the original cause
 	 */
 	public KeycloakUserNotFoundException(String message, Throwable cause) {

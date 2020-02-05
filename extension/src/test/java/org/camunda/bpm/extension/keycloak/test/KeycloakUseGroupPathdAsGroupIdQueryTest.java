@@ -193,7 +193,7 @@ public class KeycloakUseGroupPathdAsGroupIdQueryTest extends AbstractKeycloakIde
 
 	public void testOrderByGroupId() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupId().desc().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getId().compareTo(groupList.get(1).getId()) > 0);
 		assertTrue(groupList.get(1).getId().compareTo(groupList.get(2).getId()) > 0);
 		assertTrue(groupList.get(2).getId().compareTo(groupList.get(3).getId()) > 0);
@@ -203,7 +203,7 @@ public class KeycloakUseGroupPathdAsGroupIdQueryTest extends AbstractKeycloakIde
 
 	public void testOrderByGroupName() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupName().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getName().compareTo(groupList.get(1).getName()) < 0);
 		assertTrue(groupList.get(1).getName().compareTo(groupList.get(2).getName()) < 0);
 		assertTrue(groupList.get(2).getName().compareTo(groupList.get(3).getName()) < 0);
@@ -274,6 +274,12 @@ public class KeycloakUseGroupPathdAsGroupIdQueryTest extends AbstractKeycloakIde
 				.userEmailLike("*@accso.de")
 				.list();
 		assertEquals(1, result.size());
+	}
+
+	public void testFilterUserByGroupIdSimilarToClientName() {
+		User user = identityService.createUserQuery().memberOfGroup("camunda-identity-service").singleResult();
+		assertNotNull(user);
+		assertEquals("identity.service@test.de", user.getId());
 	}
 	
 }

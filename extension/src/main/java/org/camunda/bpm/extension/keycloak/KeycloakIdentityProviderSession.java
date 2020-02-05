@@ -423,7 +423,17 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-			return new JSONArray(response.getBody()).getJSONObject(0).getString("id");
+			JSONArray resultList = new JSONArray(response.getBody());
+			JSONObject result = findFirst(resultList,
+					keycloakConfiguration.isUseUsernameAsCamundaUserId() ? "username" : "email",
+					userId);
+			if (result != null) {
+				return result.getString("id");
+			}
+			throw new KeycloakUserNotFoundException(userId + 
+					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
+					? " not found - email unknown" 
+					: " not found - username unknown"));
 		} catch (JSONException je) {
 			throw new KeycloakUserNotFoundException(userId + 
 					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
@@ -471,13 +481,16 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				ResponseEntity<String> response = restTemplate.exchange(
 						keycloakConfiguration.getKeycloakAdminUrl() + "/users?username=" + configuredAdminUserId, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
-				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-					return new JSONArray(response.getBody()).getJSONObject(0).getString("email");
+				JSONObject user = findFirst(new JSONArray(response.getBody()), "username", configuredAdminUserId);
+				if (user != null) {
+					if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
+						return user.getString("email");
+					}
+					if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
+						return user.getString("username");
+					}
+					return user.getString("id");
 				}
-				if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-					return new JSONArray(response.getBody()).getJSONObject(0).getString("username");
-				}
-				return new JSONArray(response.getBody()).getJSONObject(0).getString("id");
 			} catch (JSONException je) {
 				// username not found: fall through
 			}
@@ -643,7 +656,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/users?email=" + userId, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-				return new JSONArray(response.getBody()).getJSONObject(0).getString("username");
+				JSONObject result = findFirst(new JSONArray(response.getBody()), "email", userId);
+				if (result != null) {
+					return result.getString("username");
+				}
+				throw new KeycloakUserNotFoundException(userId + " not found - email unknown");
 			} else {
 				ResponseEntity<String> response = restTemplate.exchange(
 						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + userId, HttpMethod.GET,
@@ -1283,4 +1300,20 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		return str1.compareTo(str2);
 	}
 
+	/**
+	 * Finds the first element in a list, where a given attribute matches a given name.
+	 * @param list the list
+	 * @param attributeToMatch the name of the attribute to match against
+	 * @param attributeValue the value of the attribute
+	 * @return matching element if found, {@code null} otherwise
+	 */
+	protected JSONObject findFirst(JSONArray list, String attributeToMatch, String attributeValue) {
+		for (int i=0; i < list.length(); i++) {
+			JSONObject result = list.getJSONObject(i);
+			if (attributeValue.equalsIgnoreCase(result.optString(attributeToMatch))) {
+				return result;
+			}
+		}
+		return null;
+	}
 }

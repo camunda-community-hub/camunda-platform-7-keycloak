@@ -70,6 +70,9 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 
 	protected static String USER_ID_HIERARCHY;
 	
+	protected static String GROUP_ID_SIMILAR_CLIENT_NAME;
+	protected static String USER_ID_SIMILAR_CLIENT_NAME;
+	
 	private static final RestTemplate restTemplate = new RestTemplate();
 	
 	protected static String CLIENT_SECRET = null;
@@ -189,10 +192,10 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    // Create test realm
 		String realm = "test";
 		createRealm(headers, realm);
-	    
+
 	    // Create Client
 		CLIENT_SECRET = createClient(headers, realm, "camunda-identity-service", "http://localhost:8080/login");
-	    
+
 	    // Create groups
 		GROUP_ID_ADMIN = createGroup(headers, realm, "camunda-admin", true);
 		GROUP_ID_TEAMLEAD = createGroup(headers, realm, "teamlead", false);
@@ -220,6 +223,11 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		USER_ID_HIERARCHY = createUser(headers, realm, "johnfoo", "John", "Foo", "johnfoo@gmail.com", "!§$%&/()=?#'-_.:,;+*~@€");
 		assignUserGroup(headers, realm, USER_ID_HIERARCHY, GROUP_ID_HIERARCHY_CHILD2);
 		assignUserGroup(headers, realm, USER_ID_HIERARCHY, GROUP_ID_HIERARCHY_SUBCHILD1);
+
+		// Create user and group named similar to the name of the Keycloak Client
+		GROUP_ID_SIMILAR_CLIENT_NAME = createGroup(headers, realm, "camunda-identity-service", false);
+		USER_ID_SIMILAR_CLIENT_NAME = createUser(headers, realm, "camunda-identity-service", "Identity", "Service", "identity.service@test.de", null);
+		assignUserGroup(headers, realm, USER_ID_SIMILAR_CLIENT_NAME, GROUP_ID_SIMILAR_CLIENT_NAME);
 	}
 	
 	/**

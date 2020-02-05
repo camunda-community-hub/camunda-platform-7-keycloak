@@ -18,7 +18,7 @@ public class KeycloakRefreshTokenTest extends AbstractKeycloakIdentityProviderTe
 	 */
 	public void testRefreshToken() throws Exception {
 		// access Keycloak
-	    assertEquals(4, identityService.createUserQuery().count());
+	    assertEquals(5, identityService.createUserQuery().count());
 
 	    // expire current token (the dirty way)
 	    KeycloakIdentityProviderFactory sessionFacory = (KeycloakIdentityProviderFactory) 
@@ -31,7 +31,7 @@ public class KeycloakRefreshTokenTest extends AbstractKeycloakIdentityProviderTe
 	    assertTrue(ctx.needsRefresh());
 	    
 		// access Keycloak again
-	    assertEquals(4, identityService.createUserQuery().count());
+	    assertEquals(5, identityService.createUserQuery().count());
 	    
 	}
 	

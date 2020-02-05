@@ -180,4 +180,10 @@ public class KeycloakUseUsernameAsUserIdQueryTest extends AbstractKeycloakIdenti
 		assertNull(group);
 	}
 	
+	public void testGroupQueryFilterByUserIdSimilarToClientName() {
+		Group group = identityService.createGroupQuery().groupMember("camunda-identity-service").singleResult();
+		assertNotNull(group);
+		assertEquals(GROUP_ID_SIMILAR_CLIENT_NAME, group.getId());
+		assertEquals("camunda-identity-service", group.getName());
+	}
 }

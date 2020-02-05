@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
 
 /**
  * Tests group queries.
@@ -17,7 +16,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testQueryNoFilter() {
 		List<Group> groupList = identityService.createGroupQuery().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 	}
 
 	public void testQueryPaging() {
@@ -31,7 +30,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 		// Next page
 		List<Group> resultLast = identityService.createGroupQuery().listPage(6, 10);
-		assertEquals(2, resultLast.size());
+		assertEquals(3, resultLast.size());
 
 		// unique results
 		assertEquals(0, result.stream().filter(group -> resultNext.contains(group)).count());
@@ -172,7 +171,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testOrderByGroupId() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupId().desc().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getId().compareTo(groupList.get(1).getId()) > 0);
 		assertTrue(groupList.get(1).getId().compareTo(groupList.get(2).getId()) > 0);
 		assertTrue(groupList.get(2).getId().compareTo(groupList.get(3).getId()) > 0);
@@ -182,7 +181,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testOrderByGroupName() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupName().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getName().compareTo(groupList.get(1).getName()) < 0);
 		assertTrue(groupList.get(1).getName().compareTo(groupList.get(2).getName()) < 0);
 		assertTrue(groupList.get(2).getName().compareTo(groupList.get(3).getName()) < 0);
@@ -192,7 +191,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testOrderByGroupType() {
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupType().desc().list();
-		assertEquals(8, groupList.size());
+		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getType().compareTo(groupList.get(1).getType()) >= 0);
 		assertTrue(groupList.get(1).getType().compareTo(groupList.get(2).getType()) >= 0);
 		assertTrue(groupList.get(2).getType().compareTo(groupList.get(3).getType()) >= 0);

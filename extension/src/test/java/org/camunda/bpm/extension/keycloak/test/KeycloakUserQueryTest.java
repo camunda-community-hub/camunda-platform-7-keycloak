@@ -17,7 +17,7 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
 
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
-    assertEquals(4, result.size());
+    assertEquals(5, result.size());
   }
 
   public void testQueryPaging() {
@@ -27,7 +27,7 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
 	  
 	  // Next page
 	  List<User> resultNext = identityService.createUserQuery().listPage(2, 10);
-	  assertEquals(2, resultNext.size());
+	  assertEquals(3, resultNext.size());
 	  
 	  // unique results
 	  assertEquals(0, result.stream().filter(user -> resultNext.contains(user)).count());
@@ -213,28 +213,28 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
   
   public void testOrderByUserId() {
 	  List<User> result = identityService.createUserQuery().orderByUserId().desc().list();
-	  assertEquals(4, result.size());
+	  assertEquals(5, result.size());
 	  assertTrue(result.get(0).getId().compareTo(result.get(1).getId()) > 0);
 	  assertTrue(result.get(1).getId().compareTo(result.get(2).getId()) > 0);
   }
 
   public void testOrderByUserEmail() {
 	  List<User> result = identityService.createUserQuery().orderByUserEmail().list();
-	  assertEquals(4, result.size());
+	  assertEquals(5, result.size());
 	  assertTrue(result.get(0).getEmail().compareTo(result.get(1).getEmail()) < 0);
 	  assertTrue(result.get(1).getEmail().compareTo(result.get(2).getEmail()) < 0);
   }
 
   public void testOrderByUserFirstName() {
 	  List<User> result = identityService.createUserQuery().orderByUserFirstName().desc().list();
-	  assertEquals(4, result.size());
+	  assertEquals(5, result.size());
 	  assertTrue(result.get(0).getFirstName().compareTo(result.get(1).getFirstName()) > 0);
 	  assertTrue(result.get(1).getFirstName().compareTo(result.get(2).getFirstName()) > 0);
   }
 
   public void testOrderByUserLastName() {
 	  List<User> result = identityService.createUserQuery().orderByUserLastName().list();
-	  assertEquals(4, result.size());
+	  assertEquals(5, result.size());
 	  assertTrue(result.get(0).getLastName().compareTo(result.get(1).getLastName()) < 0);
 	  assertTrue(result.get(1).getLastName().compareTo(result.get(2).getLastName()) < 0);
   }
