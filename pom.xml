@@ -13,7 +13,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-bpm-identity-keycloak-root</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - engine plugins - identity - keycloak - root</name>
   <description>A Camunda Identity Provider Plugin for Keycloak</description>
@@ -45,7 +45,7 @@
     <connection>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</connection>
     <url>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</url>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-identity-keycloak.git</developerConnection>
-    <tag>1.4.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
