@@ -10,7 +10,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -29,11 +28,7 @@ public class KeycloakConfigureAdminUserIdAsUsernameAndUseMailAsIdTest extends Ab
 	        protected void setUp() throws Exception {
 	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
 	    				.createProcessEngineConfigurationFromResource("camunda.configureAdminUserIdAsUsernameAndUseMailAsId.cfg.xml");
-	    		config.getProcessEnginePlugins().forEach(p -> {
-	    			if (p instanceof KeycloakIdentityProviderPlugin) {
-	    				((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
-	    			}
-	    		});
+	    		configureKeycloakIdentityProviderPlugin(config);
 	    		PluggableProcessEngineTestCase.cachedProcessEngine = config.buildProcessEngine();
 	        }
 	        

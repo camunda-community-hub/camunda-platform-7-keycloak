@@ -5,12 +5,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -19,6 +19,7 @@ import org.apache.http.ssl.TrustStrategy;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
@@ -81,7 +82,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	static {
 		// read keycloak configuration
 		ResourceBundle defaults = ResourceBundle.getBundle("keycloak-default");
-		KEYCLOAK_URL = getConfigValue(defaults, "keycloak.url");
+		KEYCLOAK_URL = getConfigValue(defaults, "keycloak.url").replaceAll("/+$", "");
 		KEYCLOAK_ADMIN_USER = getConfigValue(defaults, "keycloak.admin.user");
 		KEYCLOAK_ADMIN_PASSWORD = getConfigValue(defaults, "keycloak.admin.password");
 		
@@ -148,17 +149,31 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		if (cachedProcessEngine == null) {
 			ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
 					.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-			config.getProcessEnginePlugins().forEach(p -> {
-				if (p instanceof KeycloakIdentityProviderPlugin) {
-					((KeycloakIdentityProviderPlugin) p).setClientSecret(CLIENT_SECRET);
-				}
-			});
+			configureKeycloakIdentityProviderPlugin(config);
 			config.setJdbcUrl(config.getJdbcUrl().replace("KeycloakIdentityServiceTest", getClass().getSimpleName()));
 			cachedProcessEngine = config.buildProcessEngine();
 		}
 		return cachedProcessEngine;
 	}
 
+	/**
+	 * Helper for configuring the KeycloakIdentityProviderPlugin with the test setup configuration.
+	 * @param config the process engine configuration
+	 * @return the configured KeycloakIdentityProviderPlugin
+	 */
+	protected static KeycloakIdentityProviderPlugin configureKeycloakIdentityProviderPlugin(ProcessEngineConfigurationImpl config) {
+		for (ProcessEnginePlugin p : config.getProcessEnginePlugins()) {
+			if (p instanceof KeycloakIdentityProviderPlugin) {
+				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
+				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
+				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
+				kcp.setClientSecret(CLIENT_SECRET);
+				return kcp;
+			}
+		}
+		throw new IllegalStateException("KeycloakIdentityProviderPlugin not found in process engine plugins.");
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -251,14 +266,14 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @throws Exception in case of errors
 	 */
 	private static void setupRestTemplate() throws Exception {
-		final TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+		final TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
 	    final SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
                 .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
 		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
 		final HttpClient httpClient = HttpClientBuilder.create()
 	    		.setRedirectStrategy(new LaxRedirectStrategy())
-	    		.setSSLSocketFactory(new SSLConnectionSocketFactory(sslContext))
+	    		.setSSLSocketFactory(new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE))
 	    		.build();
 		factory.setHttpClient(httpClient);
 		restTemplate.setRequestFactory(factory);		
