@@ -167,7 +167,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 			// get members of this group
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members", HttpMethod.GET,
+					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members?max=" + Integer.MAX_VALUE, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
