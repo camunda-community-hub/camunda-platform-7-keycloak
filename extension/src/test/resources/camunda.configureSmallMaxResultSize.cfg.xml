@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="processEngineName" value="KeycloakIdentityServiceTest-engine" />
+  
+    <property name="jdbcUrl" value="jdbc:h2:mem:KeycloakIdentityServiceTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+  
+    <!-- Database configurations -->
+    <property name="history" value="audit" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+    
+    <property name="createDiagramOnDeploy" value="true" />
+    
+    <property name="processEnginePlugins">
+      <list>
+        <ref bean="keycloakIdentityProviderPlugin" />
+      </list>
+    </property>
+    
+  </bean>
+  
+  <bean id="keycloakIdentityProviderPlugin" class="org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin">
+  
+    <property name="keycloakIssuerUrl" value="https://localhost:9001/auth/realms/test" />
+    <property name="keycloakAdminUrl" value="https://localhost:9001/auth/admin/realms/test" />
+    <property name="clientId" value="camunda-identity-service" />
+    <property name="clientSecret" value="%clientSecret%" />
+
+    <property name="disableSSLCertificateValidation" value="true" />
+    <property name="useEmailAsCamundaUserId" value="true" />
+    <property name="maxResultSize" value="25" />
+  </bean>
+
+</beans>

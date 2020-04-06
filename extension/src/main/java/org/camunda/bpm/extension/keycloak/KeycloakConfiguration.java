@@ -63,6 +63,9 @@ public class KeycloakConfiguration {
 	/** Charset to use for REST communication with Keycloak. Leave at UTF-8 for standard installation. */
 	protected String charset = StandardCharsets.UTF_8.name();
 	
+	/** Maximum result size for Keycloak user queries */
+	protected Integer maxResultSize = 250; 
+	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
 	//-------------------------------------------------------------------------
@@ -247,6 +250,20 @@ public class KeycloakConfiguration {
 	 */
 	public void setCharset(String charset) {
 		this.charset = charset;
+	}
+
+	/**
+	 * @return the maxResultSize
+	 */
+	public Integer getMaxResultSize() {
+		return maxResultSize;
+	}
+
+	/**
+	 * @param maxResultSize the maxResultSize to set
+	 */
+	public void setMaxResultSize(Integer maxResultSize) {
+		this.maxResultSize = maxResultSize;
 	}
 
 	//-------------------------------------------------------------------------

@@ -167,8 +167,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 			// get members of this group
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members", HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members?max=" + getMaxQueryResultSize(), 
+					HttpMethod.GET, keycloakContextProvider.createApiRequestEntity(), String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
 						"Unable to read group members from " + keycloakConfiguration.getKeycloakAdminUrl()
@@ -360,6 +360,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		if (!StringUtils.isEmpty(query.getLastNameLike())) {
 			addArgument(filter, "lastName", query.getLastNameLike().replaceAll("[%,\\*]", ""));
 		}
+		addArgument(filter, "max", getMaxQueryResultSize());
 		if (filter.length() > 0) {
 			filter.insert(0, "?");
 			String result = filter.toString();
@@ -761,8 +762,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 			// get groups of this user
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + keyCloakID + "/groups", HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + keyCloakID + "/groups?max=" + getMaxQueryResultSize(), 
+					HttpMethod.GET, keycloakContextProvider.createApiRequestEntity(), String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
 						"Unable to read user groups from " + keycloakConfiguration.getKeycloakAdminUrl()
@@ -824,7 +825,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
 		}
 
-		return groupList;
+		// group queries in Keycloak do not consider the max attribute within the search request
+		return truncate(groupList, keycloakConfiguration.getMaxResultSize());
 	}
 	
 	/**
@@ -908,7 +910,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
 		}
 
-		return groupList;
+		// group queries in Keycloak do not consider the max attribute within the search request
+		return truncate(groupList, keycloakConfiguration.getMaxResultSize());
 	}
 
 	/**
@@ -924,6 +927,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		if (!StringUtils.isEmpty(query.getNameLike())) {
 			addArgument(filter, "search", query.getNameLike().replaceAll("[%,\\*]", ""));
 		}
+		addArgument(filter, "max", getMaxQueryResultSize());
 		if (filter.length() > 0) {
 			filter.insert(0, "?");
 			String result = filter.toString();
@@ -1191,6 +1195,28 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	//-------------------------------------------------------------------------
 	// Helpers
 	//-------------------------------------------------------------------------
+
+	/**
+	 * Return the maximum result size of Keycloak queries as String.
+	 * @return maximum results for Keycloak search requests
+	 */
+	private String getMaxQueryResultSize() {
+		return Integer.toString(keycloakConfiguration.getMaxResultSize());
+	}
+	
+	/**
+	 * Truncates a list to a given maximum size.
+	 * @param <T> element type of list
+	 * @param list the original list
+	 * @param maxSize the maximum size
+	 * @return the truncated list
+	 */
+	private <T> List<T> truncate(List<T> list, int maxSize) {
+		if (list == null) return list;
+		int actualSize = list.size();
+		if (actualSize <=  maxSize) return list;
+		return list.subList(0, maxSize);
+	}
 	
 	/**
 	 * Returns the value mapped by name if it exists, coercing it if necessary.

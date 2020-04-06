@@ -291,7 +291,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @return HttpHeaders including the Authorization header / acces token
 	 * @throws JSONException in case of errors
 	 */
-	private static HttpHeaders authenticateKeycloakAdmin() throws JSONException {
+	protected static HttpHeaders authenticateKeycloakAdmin() throws JSONException {
 		// Authenticate Admin
 		HttpHeaders headers = new HttpHeaders();
 	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString());
@@ -425,7 +425,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @return the user ID
 	 * @throws JSONException in case of errors
 	 */
-	private static String createUser(HttpHeaders headers, String realm, String userName, String firstName, String lastName, String email, String password) throws JSONException {
+	static String createUser(HttpHeaders headers, String realm, String userName, String firstName, String lastName, String email, String password) throws JSONException {
 		// create user
 	    String userData = "{\"id\":null,\"username\":\""+ userName + "\",\"enabled\":true,\"totp\":false,\"emailVerified\":false,\"firstName\":\"" + firstName + "\",\"lastName\":\"" + lastName + "\",\"email\":\"" + email + "\",\"disableableCredentialTypes\":[\"password\"],\"requiredActions\":[],\"federatedIdentities\":[],\"notBefore\":0,\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}";
 	    HttpEntity<String> request = new HttpEntity<>(userData, headers);
@@ -447,6 +447,18 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	}
 	
 	/**
+	 * Deletes a user.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param userId the user ID
+	 */
+	static void deleteUser(HttpHeaders headers, String realm, String userId) {
+		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm +"/users/" + userId, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
+		LOG.info("Deleted user with ID {}", userId);
+	}
+	
+	/**
 	 * Creates a group.
 	 * @param headers HttpHeaders including the Authorization header / acces token
 	 * @param realm the realm name
@@ -455,7 +467,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @return the group ID
 	 * @throws JSONException in case of errors
 	 */
-	private static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup) throws JSONException {
+	static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup) throws JSONException {
 		// create group without parent
 		return createGroup(headers, realm, groupName, isSystemGroup, null);
 	}
@@ -470,7 +482,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @return the group ID
 	 * @throws JSONException in case of errors
 	 */
-	private static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup, String parentGroupId) throws JSONException {
+	static String createGroup(HttpHeaders headers, String realm, String groupName, boolean isSystemGroup, String parentGroupId) throws JSONException {
 		// create group
 	    String camundaAdmin = "{\"id\":null,\"name\":\"" + groupName + "\",\"attributes\":{" + (isSystemGroup ? "\"type\":[\"SYSTEM\"]" : "") + 
 	    		"},\"realmRoles\":[],\"clientRoles\":{},\"subGroups\":[],\"access\":{\"view\":true,\"manage\":true,\"manageMembership\":true}}";
@@ -486,6 +498,18 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    	return group.getString("id");
 	    }
 	    throw new IllegalStateException("Error creating group " + groupName);
+	}
+
+	/**
+	 * Deletes a group.
+	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param realm the realm name
+	 * @param userId the user ID
+	 */
+	static void deleteGroup(HttpHeaders headers, String realm, String groupId) {
+		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups/" + groupId, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
+		LOG.info("Deleted group with ID {}", groupId);
 	}
 
 	private static JSONObject findGroupInHierarchy(JSONArray groups, String groupName) throws JSONException {
@@ -510,7 +534,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @param userId the user ID
 	 * @param groupId the group ID
 	 */
-	private static void assignUserGroup(HttpHeaders headers, String realm, String userId, String groupId) {
+	static void assignUserGroup(HttpHeaders headers, String realm, String userId, String groupId) {
 		ResponseEntity<String>response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/users/" + userId + "/groups/" + groupId, 
 				HttpMethod.PUT, new HttpEntity<>(headers), String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
