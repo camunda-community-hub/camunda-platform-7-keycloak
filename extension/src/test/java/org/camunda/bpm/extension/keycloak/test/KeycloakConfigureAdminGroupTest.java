@@ -11,7 +11,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;

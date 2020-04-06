@@ -51,7 +51,7 @@ public class KeycloakMassDataTest extends AbstractKeycloakIdentityProviderTest {
 	    		// setup process engine
 	    		// -------------------------------------
 	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-	    				.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
+	    				.createProcessEngineConfigurationFromResource("camunda.configureHigherMaxResultSize.cfg.xml");
 	    		configureKeycloakIdentityProviderPlugin(config).setAdministratorUserId(USER_ID_CAMUNDA_ADMIN);
 	    		PluggableProcessEngineTestCase.cachedProcessEngine = config.buildProcessEngine();
 	        }
