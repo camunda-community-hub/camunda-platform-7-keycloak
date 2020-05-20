@@ -243,6 +243,22 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		GROUP_ID_SIMILAR_CLIENT_NAME = createGroup(headers, realm, "camunda-identity-service", false);
 		USER_ID_SIMILAR_CLIENT_NAME = createUser(headers, realm, "camunda-identity-service", "Identity", "Service", "identity.service@test.de", null);
 		assignUserGroup(headers, realm, USER_ID_SIMILAR_CLIENT_NAME, GROUP_ID_SIMILAR_CLIENT_NAME);
+		
+		// --------------------------------------------------------------------
+		
+		// Create Client roles
+		String clientInternalId = getClientInternalId(headers, realm, "camunda-identity-service");
+		createClientRole(headers, realm, clientInternalId, "role-admin");
+		createClientRole(headers, realm, clientInternalId, "role-readonly");
+		createClientRole(headers, realm, clientInternalId, "role-teamlead");
+		createClientRole(headers, realm, clientInternalId, "role-manager");
+		
+		// Add Client level roles to groups and users
+		addGroupClientRoleMapping(headers, realm, GROUP_ID_ADMIN, clientInternalId, "role-admin");
+		addGroupClientRoleMapping(headers, realm, GROUP_ID_TEAMLEAD, clientInternalId, "role-teamlead");
+		addGroupClientRoleMapping(headers, realm, GROUP_ID_MANAGER, clientInternalId, "role-manager");
+		addUserClientRoleMapping(headers, realm, USER_ID_TEAMLEAD, clientInternalId, "role-readonly");
+		addUserClientRoleMapping(headers, realm, USER_ID_MANAGER, clientInternalId, "role-readonly");
 	}
 	
 	/**
@@ -375,6 +391,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    String queryUserRoleId = null;
 	    String queryGroupRoleId = null;
 	    String viewUserRoleId = null;
+	    String viewClientsRoleId = null;
 	    response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/clients?clientId=realm-management",
 				HttpMethod.GET, new HttpEntity<>(headers), String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
@@ -392,18 +409,21 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	    		queryGroupRoleId = role.getString("id");
 	    	} else if (roleName.equals("view-users")) {
 	    		viewUserRoleId = role.getString("id");
+	    	} else if (roleName.equals("view-clients")) {
+	    		viewClientsRoleId = role.getString("id");
 	    	}
-	    	if (queryUserRoleId != null && queryGroupRoleId != null && viewUserRoleId != null) break;
+	    	if (queryUserRoleId != null && queryGroupRoleId != null && viewUserRoleId != null && viewClientsRoleId != null) break;
 	    }
 	    assertThat(queryUserRoleId, notNullValue());
 	    assertThat(queryGroupRoleId, notNullValue());
 	    assertThat(viewUserRoleId, notNullValue());
 
-	    // Add service account client roles query-user, query-group, view-user for realm management: this allows using the management REST API via this newly created client
+	    // Add service account client roles query-user, query-group, view-user, view-clients for realm management: this allows using the management REST API via this newly created client
 	    String roleMapping ="["
 	    		+ "{\"clientRole\":true,\"composite\":false,\"containerId\":\"" + realmManagementId + "\",\"description\":\"${role_query-groups}\",\"id\":\"" + queryGroupRoleId + "\",\"name\":\"query-groups\"},"
 	    		+ "{\"clientRole\":true,\"composite\":false,\"containerId\":\"" + realmManagementId + "\",\"description\":\"${role_query-users}\",\"id\":\"" + queryUserRoleId + "\",\"name\":\"query-users\"},"
-	    		+ "{\"clientRole\":true,\"composite\":true,\"containerId\":\"" + realmManagementId + "\",\"description\":\"${role_view-users}\",\"id\":\"" + viewUserRoleId + "\",\"name\":\"view-users\"}"
+	    		+ "{\"clientRole\":true,\"composite\":true,\"containerId\":\"" + realmManagementId + "\",\"description\":\"${role_view-users}\",\"id\":\"" + viewUserRoleId + "\",\"name\":\"view-users\"},"
+	    		+ "{\"clientRole\":true,\"composite\":true,\"containerId\":\"" + realmManagementId + "\",\"description\":\"${role_view-clients}\",\"id\":\"" + viewClientsRoleId + "\",\"name\":\"view-clients\"}"
 	    		+ "]";
 	    request = new HttpEntity<>(roleMapping, headers);
 	    response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/users/" + serviceAccountId + "/role-mappings/clients/" + realmManagementId, request, String.class);
@@ -529,7 +549,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	
 	/**
 	 * Assigns a user to a group.
-	 * @param headers HttpHeaders including the Authorization header / acces token
+	 * @param headers HttpHeaders including the Authorization header / access token
 	 * @param realm the realm name
 	 * @param userId the user ID
 	 * @param groupId the group ID
@@ -539,4 +559,85 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 				HttpMethod.PUT, new HttpEntity<>(headers), String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
 	}
+	
+	// ------------------------------------------------------------------------
+	// Client role specific functions
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Returns the Keycloak internal ID of the service client
+	 * @param headers HttpHeaders including the Authorization header / access token
+	 * @param realm the realm name
+	 * @param clientId the client ID
+	 * @return the internal ID of the client
+	 * @throws JSONException in case of any errors
+	 */
+	static String getClientInternalId(HttpHeaders headers, String realm, String clientId) throws JSONException {
+		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/clients?clientId=" + clientId, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	    JSONArray json = new JSONArray(response.getBody());
+	    return json.getJSONObject(0).getString("id");
+	}
+	
+	/**
+	 * Creates a client role.
+	 * @param headers HttpHeaders including the Authorization header / access token
+	 * @param realm the realm name
+	 * @param clientInternalId the Keycloak internal ID of the client
+	 * @param roleName the name of the client role to create
+	 */
+	static void createClientRole(HttpHeaders headers, String realm, String clientInternalId, String roleName) {
+		String role = "{\"name\":\"" + roleName + "\"}";
+	    HttpEntity<String> request = new HttpEntity<>(role, headers);
+	    ResponseEntity<String> response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/clients/" + clientInternalId + "/roles", request, String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
+	    LOG.info("Created client role {}", roleName);
+	}
+	
+	/**
+	 * Add client-level roles to the user role mapping
+	 * @param headers HttpHeaders including the Authorization header / access token
+	 * @param realm the realm name
+	 * @param userId the Keycloak ID of the user
+	 * @param clientInternalId the Keycloak internal ID of the client
+	 * @param roleName the name of the client role to create the mapping for
+	 * @throws JSONException in case of any errors
+	 */
+	static void addUserClientRoleMapping(HttpHeaders headers, String realm, String userId, String clientInternalId, String roleName) throws JSONException {
+		// get internal ID of client role
+		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/clients/" + clientInternalId + "/roles/" + roleName, 
+				HttpMethod.GET, new HttpEntity<>(headers), String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	    String roleId = new JSONObject(response.getBody()).getString("id");
+		
+	    // create role mapping
+		String mapping = "[{\"id\":\"" + roleId + "\",\"name\":\""+ roleName + "\",\"composite\":false,\"clientRole\":true,\"containerId\":\""+ clientInternalId + "\"}]";
+	    HttpEntity<String> request = new HttpEntity<>(mapping, headers);
+	    response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/users/" + userId + "/role-mappings/clients/" + clientInternalId, request, String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
+	}
+
+	/**
+	 * Add client-level roles to the group role mapping
+	 * @param headers HttpHeaders including the Authorization header / access token
+	 * @param realm the realm name
+	 * @param groupId the Keycloak ID of the group
+	 * @param clientInternalId the Keycloak internal ID of the client
+	 * @param roleName the name of the client role to create the mapping for
+	 * @throws JSONException in case of any errors
+	 */
+	static void addGroupClientRoleMapping(HttpHeaders headers, String realm, String groupId, String clientInternalId, String roleName) throws JSONException {
+		// get internal ID of client role
+		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/clients/" + clientInternalId + "/roles/" + roleName, 
+				HttpMethod.GET, new HttpEntity<>(headers), String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	    String roleId = new JSONObject(response.getBody()).getString("id");
+		
+	    // create role mapping
+		String mapping = "[{\"id\":\"" + roleId + "\",\"name\":\""+ roleName + "\",\"composite\":false,\"clientRole\":true,\"containerId\":\""+ clientInternalId + "\"}]";
+	    HttpEntity<String> request = new HttpEntity<>(mapping, headers);
+	    response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups/" + groupId + "/role-mappings/clients/" + clientInternalId, request, String.class);
+	    assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
+	}
+
 }

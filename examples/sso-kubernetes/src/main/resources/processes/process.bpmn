@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
   <bpmn:process id="camunda.showcase" name="camunda.showcase" isExecutable="true">
-    <bpmn:startEvent id="START" name="Process&#10;started" camunda:formKey="embedded:app:camunda/forms/start-form.html">
+    <bpmn:startEvent id="START" name="Process&#10;started" camunda:formKey="embedded:app:forms/start-form.html">
       <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="END_APPROVED" name="Process&#10;ended">
@@ -14,7 +14,7 @@
       <bpmn:outgoing>SequenceFlow_18o7zqy</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1f6ewxt" sourceRef="ApproveUser" targetRef="ExclusiveGateway_05yeyo5" />
-    <bpmn:userTask id="ApproveUser" name="Approve user" camunda:formKey="embedded:app:camunda/forms/task-form.html">
+    <bpmn:userTask id="ApproveUser" name="Approve user" camunda:formKey="embedded:app:forms/task-form.html">
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1f6ewxt</bpmn:outgoing>
     </bpmn:userTask>

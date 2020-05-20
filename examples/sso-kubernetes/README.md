@@ -261,7 +261,8 @@ In order to make the Camunda Showcase work the following points are noteworthy:
 
 You should work through the following points:
 * Within the ``deployment.yaml`` of the showcase adapt the image name to your own needs.
-* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_CLIENT`` to your own host
+* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_AUTH`` to your own host
+* Within the ``deployment.yaml`` adapt ``ip`` and ``hostnames`` settings of ``hostAliases`` to your own host.
 * Within the ``ingress-service.yaml`` adapt the host name to your own environment.
 
 ### SSL
