@@ -2,6 +2,7 @@ package org.camunda.bpm.extension.keycloak;
 
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,9 +14,7 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.extension.keycloak.json.JSONArray;
-import org.camunda.bpm.extension.keycloak.json.JSONException;
-import org.camunda.bpm.extension.keycloak.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -24,6 +23,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Implementation of user queries against Keycloak's REST API.
@@ -58,13 +60,13 @@ public class KeycloakUserService extends KeycloakServiceBase {
 						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + configuredAdminUserId, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-					return new JSONObject(response.getBody()).getString("email");
+					return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "email");
 				}
 				if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-					return new JSONObject(response.getBody()).getString("username");
+					return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "username");
 				}
-				return new JSONObject(response.getBody()).getString("id");
-			} catch (RestClientException | JSONException ex) {
+				return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "id");
+			} catch (RestClientException | JsonException ex) {
 				// user ID not found: fall through
 			}
 			// check whether configured admin user ID can be resolved as email address
@@ -81,17 +83,17 @@ public class KeycloakUserService extends KeycloakServiceBase {
 				ResponseEntity<String> response = restTemplate.exchange(
 						keycloakConfiguration.getKeycloakAdminUrl() + "/users?username=" + configuredAdminUserId, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
-				JSONObject user = findFirst(new JSONArray(response.getBody()), "username", configuredAdminUserId);
+				JsonObject user = findFirst(parseAsJsonArray(response.getBody()), "username", configuredAdminUserId);
 				if (user != null) {
 					if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-						return user.getString("email");
+						return getJsonString(user, "email");
 					}
 					if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-						return user.getString("username");
+						return getJsonString(user, "username");
 					}
-					return user.getString("id");
+					return getJsonString(user, "id");
 				}
-			} catch (JSONException je) {
+			} catch (JsonException je) {
 				// username not found: fall through
 			}
 			// keycloak admin user does not exist :-(
@@ -135,15 +137,15 @@ public class KeycloakUserService extends KeycloakServiceBase {
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONArray searchResult = new JSONArray(response.getBody());
-			for (int i = 0; i < searchResult.length(); i++) {
-				JSONObject keycloakUser = searchResult.getJSONObject(i);
+			JsonArray searchResult = parseAsJsonArray(response.getBody());
+			for (int i = 0; i < searchResult.size(); i++) {
+				JsonObject keycloakUser = getJsonObjectAtIndex(searchResult, i);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId() && 
-						StringUtils.isEmpty(getStringValue(keycloakUser, "email"))) {
+						StringUtils.isEmpty(getJsonString(keycloakUser, "email"))) {
 					continue;
 				}
 				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
-						StringUtils.isEmpty(getStringValue(keycloakUser, "username"))) {
+						StringUtils.isEmpty(getJsonString(keycloakUser, "username"))) {
 					continue;
 				}
 				UserEntity user = transformUser(keycloakUser);
@@ -178,7 +180,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			throw hcee;
 		} catch (RestClientException rce) {
 			throw new IdentityProviderException("Unable to query members of group " + groupId, rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new IdentityProviderException("Unable to query members of group " + groupId, je);
 		}
 
@@ -232,15 +234,15 @@ public class KeycloakUserService extends KeycloakServiceBase {
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONArray searchResult = new JSONArray(response.getBody());
-			for (int i = 0; i < searchResult.length(); i++) {
-				JSONObject keycloakUser = searchResult.getJSONObject(i);
+			JsonArray searchResult = parseAsJsonArray(response.getBody());
+			for (int i = 0; i < searchResult.size(); i++) {
+				JsonObject keycloakUser = getJsonObjectAtIndex(searchResult, i);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId() && 
-						StringUtils.isEmpty(getStringValue(keycloakUser, "email"))) {
+						StringUtils.isEmpty(getJsonString(keycloakUser, "email"))) {
 					continue;
 				}
 				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
-						StringUtils.isEmpty(getStringValue(keycloakUser, "username"))) {
+						StringUtils.isEmpty(getJsonString(keycloakUser, "username"))) {
 					continue;
 				}
 
@@ -272,7 +274,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 
 		} catch (RestClientException rce) {
 			throw new IdentityProviderException("Unable to query users", rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new IdentityProviderException("Unable to query users", je);
 		}
 
@@ -367,23 +369,23 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * Maps a Keycloak JSON result to a User object
 	 * @param result the Keycloak JSON result
 	 * @return the User object
-	 * @throws JSONException in case of errors
+	 * @throws JsonException in case of errors
 	 */
-	private UserEntity transformUser(JSONObject result) throws JSONException {
+	private UserEntity transformUser(JsonObject result) throws JsonException {
 		UserEntity user = new UserEntity();
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-			user.setId(getStringValue(result, "email"));
+			user.setId(getJsonString(result, "email"));
 		} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-			user.setId(getStringValue(result, "username"));
+			user.setId(getJsonString(result, "username"));
 		} else {
-			user.setId(result.getString("id"));
+			user.setId(getJsonString(result, "id"));
 		}
-		user.setFirstName(getStringValue(result, "firstName"));
-		user.setLastName(getStringValue(result, "lastName"));
+		user.setFirstName(getJsonString(result, "firstName"));
+		user.setLastName(getJsonString(result, "lastName"));
 		if (StringUtils.isEmpty(user.getFirstName()) && StringUtils.isEmpty(user.getLastName())) {
-			user.setFirstName(getStringValue(result, "username"));
+			user.setFirstName(getJsonString(result, "username"));
 		}
-		user.setEmail(getStringValue(result, "email"));
+		user.setEmail(getJsonString(result, "email"));
 		return user;
 	}
 

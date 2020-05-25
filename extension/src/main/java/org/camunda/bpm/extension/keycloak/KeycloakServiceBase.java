@@ -1,18 +1,21 @@
 package org.camunda.bpm.extension.keycloak;
 
+import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.extension.keycloak.json.JSONArray;
-import org.camunda.bpm.extension.keycloak.json.JSONException;
-import org.camunda.bpm.extension.keycloak.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Base class for services implementing user / group queries against Keycloak.
@@ -63,18 +66,18 @@ public abstract class KeycloakServiceBase {
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-			JSONArray resultList = new JSONArray(response.getBody());
-			JSONObject result = findFirst(resultList,
+			JsonArray resultList = parseAsJsonArray(response.getBody());
+			JsonObject result = findFirst(resultList,
 					keycloakConfiguration.isUseUsernameAsCamundaUserId() ? "username" : "email",
 					userId);
 			if (result != null) {
-				return result.getString("id");
+				return getJsonString(result, "id");
 			}
 			throw new KeycloakUserNotFoundException(userId + 
 					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
 					? " not found - email unknown" 
 					: " not found - username unknown"));
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new KeycloakUserNotFoundException(userId + 
 					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
 					? " not found - email unknown" 
@@ -101,8 +104,8 @@ public abstract class KeycloakServiceBase {
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-			return new JSONObject(response.getBody()).getString("id");
-		} catch (JSONException je) {
+			return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "id");
+		} catch (JsonException je) {
 			throw new KeycloakGroupNotFoundException(groupId + " not found - path unknown", je);
 		}
 	}
@@ -133,38 +136,6 @@ public abstract class KeycloakServiceBase {
 		return list.subList(0, maxSize);
 	}
 	
-	/**
-	 * Returns the value mapped by name if it exists, coercing it if necessary.
-	 * 
-	 * @param result the result object
-	 * @param name   the attribute to read
-	 * @return the string value or {@code null} if not such attribute exists.
-	 */
-	protected String getStringValue(JSONObject result, String name) {
-		try {
-			return result.getString(name);
-		} catch (JSONException e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Finds the first element in a list, where a given attribute matches a given name.
-	 * @param list the list
-	 * @param attributeToMatch the name of the attribute to match against
-	 * @param attributeValue the value of the attribute
-	 * @return matching element if found, {@code null} otherwise
-	 */
-	protected JSONObject findFirst(JSONArray list, String attributeToMatch, String attributeValue) {
-		for (int i=0; i < list.length(); i++) {
-			JSONObject result = list.getJSONObject(i);
-			if (attributeValue.equalsIgnoreCase(result.optString(attributeToMatch))) {
-				return result;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Adds a single argument to search filter
 	 * @param filter the current filter

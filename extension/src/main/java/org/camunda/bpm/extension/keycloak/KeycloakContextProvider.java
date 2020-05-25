@@ -1,8 +1,9 @@
 package org.camunda.bpm.extension.keycloak;
 
+import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
+
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
-import org.camunda.bpm.extension.keycloak.json.JSONException;
-import org.camunda.bpm.extension.keycloak.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpEntity;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonObject;
 
 /**
  * Keycloak context provider. 
@@ -57,17 +60,17 @@ public class KeycloakContextProvider {
 						+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONObject json = new JSONObject(response.getBody());
-			String accessToken = json.getString("access_token");
-			String tokenType = json.getString("token_type");
-			String refreshToken = json.getString("refresh_token");
-			long expiresInMillis = json.getLong("expires_in") * 1000;
+			JsonObject json = parseAsJsonObject(response.getBody());
+			String accessToken = getJsonString(json, "access_token");
+			String tokenType = getJsonString(json, "token_type");
+			String refreshToken = getJsonString(json, "refresh_token");
+			long expiresInMillis = getJsonLong(json, "expires_in") * 1000;
 			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken, keycloakConfiguration.getCharset());
 
 		} catch (RestClientException rce) {
 			LOG.requestTokenFailed(rce);
 			throw new IdentityProviderException("Unable to get access token from Keycloak server", rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			LOG.requestTokenFailed(je);
 			throw new IdentityProviderException("Unable to get access token from Keycloak server", je);
 		}
@@ -95,17 +98,17 @@ public class KeycloakContextProvider {
 						+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONObject json = new JSONObject(response.getBody());
-			String accessToken = json.getString("access_token");
-			String tokenType = json.getString("token_type");
-			String refreshToken = json.getString("refresh_token");
-			long expiresInMillis = json.getLong("expires_in") * 1000;
+			JsonObject json = parseAsJsonObject(response.getBody());
+			String accessToken = getJsonString(json, "access_token");
+			String tokenType = getJsonString(json, "token_type");
+			String refreshToken = getJsonString(json, "refresh_token");
+			long expiresInMillis = getJsonLong(json, "expires_in") * 1000;
 			return new KeycloakContext(accessToken, tokenType, expiresInMillis, refreshToken, keycloakConfiguration.getCharset());
 
 		} catch (RestClientException rce) {
 			LOG.refreshTokenFailed(rce);
 			throw new IdentityProviderException("Unable to refresh access token from Keycloak server", rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			LOG.refreshTokenFailed(je);
 			throw new IdentityProviderException("Unable to refresh access token from Keycloak server", je);
 		}

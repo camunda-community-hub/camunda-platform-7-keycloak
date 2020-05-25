@@ -1,5 +1,7 @@
 package org.camunda.bpm.extension.keycloak;
 
+import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -16,9 +18,7 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.extension.keycloak.json.JSONArray;
-import org.camunda.bpm.extension.keycloak.json.JSONException;
-import org.camunda.bpm.extension.keycloak.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpEntity;
@@ -30,6 +30,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonObject;
 
 /**
  * Keycloak {@link ReadOnlyIdentityProvider}.
@@ -217,18 +219,18 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/users?email=" + userId, HttpMethod.GET,
 					keycloakContextProvider.createApiRequestEntity(), String.class);
-				JSONObject result = findFirst(new JSONArray(response.getBody()), "email", userId);
+				JsonObject result = findFirst(parseAsJsonArray(response.getBody()), "email", userId);
 				if (result != null) {
-					return result.getString("username");
+					return getJsonString(result, "username");
 				}
 				throw new KeycloakUserNotFoundException(userId + " not found - email unknown");
 			} else {
 				ResponseEntity<String> response = restTemplate.exchange(
 						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + userId, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
-				return new JSONObject(response.getBody()).getString("username");
+				return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "username");
 			}
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new KeycloakUserNotFoundException(userId + 
 					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
 					? " not found - email unknown" 
@@ -326,27 +328,6 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	@Override
 	public Tenant findTenantById(String id) {
 		// since multi-tenancy is currently not supported for the Keycloak plugin, always return null
-		return null;
-	}
-
-	//-------------------------------------------------------------------------
-	// Helpers
-	//-------------------------------------------------------------------------
-
-	/**
-	 * Finds the first element in a list, where a given attribute matches a given name.
-	 * @param list the list
-	 * @param attributeToMatch the name of the attribute to match against
-	 * @param attributeValue the value of the attribute
-	 * @return matching element if found, {@code null} otherwise
-	 */
-	protected JSONObject findFirst(JSONArray list, String attributeToMatch, String attributeValue) {
-		for (int i=0; i < list.length(); i++) {
-			JSONObject result = list.getJSONObject(i);
-			if (attributeValue.equalsIgnoreCase(result.optString(attributeToMatch))) {
-				return result;
-			}
-		}
 		return null;
 	}
 

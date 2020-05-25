@@ -2,6 +2,7 @@ package org.camunda.bpm.extension.keycloak;
 
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,9 +15,7 @@ import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.extension.keycloak.json.JSONArray;
-import org.camunda.bpm.extension.keycloak.json.JSONException;
-import org.camunda.bpm.extension.keycloak.json.JSONObject;
+import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Implementation of group queries against Keycloak's REST API.
@@ -59,10 +61,10 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 						keycloakConfiguration.getKeycloakAdminUrl() + "/group-by-path/" + configuredAdminGroupName, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 				if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
-					return new JSONObject(response.getBody()).getString("path").substring(1); // remove trailing '/'
+					return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "path").substring(1); // remove trailing '/'
 				}
-				return new JSONObject(response.getBody()).getString("id");
-			} catch (RestClientException | JSONException ex) {
+				return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "id");
+			} catch (RestClientException | JsonException ex) {
 				// group not found: fall through
 			}
 			
@@ -72,24 +74,24 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 						keycloakConfiguration.getKeycloakAdminUrl() + "/groups?search=" + configuredAdminGroupName, HttpMethod.GET,
 						keycloakContextProvider.createApiRequestEntity(), String.class);
 				// filter search result for exact group name, including subgroups
-				JSONArray result = flattenSubGroups(new JSONArray(response.getBody()), new JSONArray());
-				JSONArray groups = new JSONArray();
-				for (int i = 0; i < result.length(); i++) {
-					JSONObject keycloakGroup = result.getJSONObject(i);
-					if (keycloakGroup.getString("name").equals(configuredAdminGroupName)) {
-						groups.put(keycloakGroup);
+				JsonArray result = flattenSubGroups(parseAsJsonArray(response.getBody()), new JsonArray());
+				JsonArray groups = new JsonArray();
+				for (int i = 0; i < result.size(); i++) {
+					JsonObject keycloakGroup = getJsonObjectAtIndex(result, i);
+					if (getOptJsonString(keycloakGroup, "name").equals(configuredAdminGroupName)) {
+						groups.add(keycloakGroup);
 					}
 				}
-				if (groups.length() == 1) {
+				if (groups.size() == 1) {
 					if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
-						return groups.getJSONObject(0).getString("path").substring(1); // remove trailing '/'
+						return getJsonString(getJsonObjectAtIndex(groups, 0), "path").substring(1); // remove trailing '/'
 					}
-					return groups.getJSONObject(0).getString("id");
-				} else if (groups.length() > 0) {
+					return getJsonString(getJsonObjectAtIndex(groups, 0), "id");
+				} else if (groups.size() > 0) {
 					throw new IdentityProviderException("Configured administratorGroupName " + configuredAdminGroupName + " is not unique. Please configure exact group path.");
 				}
 				// groups size == 0: fall through
-			} catch (JSONException je) {
+			} catch (JsonException je) {
 				// group not found: fall through
 			}
 
@@ -134,9 +136,9 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONArray searchResult = new JSONArray(response.getBody());
-			for (int i = 0; i < searchResult.length(); i++) {
-				JSONObject keycloakGroup = searchResult.getJSONObject(i);
+			JsonArray searchResult = parseAsJsonArray(response.getBody());
+			for (int i = 0; i < searchResult.size(); i++) {
+				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
 				Group group = transformGroup(keycloakGroup);
 
 				// client side check of further query filters
@@ -169,7 +171,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			throw hcee;
 		} catch (RestClientException rce) {
 			throw new IdentityProviderException("Unable to query groups of user " + userId, rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new IdentityProviderException("Unable to query groups of user " + userId, je);
 		}
 
@@ -223,15 +225,15 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JSONArray searchResult = null;
+			JsonArray searchResult = null;
 			if (!StringUtils.isEmpty(query.getId())) {
-				searchResult = new JSONArray(response.getBody());
+				searchResult = parseAsJsonArray(response.getBody());
 			} else {
 				// for non ID queries search in subgroups as well
-				searchResult = flattenSubGroups(new JSONArray(response.getBody()), new JSONArray());
+				searchResult = flattenSubGroups(parseAsJsonArray(response.getBody()), new JsonArray());
 			}
-			for (int i = 0; i < searchResult.length(); i++) {
-				JSONObject keycloakGroup = searchResult.getJSONObject(i);
+			for (int i = 0; i < searchResult.size(); i++) {
+				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
 				Group group = transformGroup(keycloakGroup);
 				
 				// client side check of further query filters
@@ -254,7 +256,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 
 		} catch (RestClientException rce) {
 			throw new IdentityProviderException("Unable to query groups", rce);
-		} catch (JSONException je) {
+		} catch (JsonException je) {
 			throw new IdentityProviderException("Unable to query groups", je);
 		}
 
@@ -306,20 +308,20 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param groups the original structured hierarchy of groups
 	 * @param result recursive result
 	 * @return flattened list of all groups in this hierarchy
-	 * @throws JSONException in case of errors
+	 * @throws JsonException in case of errors
 	 */
-	private JSONArray flattenSubGroups(JSONArray groups, JSONArray result) throws JSONException {
+	private JsonArray flattenSubGroups(JsonArray groups, JsonArray result) throws JsonException {
 		if (groups == null) return result;
-	    for (int i = 0; i < groups.length(); i++) {
-	    	JSONObject group = groups.getJSONObject(i);
-	    	JSONArray subGroups;
+	    for (int i = 0; i < groups.size(); i++) {
+	    	JsonObject group = getJsonObjectAtIndex(groups, i);
+	    	JsonArray subGroups;
 			try {
-				subGroups = group.getJSONArray("subGroups");
+				subGroups = getJsonArray(group, "subGroups");
 		    	group.remove("subGroups");
-		    	result.put(group);
+		    	result.add(group);
 		    	flattenSubGroups(subGroups, result);
-			} catch (JSONException e) {
-				result.put(group);
+			} catch (JsonException e) {
+				result.add(group);
 			}
 	    }
 	    return result;
@@ -358,16 +360,16 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * Maps a Keycloak JSON result to a Group object
 	 * @param result the Keycloak JSON result
 	 * @return the Group object
-	 * @throws JSONException in case of errors
+	 * @throws JsonException in case of errors
 	 */
-	private GroupEntity transformGroup(JSONObject result) throws JSONException {
+	private GroupEntity transformGroup(JsonObject result) throws JsonException {
 		GroupEntity group = new GroupEntity();
 		if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
-			group.setId(result.getString("path").substring(1)); // remove trailing '/'
+			group.setId(getJsonString(result, "path").substring(1)); // remove trailing '/'
 		} else {
-			group.setId(result.getString("id"));
+			group.setId(getJsonString(result, "id"));
 		}
-		group.setName(result.getString("name"));
+		group.setName(getJsonString(result, "name"));
 		if (isSystemGroup(result)) {
 			group.setType(Groups.GROUP_TYPE_SYSTEM);
 		} else {
@@ -380,21 +382,22 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * Checks whether a Keycloak JSON result represents a SYSTEM group.
 	 * @param result the Keycloak JSON result
 	 * @return {@code true} in case the result is a SYSTEM group.
+	 * @throws JsonException in case of errors
 	 */
-	private boolean isSystemGroup(JSONObject result) {
-		String name = result.getString("name");
+	private boolean isSystemGroup(JsonObject result) throws JsonException {
+		String name = getJsonString(result, "name");
 		if (Groups.CAMUNDA_ADMIN.equals(name) || 
 				name.equals(keycloakConfiguration.getAdministratorGroupName())) {
 			return true;
 		}
 		try {
-			JSONArray types = result.getJSONObject("attributes").getJSONArray("type");
-			for (int i = 0; i < types.length(); i++) {
-				if (Groups.GROUP_TYPE_SYSTEM.equals(types.getString(i).toUpperCase())) {
+			JsonArray types = getJsonArray(getJsonObject(result, "attributes"), "type");
+			for (int i = 0; i < types.size(); i++) {
+				if (Groups.GROUP_TYPE_SYSTEM.equals(getJsonStringAtIndex(types, i).toUpperCase())) {
 					return true;
 				}
 			}
-		} catch (JSONException ex) {
+		} catch (JsonException ex) {
 			return false;
 		}
 		return false;
