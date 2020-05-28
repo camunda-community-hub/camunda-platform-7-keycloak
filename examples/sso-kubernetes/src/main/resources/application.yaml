@@ -22,6 +22,7 @@ camunda.bpm:
     enabled: true
   filter:
     create: All tasks
+  webapp.application-path:
 
 server:
   port: 8080

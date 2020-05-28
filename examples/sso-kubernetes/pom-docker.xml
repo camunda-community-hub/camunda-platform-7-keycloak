@@ -21,11 +21,11 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-		<version.camunda>7.12.0</version.camunda>
-		<!-- <version.camunda>7.12.0-ee</version.camunda> -->
-		<version.camundaSpringBoot>3.4.0</version.camundaSpringBoot>
-		<version.springBoot>2.2.1.RELEASE</version.springBoot>
-		<version.springSecurityOauth2>2.2.1.RELEASE</version.springSecurityOauth2>
+		<version.camunda>7.13.0-alpha5</version.camunda>
+		<!-- <version.camunda>7.13.0-ee</version.camunda> -->
+		<version.camundaSpringBoot>7.13.0-alpha5</version.camundaSpringBoot>
+		<version.springBoot>2.2.7.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.2.6.RELEASE</version.springSecurityOauth2>
 	</properties>
 
     <dependencyManagement>
