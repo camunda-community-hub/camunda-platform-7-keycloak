@@ -25,8 +25,8 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.13.0-alpha5</version.camunda>
-	<version.camundaSpringBoot>7.13.0-alpha5</version.camundaSpringBoot>
+	<version.camunda>7.13.0</version.camunda>
+    <!-- <version.camunda>7.13.0-ee</version.camunda> -->
 	<version.springBoot>2.2.7.RELEASE</version.springBoot>
 	<version.springSecurityOauth2>2.2.6.RELEASE</version.springSecurityOauth2>
 
@@ -95,5 +95,15 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <repositories>
+    <!-- Camunda EE Repository
+    <repository>
+        <id>camunda-bpm-ee</id>
+        <name>Camunda Enterprise Maven Repository</name>
+        <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
+    </repository>
+    -->
+  </repositories>
 
 </project>

@@ -22,13 +22,13 @@
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
 <!-- 			<artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
-			<version>${version.camundaSpringBoot}</version>
+			<version>${version.camunda}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-			<version>${version.camundaSpringBoot}</version>
+			<version>${version.camunda}</version>
 		</dependency>
 
 		<!-- Spring Security -->

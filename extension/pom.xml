@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
-			<version>${version.camundaSpringBoot}</version>
+			<version>${version.camunda}</version>
 			<scope>test</scope>
 		</dependency>
  		
