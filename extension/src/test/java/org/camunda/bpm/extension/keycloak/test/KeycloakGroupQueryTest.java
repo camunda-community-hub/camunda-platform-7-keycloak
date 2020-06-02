@@ -19,6 +19,11 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertEquals(9, groupList.size());
 	}
 
+	public void testQueryUnlimitedList() {
+		List<Group> groupList = identityService.createGroupQuery().unlimitedList();
+		assertEquals(9, groupList.size());
+	}
+	
 	public void testQueryPaging() {
 		// First page
 		List<Group> result = identityService.createGroupQuery().listPage(0, 3);

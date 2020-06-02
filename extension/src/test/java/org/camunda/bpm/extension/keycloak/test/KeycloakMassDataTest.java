@@ -76,6 +76,11 @@ public class KeycloakMassDataTest extends AbstractKeycloakIdentityProviderTest {
 		assertEquals(USER_IDS.size() + 5, result.size());
 	}
 
+	public void testQueryUnlimitedList() {
+	    List<User> result = identityService.createUserQuery().unlimitedList();
+	    assertEquals(USER_IDS.size() + 5, result.size());
+	}
+
 	public void testGroupMemberQuery() {
 		List<User> result = identityService.createUserQuery().memberOfGroup(GROUP_ID_MANAGER).list();	
 		assertEquals(USER_IDS.size() + 1, result.size());

@@ -70,6 +70,11 @@ public class KeycloakMaxResultSizeTest extends AbstractKeycloakIdentityProviderT
 		assertEquals(25, result.size());
 	}
 
+	public void testQueryUnlimitedList() {
+	    List<User> result = identityService.createUserQuery().unlimitedList();
+	    assertEquals(25, result.size());
+	}
+
 	public void testGroupMemberQuery() {
 		List<User> result = identityService.createUserQuery().memberOfGroup(GROUP_ID_MANAGER).list();	
 		assertEquals(25, result.size());

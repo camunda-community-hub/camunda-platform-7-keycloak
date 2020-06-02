@@ -20,6 +20,11 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     assertEquals(5, result.size());
   }
 
+  public void testQueryUnlimitedList() {
+    List<User> result = identityService.createUserQuery().unlimitedList();
+    assertEquals(5, result.size());
+  }
+  
   public void testQueryPaging() {
 	  // First page
 	  List<User> result = identityService.createUserQuery().listPage(0, 2);
