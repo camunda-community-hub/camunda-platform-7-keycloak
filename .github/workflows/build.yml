@@ -1,13 +1,13 @@
 name: Build project with Maven
 on:
-  pull_request: 
-  push: 
+  pull_request:
+  push:
   schedule:
   - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     services:
       keycloak:
         image: jboss/keycloak:8.0.2
