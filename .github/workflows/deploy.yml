@@ -1,0 +1,115 @@
+# If this workflow is triggered by a push to master, it
+#        deploys a SNAPSHOT
+# If this workflow is triggered by publishing a Release, it
+#        deploys a RELEASE with the selected version
+#        updates the project version by incrementing the patch version
+#        commits the version update change to the repository's default branch.
+# This workflow waits for the `build` workflow to complete successfully before proceeding.
+name: Deploy artifacts with Maven
+on:
+  push:
+    branches: [ master ]
+  release:
+    types: [ published ]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for build to succeed
+      uses: fountainhead/action-wait-for-check@507b029e31edbe1a72d4de429476e1f4efe98869 # pin@v1.0.0
+      id: wait-for-build
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        checkName: build
+        ref: ${{ env.GITHUB_SHA || github.ref }}
+
+    - name: Cancel workflow when build fails
+      if: steps.wait-for-build.outputs.conclusion == 'failure'
+      run: echo "Build failed, skipping deploy" && exit 1
+    - uses: actions/checkout@f0698e2cb784138d203b1caade48dca3d0fbdc53 # pin@v2
+    - name: Detect release type
+      run: |-
+        if [[ "${{github.ref}}" == "refs/heads/master" ]]; then
+          echo "::set-output name=type::SNAPSHOT"
+        else
+          echo "::set-output name=type::RELEASE"
+        fi
+      id: release-detection
+    - uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      with:
+        java-version: 1.8
+    - name: Import Secrets
+      uses: RichiCoder1/vault-action@22e3f3e09e3baba4d6cc62823175d21fafe4e30a # pin@v1.0.1
+      with:
+        url: ${{ secrets.VAULT_ADDR }}
+        method: approle
+        roleId: ${{ secrets.VAULT_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_SECRET_ID }}
+        secrets: |
+          common/github.com/actions/camunda NEXUS_PSW | NEXUS_PSW;
+          common/github.com/actions/camunda NEXUS_USR | NEXUS_USR;
+          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE | MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE;
+          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB | MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB;
+          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC | MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC;
+          common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_PSW | MAVEN_CENTRAL_DEPLOYMENT_PSW;
+          common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_USR | MAVEN_CENTRAL_DEPLOYMENT_USR;
+    - name: Import GPG keys
+      run: echo -e "${MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC}\n\n${MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB}" | base64 -d | gpg -q --import --no-tty --batch --yes --allow-secret-key-import
+    - name: Set up Nexus authentication
+      uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      with:
+        java-version: 1.8
+        server-id: camunda-nexus
+        server-username: NEXUS_USR
+        server-password: NEXUS_PSW
+    - name: Set up Maven Central authentication
+      uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      with:
+        java-version: 1.8
+        server-id: central
+        server-username: MAVEN_CENTRAL_DEPLOYMENT_USR
+        server-password: MAVEN_CENTRAL_DEPLOYMENT_PSW
+        settings-path: ${{ github.workspace }}
+    - name: Cache
+      uses: actions/cache@ab292760e111de7e4ac6060d5b7ee555d1a037a3 # pin@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - if: github.event.release
+      name: Update version in pom.xml (Release only)
+      run: mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+    - name: Publish package (${{ steps.release-detection.outputs.type }})
+      run: |-
+        mvn -B deploy -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}"
+
+        sed -i 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots/@g' target/nexus-staging/deferred/.index
+        cat target/nexus-staging/deferred/.index
+        mvn -s $GITHUB_WORKSPACE/settings.xml -B org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DskipTests=true -Dgpg.passphrase="${GPG_PASSPHRASE}"
+    - name: Archive artifacts
+      run: |-
+        ZIPFILE=${{github.event.repository.name}}-${{github.event.release.tag_name}}.zip
+        zip $ZIPFILE $(find target/nexus-staging -name "*.jar")
+        echo "::set-output name=filename::${ZIPFILE}"
+      id: zip
+    - if: github.event.release
+      name: Attach artifacts to GitHub Release (Release only)
+      uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # pin@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{ steps.zip.outputs.filename }}
+        asset_name: ${{ steps.zip.outputs.filename }}
+        asset_content_type: application/zip
+    - if: github.event.release
+      name: Checkout ${{ github.event.repository.default_branch }} and commit new development version (Release only)
+      run: |-
+        git config --global user.name "Release Bot"
+        git config --global user.email actions@github.com
+        git fetch
+        git checkout -b ${{ github.event.repository.default_branch }} --track origin/${{ github.event.repository.default_branch }}
+        mvn -B org.apache.maven.plugins:maven-release-plugin:update-versions -DgenerateBackupPoms=false
+        git add "**pom.xml"
+        mvn -B scm:checkin -Dbasedir=. -Dmessage="release(v${{ github.event.release.tag_name }}): bump version" -DdeveloperConnectionUrl="scm:git:https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${{ github.event.repository.full_name }}.git"

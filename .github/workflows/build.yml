@@ -1,0 +1,37 @@
+name: Build project with Maven
+on:
+  pull_request: 
+  push: 
+  schedule:
+  - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      keycloak:
+        image: jboss/keycloak:8.0.2
+        env:
+          KEYCLOAK_USER: keycloak
+          KEYCLOAK_PASSWORD: keycloak1!
+          DB_VENDOR: h2
+        ports: [ 8443/tcp ]
+        options: --health-cmd "curl -Iks https://localhost:8443" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+    - name: Checkout
+      uses: actions/checkout@f0698e2cb784138d203b1caade48dca3d0fbdc53 # pin@v2
+    - name: Java setup
+      uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      with:
+        java-version: 1.8
+    - name: Cache
+      uses: actions/cache@ab292760e111de7e4ac6060d5b7ee555d1a037a3 # pin@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Run Maven
+      env:
+        KEYCLOAK_URL: https://localhost:${{ job.services.keycloak.ports[8443] }}/auth
+      run: mvn -B clean install com.mycila:license-maven-plugin:check
