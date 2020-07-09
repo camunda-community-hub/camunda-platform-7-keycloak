@@ -16,13 +16,13 @@ import junit.framework.TestSuite;
  * Group query test for the Keycloak identity provider.
  * Flag useGroupPathAsCamundaGroupId enabled.
  */
-public class KeycloakUseGroupPathdAsGroupIdQueryTest extends AbstractKeycloakIdentityProviderTest {
+public class KeycloakUseGroupPathAsGroupIdQueryTest extends AbstractKeycloakIdentityProviderTest {
 
 	public static Test suite() {
-	    return new TestSetup(new TestSuite(KeycloakUseGroupPathdAsGroupIdQueryTest.class)) {
+	    return new TestSetup(new TestSuite(KeycloakUseGroupPathAsGroupIdQueryTest.class)) {
 
 	    	// @BeforeClass
-	        protected void setUp() throws Exception {
+	        protected void setUp() {
 	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
 	    				.createProcessEngineConfigurationFromResource("camunda.useGroupPathAsCamundaGroupId.cfg.xml");
 	    		configureKeycloakIdentityProviderPlugin(config);
@@ -30,7 +30,7 @@ public class KeycloakUseGroupPathdAsGroupIdQueryTest extends AbstractKeycloakIde
 	        }
 	        
 	        // @AfterClass
-	        protected void tearDown() throws Exception {
+	        protected void tearDown() {
 	    		PluggableProcessEngineTestCase.cachedProcessEngine.close();
 	    		PluggableProcessEngineTestCase.cachedProcessEngine = null;
 	        }
