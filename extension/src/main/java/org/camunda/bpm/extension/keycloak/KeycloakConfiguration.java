@@ -36,6 +36,18 @@ public class KeycloakConfiguration {
 	 * and e.g. use them in Camunda's authorization configuration.
 	 */
 	protected boolean useGroupPathAsCamundaGroupId = false;
+
+	/**
+	 * Whether listing of users (e.g. all users or members of a group) is disabled. If this property is set to
+	 * <code>true</code>, all queries that have a user list as result will return an empty list. Querying of the
+	 * attributes of one particular user is still allowed.
+	 *
+	 * <p>Some installations might want to manage permission using groups only and never grant permissions to
+	 * individual users. The corresponding queries might even be prohibited in the KeyCloak server. In this situation,
+	 * the plugin would run into an error if it would try to execute these queries. The parameter tells 'don't even try
+	 * to execute the queries'.
+	 */
+	protected boolean disableUserListing = false;
 	
 	/** The name of the administrator group.
 	 *
@@ -63,8 +75,8 @@ public class KeycloakConfiguration {
 	/** Charset to use for REST communication with Keycloak. Leave at UTF-8 for standard installation. */
 	protected String charset = StandardCharsets.UTF_8.name();
 	
-	/** Maximum result size for Keycloak user queries */
-	protected Integer maxResultSize = 250; 
+	/** Maximum result size for Keycloak queries */
+	protected Integer maxResultSize = 250;
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -166,6 +178,14 @@ public class KeycloakConfiguration {
 	 */
 	public void setUseGroupPathAsCamundaGroupId(boolean useGroupPathAsCamundaGroupId) {
 		this.useGroupPathAsCamundaGroupId = useGroupPathAsCamundaGroupId;
+	}
+
+	public boolean isDisableUserListing() {
+		return disableUserListing;
+	}
+
+	public void setDisableUserListing(boolean disableUserListing) {
+		this.disableUserListing = disableUserListing;
 	}
 
 	/**
