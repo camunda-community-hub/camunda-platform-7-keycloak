@@ -109,6 +109,10 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @return list of matching users
 	 */
 	public List<User> requestUsersByGroupId(KeycloakUserQuery query) {
+		if (keycloakConfiguration.isDisableUserListing()) {
+			return new ArrayList<>();
+		}
+
 		String groupId = query.getGroupId();
 		List<User> userList = new ArrayList<>();
 
@@ -178,10 +182,8 @@ public class KeycloakUserService extends KeycloakServiceBase {
 				return userList;
 			}
 			throw hcee;
-		} catch (RestClientException rce) {
-			throw new IdentityProviderException("Unable to query members of group " + groupId, rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query members of group " + groupId, je);
+		} catch (RestClientException | JsonException e) {
+			throw new IdentityProviderException("Unable to query members of group " + groupId, e);
 		}
 
 		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
@@ -218,11 +220,15 @@ public class KeycloakUserService extends KeycloakServiceBase {
 
 		try {
 			// get members of this group
-			ResponseEntity<String> response = null;
+			ResponseEntity<String> response;
 
 			if (!StringUtils.isEmpty(query.getId())) {
 				response = requestUserById(query.getId());
 			} else {
+				if (keycloakConfiguration.isDisableUserListing()) {
+					return userList;
+				}
+
 				// Create user search filter
 				String userFilter = createUserSearchFilter(query);
 				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/users" + userFilter, HttpMethod.GET,
@@ -272,10 +278,8 @@ public class KeycloakUserService extends KeycloakServiceBase {
 				}
 			}
 
-		} catch (RestClientException rce) {
-			throw new IdentityProviderException("Unable to query users", rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query users", je);
+		} catch (RestClientException | JsonException e) {
+			throw new IdentityProviderException("Unable to query users", e);
 		}
 
 		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
