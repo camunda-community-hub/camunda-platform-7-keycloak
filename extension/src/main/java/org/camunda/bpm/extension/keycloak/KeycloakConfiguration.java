@@ -1,6 +1,5 @@
 package org.camunda.bpm.extension.keycloak;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -312,12 +311,5 @@ public class KeycloakConfiguration {
 		}
 		return url;
 	}
-
-	private URI toUri(String uri) {
-		if (uri != null) {
-			return URI.create(uri);
-		} else {
-			return null;
-		}
-	}
+	
 }
