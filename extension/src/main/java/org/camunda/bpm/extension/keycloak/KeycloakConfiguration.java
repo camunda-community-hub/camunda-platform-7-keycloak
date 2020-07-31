@@ -1,5 +1,6 @@
 package org.camunda.bpm.extension.keycloak;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -13,7 +14,7 @@ public class KeycloakConfiguration {
 	/** Keycloak admin REST api base URL including realm name, e.g. {@code https://<mykeyclaokserver>/auth/admin/realms/master}. */
 	protected String keycloakAdminUrl;
 
-	// Client must have access type confidential, service accounts enabled, 
+	// Client must have access type confidential, service accounts enabled,
 	// service account roles must include realm roles for query-users, query-groups, view-users
 
 	/** The client ID. */
@@ -36,7 +37,7 @@ public class KeycloakConfiguration {
 	 * and e.g. use them in Camunda's authorization configuration.
 	 */
 	protected boolean useGroupPathAsCamundaGroupId = false;
-	
+
 	/** The name of the administrator group.
 	 *
 	 * If this name is set to a non-null and non-empty value,
@@ -50,22 +51,28 @@ public class KeycloakConfiguration {
 	 * the plugin will create user-level Administrator authorizations
 	 * on all built-in resources. */
 	protected String administratorUserId;
-	
+
 	/** Whether to enable Camunda authorization checks for groups and users. */
 	protected boolean authorizationCheckEnabled = true;
 
 	/** Disables SSL certificate validation. Useful for testing. */
 	protected boolean disableSSLCertificateValidation = false;
-	
+
 	/** Maximum number of HTTP connections of the Keycloak specific connection pool. */
 	protected int maxHttpConnections = 50;
-	
+
 	/** Charset to use for REST communication with Keycloak. Leave at UTF-8 for standard installation. */
 	protected String charset = StandardCharsets.UTF_8.name();
-	
+
 	/** Maximum result size for Keycloak user queries */
-	protected Integer maxResultSize = 250; 
-	
+	protected Integer maxResultSize = 250;
+
+	protected String proxyUri = null;
+
+	protected String proxyUser = null;
+
+	protected String proxyPassword = null;
+
 	//-------------------------------------------------------------------------
 	// Getters / Setters
 	//-------------------------------------------------------------------------
@@ -266,6 +273,30 @@ public class KeycloakConfiguration {
 		this.maxResultSize = maxResultSize;
 	}
 
+	public String getProxyUri() {
+		return proxyUri;
+	}
+
+	public void setProxyUri(String proxyUri) {
+		this.proxyUri = proxyUri;
+	}
+
+	public String getProxyUser() {
+		return proxyUser;
+	}
+
+	public void setProxyUser(String proxyUser) {
+		this.proxyUser = proxyUser;
+	}
+
+	public String getProxyPassword() {
+		return proxyPassword;
+	}
+
+	public void setProxyPassword(String proxyPassword) {
+		this.proxyPassword = proxyPassword;
+	}
+
 	//-------------------------------------------------------------------------
 	// Helpers
 	//-------------------------------------------------------------------------
@@ -280,5 +311,13 @@ public class KeycloakConfiguration {
 			return url.substring(0, url.length() - 1);
 		}
 		return url;
+	}
+
+	private URI toUri(String uri) {
+		if (uri != null) {
+			return URI.create(uri);
+		} else {
+			return null;
+		}
 	}
 }
