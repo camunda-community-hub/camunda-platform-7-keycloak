@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
@@ -76,7 +77,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 		}
 
 		// confgure proxy if set
-		if (keycloakConfiguration.getProxyUri() != null) {
+		if (StringUtils.hasLength(keycloakConfiguration.getProxyUri())) {
 			final URI proxyUri = URI.create(keycloakConfiguration.getProxyUri());
 			final HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
 			httpClient.setProxy(proxy);
