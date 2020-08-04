@@ -82,7 +82,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 			final HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
 			httpClient.setProxy(proxy);
 			// configure proxy auth if set
-			if (keycloakConfiguration.getProxyUser() != null && keycloakConfiguration.getProxyPassword() != null) {
+			if (StringUtils.hasLength(keycloakConfiguration.getProxyUser()) && keycloakConfiguration.getProxyPassword() != null) {
 				final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 				credentialsProvider.setCredentials(
 						new AuthScope(proxyUri.getHost(), proxyUri.getPort()),
