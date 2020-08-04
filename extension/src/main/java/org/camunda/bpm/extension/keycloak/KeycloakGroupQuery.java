@@ -26,11 +26,13 @@ public class KeycloakGroupQuery extends GroupQueryImpl {
 
 	// execute queries ////////////////////////////
 
+	@Override
 	public long executeCount(CommandContext commandContext) {
 		final KeycloakIdentityProviderSession identityProvider = getKeycloakIdentityProvider(commandContext);
 		return identityProvider.findGroupCountByQueryCriteria(this);
 	}
 
+	@Override
 	public List<Group> executeList(CommandContext commandContext, Page page) {
 		final KeycloakIdentityProviderSession identityProvider = getKeycloakIdentityProvider(commandContext);
 		return identityProvider.findGroupByQueryCriteria(this);

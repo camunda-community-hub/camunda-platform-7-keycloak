@@ -26,11 +26,13 @@ public class KeycloakUserQuery extends UserQueryImpl {
 
 	// execute queries /////////////////////////////////////////
 
+	@Override
 	public long executeCount(CommandContext commandContext) {
 		final KeycloakIdentityProviderSession provider = getKeycloakIdentityProvider(commandContext);
 		return provider.findUserCountByQueryCriteria(this);
 	}
 
+	@Override
 	public List<User> executeList(CommandContext commandContext, Page page) {
 		final KeycloakIdentityProviderSession provider = getKeycloakIdentityProvider(commandContext);
 		return provider.findUserByQueryCriteria(this);
