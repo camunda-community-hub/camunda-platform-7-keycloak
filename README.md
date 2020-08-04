@@ -133,7 +133,9 @@ A complete list of configuration options can be found below:
 | `maxResultSize`| Maximum result size of queries against the Keycloak API. Default: `100`.<br /><br />*Beware*: Setting the parameter to a too low value can lead to unexpected effects. Keep in mind that parts of the filtering takes place on the client side / within the plugin itself. Setting the paramater to a too high value can lead to performance and memory issues.<br />*Since 1.5.0* |
 | `maxHttpConnections` | Maximum number HTTP connections for the Keycloak connection pool. Default: `50`|
 | `disableSSLCertificateValidation` | Whether to disable SSL certificate validation. Default: `false`. Useful in test environments. |
-
+| `proxyUri` | Optional URI of a proxy to use. Default: `null`, example: `http://proxy:81` |
+| `proxyUser` | Optional username for proxy authentication. Default: `null` |
+| `proxyPassword` | Optional password for proxy authentication. Default: `null` |
 <!--
 | `charset` | Charset to use for REST communication with Keycloak Server. Default: `UTF-8`.<br />*Since 1.1.0* |
 -->

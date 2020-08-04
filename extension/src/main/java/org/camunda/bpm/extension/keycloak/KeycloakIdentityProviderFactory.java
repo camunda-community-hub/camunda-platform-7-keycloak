@@ -1,18 +1,19 @@
 package org.camunda.bpm.extension.keycloak;
 
-import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.TrustStrategy;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
@@ -21,9 +22,15 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import java.net.URI;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 
 /**
  * Keycloak Identity Provider Session Factory.
@@ -53,7 +60,9 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 				        .build();
 				HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
 				Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-				        .<ConnectionSocketFactory> create().register("https", new SSLConnectionSocketFactory(sslContext, allowAllHosts))
+				        .<ConnectionSocketFactory> create()
+						.register("https", new SSLConnectionSocketFactory(sslContext, allowAllHosts))
+						.register("http", new PlainConnectionSocketFactory()) // needed if http proxy is in place
 				        .build();
 				final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
 				connectionManager.setMaxTotal(keycloakConfiguration.getMaxHttpConnections());
@@ -66,6 +75,24 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 			connectionManager.setMaxTotal(keycloakConfiguration.getMaxHttpConnections());
 			httpClient.setConnectionManager(connectionManager);
 		}
+
+		// confgure proxy if set
+		if (StringUtils.hasLength(keycloakConfiguration.getProxyUri())) {
+			final URI proxyUri = URI.create(keycloakConfiguration.getProxyUri());
+			final HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
+			httpClient.setProxy(proxy);
+			// configure proxy auth if set
+			if (StringUtils.hasLength(keycloakConfiguration.getProxyUser()) && keycloakConfiguration.getProxyPassword() != null) {
+				final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+				credentialsProvider.setCredentials(
+						new AuthScope(proxyUri.getHost(), proxyUri.getPort()),
+						new UsernamePasswordCredentials(keycloakConfiguration.getProxyUser(), keycloakConfiguration.getProxyPassword())
+				);
+				httpClient.setDefaultCredentialsProvider(credentialsProvider)
+						.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+			}
+		}
+
 		factory.setHttpClient(httpClient.build());
 		restTemplate.setRequestFactory(factory);
 
