@@ -26,7 +26,7 @@ keycloak:
 
   # Keycloak Camunda Identity Client
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
-  client.secret: ${KEYCLOAK_CLIENT_SECRET:0ca35c49-c721-44dd-a6c2-a5e825e13c84}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:7979d2a6-eacc-43b1-afe0-54cea181fadc}
 
 # Spring Boot SSO OAuth2 Security
 security:
