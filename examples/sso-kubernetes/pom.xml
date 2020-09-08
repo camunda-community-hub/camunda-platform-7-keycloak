@@ -84,6 +84,12 @@
 			<artifactId>camunda-engine-plugin-spin</artifactId>
 		</dependency>
 
+        <!-- Monitoring dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
 		<!-- Required to run with Java 11 -->
 		<dependency>
 		    <groupId>javax.xml.bind</groupId>

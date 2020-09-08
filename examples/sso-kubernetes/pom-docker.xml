@@ -23,8 +23,8 @@
 	    <!-- versions -->
 		<version.camunda>7.13.0</version.camunda>
 		<!-- <version.camunda>7.13.0-ee</version.camunda> -->
-		<version.springBoot>2.2.7.RELEASE</version.springBoot>
-		<version.springSecurityOauth2>2.2.6.RELEASE</version.springSecurityOauth2>
+		<version.springBoot>2.3.3.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.3.3.RELEASE</version.springSecurityOauth2>
 	</properties>
 
     <dependencyManagement>
@@ -119,6 +119,12 @@
 			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-engine-plugin-spin</artifactId>
 		</dependency>
+
+        <!-- Monitoring dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
 		<!-- Required to run with Java 11 -->
 		<dependency>

@@ -28,6 +28,13 @@ server:
   port: 8080
   servlet.context-path: /camunda
 
+# Metrics & Health
+management:
+  health.probes.enabled: true
+  endpoints:
+    web.exposure.include: env,health,info,metrics
+
+
 # Externalized Keycloak configuration
 keycloak:
   # SSO Authentication requests. Send by application as redirect to the browser

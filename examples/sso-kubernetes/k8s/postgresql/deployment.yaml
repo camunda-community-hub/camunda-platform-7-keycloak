@@ -27,4 +27,9 @@ spec:
              value: camunda1!
            - name: POSTGRES_ROLE
              value: camunda
+           readinessProbe:
+             tcpSocket:
+               port: 5432
+             initialDelaySeconds: 45
+             periodSeconds: 5
              

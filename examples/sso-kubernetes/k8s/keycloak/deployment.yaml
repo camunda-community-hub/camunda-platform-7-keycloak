@@ -35,3 +35,9 @@ spec:
              value: keycloak
            - name: KEYCLOAK_PASSWORD
              value: keycloak1!
+           readinessProbe:
+             tcpSocket:
+               port: 8080
+             initialDelaySeconds: 60
+             periodSeconds: 5
+             

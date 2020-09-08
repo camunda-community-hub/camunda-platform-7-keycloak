@@ -40,8 +40,29 @@ spec:
              value: camunda-identity-service
            - name: KEYCLOAK_CLIENT_SECRET
              value: 7979d2a6-eacc-43b1-afe0-54cea181fadc
+           livenessProbe:
+             httpGet:
+               path: /camunda/actuator/health/liveness
+               port: 8080
+             initialDelaySeconds: 60
+             periodSeconds: 15
+             failureThreshold: 4
+           readinessProbe:
+             httpGet:
+               path: /camunda/actuator/health/readiness
+               port: 8080
+             initialDelaySeconds: 30
+             periodSeconds: 5
+             failureThreshold: 12
+         initContainers:
+         - name: init-keycloak
+           image: busybox:1.28
+           command: ['sh', '-c', "until nc -z -w 2 keycloak-server-service:8080; do echo waiting for keycloak; sleep 5; done"]
+         - name: init-postgres
+           image: busybox:1.28
+           command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
          hostAliases:
-         - ip: 10.112.4.74
+         - ip: 172.19.96.1
            hostnames:
            - armstrong02
 # Redis Session Cache not yet in use
