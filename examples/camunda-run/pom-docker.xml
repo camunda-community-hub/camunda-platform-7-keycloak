@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.camunda.bpm.extension.examples</groupId>
+	<artifactId>camunda-bpm-identity-keycloak-examples-camunda-run</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+
+  	<name>camunda BPM - engine plugins - identity - keycloak - examples - showcase - camunda -run</name>
+	<description>Showcase for using Camunda Keycloak Identity Provider on Camunda BPM Run</description>
+
+	<properties>
+		<version.java>11</version.java>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+    	<encoding>UTF-8</encoding>
+    	<project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+    	<project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+    
+	    <!-- versions -->
+		<version.camunda>7.13.0</version.camunda>
+		<!-- <version.camunda>7.13.0-ee</version.camunda> -->
+		<version.springBoot>2.3.3.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.3.3.RELEASE</version.springSecurityOauth2>
+	</properties>
+
+    <dependencyManagement>
+	    <dependencies>
+	      <dependency>
+	        <groupId>org.camunda.bpm</groupId>
+	        <artifactId>camunda-bom</artifactId>
+	        <version>${version.camunda}</version>
+	        <scope>import</scope>
+	        <type>pom</type>
+	      </dependency>
+	      <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-dependencies</artifactId>
+	        <version>${version.springBoot}</version>
+	        <type>pom</type>
+	        <scope>import</scope>
+	      </dependency>
+	      <!-- modules -->
+	      <dependency>
+	        <groupId>org.camunda.bpm.extension</groupId>
+	        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+	        <version>${project.version}</version>
+	        <scope>provided</scope>
+	      </dependency>
+	    </dependencies>
+    </dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+<!-- 			<artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
+			<version>${version.camunda}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+			<version>${version.camunda}</version>
+		</dependency>
+
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security.oauth.boot</groupId>
+			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
+			<version>${version.springSecurityOauth2}</version>
+		</dependency>
+
+		<!-- Redis Session Cache
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		-->
+		
+		<!-- Keycloak Identity Prover Plugin  -->
+		<dependency>
+	        <groupId>org.camunda.bpm.extension</groupId>
+	        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+		</dependency>
+
+		<!-- Database -->
+		<dependency>
+		  <groupId>org.springframework.boot</groupId>
+		  <artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+
+		<!-- Required to use Spin dataformat support -->
+		<dependency>
+			<groupId>org.camunda.spin</groupId>
+			<artifactId>camunda-spin-dataformat-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.camunda.bpm</groupId>
+			<artifactId>camunda-engine-plugin-spin</artifactId>
+		</dependency>
+
+        <!-- Monitoring dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+		<!-- Required to run with Java 11 -->
+		<dependency>
+		    <groupId>javax.xml.bind</groupId>
+		    <artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.camunda.bpm.assert</groupId>
+			<artifactId>camunda-bpm-assert</artifactId>
+			<version>5.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- java util logging => slf4j -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Add your own dependencies here, if in compile scope, they are added 
+			to the jar -->
+
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>camunda-bpm-nexus</id>
+			<name>Camunda Maven Repository</name>
+			<url>https://app.camunda.com/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>camunda-bpm-nexus-snapshot</id>
+			<name>Camunda Maven Repository</name>
+			<url>https://app.camunda.com/nexus/repository/camunda-bpm-community-extensions-snapshots</url>
+		</repository>
+		<!-- Camunda EE Repository, login data see settings-docker.xml
+		<repository>
+			<id>camunda-bpm-ee</id>
+			<name>Camunda Enterprise Maven Repository</name>
+			<url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
+		</repository>
+		-->
+	</repositories>
+
+</project>

@@ -16,6 +16,7 @@
   <description>Camunda Keycloak Identity Provider Plugin Examples</description>
   
   <modules>
+    <module>camunda-run</module>
     <module>sso-kubernetes</module>
   </modules>
   
