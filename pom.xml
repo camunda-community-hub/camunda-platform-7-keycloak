@@ -25,10 +25,10 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.13.0</version.camunda>
-    <!-- <version.camunda>7.13.0-ee</version.camunda> -->
-	<version.springBoot>2.3.3.RELEASE</version.springBoot>
-	<version.springSecurityOauth2>2.3.3.RELEASE</version.springSecurityOauth2>
+	<version.camunda>7.14.0</version.camunda>
+    <!-- <version.camunda>7.14.0-ee</version.camunda> -->
+	<version.springBoot>2.3.4.RELEASE</version.springBoot>
+	<version.springSecurityOauth2>2.3.4.RELEASE</version.springSecurityOauth2>
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>

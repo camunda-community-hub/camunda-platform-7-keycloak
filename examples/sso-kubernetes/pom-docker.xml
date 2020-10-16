@@ -21,10 +21,10 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-		<version.camunda>7.13.0</version.camunda>
-		<!-- <version.camunda>7.13.0-ee</version.camunda> -->
-		<version.springBoot>2.3.3.RELEASE</version.springBoot>
-		<version.springSecurityOauth2>2.3.3.RELEASE</version.springSecurityOauth2>
+		<version.camunda>7.14.0</version.camunda>
+		<!-- <version.camunda>7.14.0-ee</version.camunda> -->
+		<version.springBoot>2.3.4.RELEASE</version.springBoot>
+		<version.springSecurityOauth2>2.3.4.RELEASE</version.springSecurityOauth2>
 	</properties>
 
     <dependencyManagement>
@@ -58,13 +58,11 @@
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
 <!-- 			<artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
-			<version>${version.camunda}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-			<version>${version.camunda}</version>
 		</dependency>
 
 		<!-- Spring Security -->
@@ -141,7 +139,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.assert</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>5.0.0</version>
+			<version>8.0.0</version>
 			<scope>test</scope>
 		</dependency>
 
