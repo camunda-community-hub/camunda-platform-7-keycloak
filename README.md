@@ -279,6 +279,10 @@ A sample project using this plugin including a basic SSO and Kubernetes setup ca
 
 Even if from an architectural point of view Spring Boot is currently the most recommended approach for cloud scenarios, it is of course possible to install the plugin in other Camunda distributions as well. A description on how to install the plugin on an Apache Tomcat full distribution can be found under [Installation on Tomcat](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/tomcat). See directory `examples`.
 
+## Installation on Camunda BPM Run
+
+A description on how to install the plugin on Camunda BPM Run can be found under [Installation on Camunda BPM Run](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/run). See directory `examples`.
+
 ## Unit testing the plugin
 
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
