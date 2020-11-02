@@ -67,6 +67,7 @@
   <modules>
     <module>extension</module>
     <module>extension-all</module>
+    <module>extension-run</module>
     <module>examples</module>
   </modules>
   
