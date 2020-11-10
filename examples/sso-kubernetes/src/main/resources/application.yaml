@@ -44,6 +44,8 @@ keycloak:
   # Keycloak access for the Identity Provider plugin.
   url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
 
+  realm.id: ${KEYCLOAK_REALM:camunda}
+
   # Keycloak Camunda Identity Client
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
   client.secret: ${KEYCLOAK_CLIENT_SECRET:7979d2a6-eacc-43b1-afe0-54cea181fadc}
@@ -54,28 +56,29 @@ security:
     client:
       client-id: ${keycloak.client.id}
       client-secret: ${keycloak.client.secret}
-      accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+      accessTokenUri: ${keycloak.url.token}/auth/realms/${keycloak.realm.id}/protocol/openid-connect/token
+      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/${keycloak.realm.id}/protocol/openid-connect/auth
       scope: openid profile email
     resource:
-      userInfoUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+      userInfoUri: ${keycloak.url.auth}/auth/realms/${keycloak.realm.id}/protocol/openid-connect/userinfo
 
 logging.level.org.springframework.security: DEBUG
 
 # Camunda Rest API
 rest.security:
   enabled: true
-  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+  jwk-set-url: ${keycloak.url.token}/auth/realms/${keycloak.realm.id}/protocol/openid-connect/certs
   required-audience: camunda-rest-api
 
 # Camunda Keycloak Identity Provider Plugin
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
-  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/${keycloak.realm.id}
+  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/${keycloak.realm.id}
   clientId: ${keycloak.client.id}
   clientSecret: ${keycloak.client.secret}
-  useEmailAsCamundaUserId: true
-  useUsernameAsCamundaUserId: false
+  useEmailAsCamundaUserId: false
+  useUsernameAsCamundaUserId: true
   useGroupPathAsCamundaGroupId: true
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true
+  proxyUri: ${KEYCLOAK_PROXY_URI}
