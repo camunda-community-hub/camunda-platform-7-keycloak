@@ -35,7 +35,7 @@ jobs:
           echo "::set-output name=type::RELEASE"
         fi
       id: release-detection
-    - uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+    - uses: actions/setup-java@v1
       with:
         java-version: 1.8
     - name: Import Secrets
@@ -56,14 +56,14 @@ jobs:
     - name: Import GPG keys
       run: echo -e "${MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC}\n\n${MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB}" | base64 -d | gpg -q --import --no-tty --batch --yes --allow-secret-key-import
     - name: Set up Nexus authentication
-      uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      uses: actions/setup-java@v1
       with:
         java-version: 1.8
         server-id: camunda-nexus
         server-username: NEXUS_USR
         server-password: NEXUS_PSW
     - name: Set up Maven Central authentication
-      uses: actions/setup-java@32b40ff017548e5bb9853df55204c675fa287265 # pin@v1
+      uses: actions/setup-java@v1
       with:
         java-version: 1.8
         server-id: central
