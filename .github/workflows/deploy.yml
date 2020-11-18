@@ -39,20 +39,20 @@ jobs:
       with:
         java-version: 1.8
     - name: Import Secrets
-      uses: RichiCoder1/vault-action@22e3f3e09e3baba4d6cc62823175d21fafe4e30a # pin@v1.0.1
+      uses: hashicorp/vault-action@v2.1.0
       with:
         url: ${{ secrets.VAULT_ADDR }}
         method: approle
         roleId: ${{ secrets.VAULT_ROLE_ID }}
         secretId: ${{ secrets.VAULT_SECRET_ID }}
         secrets: |
-          common/github.com/actions/camunda NEXUS_PSW | NEXUS_PSW;
-          common/github.com/actions/camunda NEXUS_USR | NEXUS_USR;
-          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE | MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE;
-          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB | MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB;
-          common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC | MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC;
-          common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_PSW | MAVEN_CENTRAL_DEPLOYMENT_PSW;
-          common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_USR | MAVEN_CENTRAL_DEPLOYMENT_USR;
+          secret/data/common/github.com/actions/camunda NEXUS_PSW | NEXUS_PSW;
+          secret/data/common/github.com/actions/camunda NEXUS_USR | NEXUS_USR;
+          secret/data/common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE | MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE;
+          secret/data/common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB | MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB;
+          secret/data/common/github.com/actions/camunda MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC | MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC;
+          secret/data/common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_PSW | MAVEN_CENTRAL_DEPLOYMENT_PSW;
+          secret/data/common/github.com/actions/camunda MAVEN_CENTRAL_DEPLOYMENT_USR | MAVEN_CENTRAL_DEPLOYMENT_USR;
     - name: Import GPG keys
       run: echo -e "${MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC}\n\n${MAVEN_CENTRAL_GPG_SIGNING_KEY_PUB}" | base64 -d | gpg -q --import --no-tty --batch --yes --allow-secret-key-import
     - name: Set up Nexus authentication
