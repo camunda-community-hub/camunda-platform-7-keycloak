@@ -290,6 +290,10 @@ Even if from an architectural point of view Spring Boot is currently the most re
 
 A description on how to install the plugin on Camunda BPM Run can be found under [Installation on Camunda BPM Run](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/run). See directory `examples`.
 
+## Installation on JBoss/Wildfly
+
+A description on how to install the plugin on a JBoss/Wildfly can be found under [Installation on JBoss/Wildfly](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/wildfly). See directory `examples`.
+
 ## Unit testing the plugin
 
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
