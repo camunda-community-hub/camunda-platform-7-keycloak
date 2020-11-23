@@ -14,10 +14,17 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Current version: `1.5.0`<br >
+Current version: `2.0.0`<br >
 Tested with: Keycloak >= `5.0.0`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 #### Features
+
+New in Version `2.0.0`:
+
+* Support for Camunda BPM Run
+* New options `proxyUri`, `proxyUser`, `proxyPassword` for optional proxy support.
+* Usage of `com.google.code.gson` for JSON (de)serialization.
+* Further internal refactorings and preparations for future enhancements.
 
 New in Version `1.5.0`:
 
@@ -73,7 +80,7 @@ Maven Dependencies:
 		<dependency>
 			<groupId>org.camunda.bpm.extension</groupId>
 			<artifactId>camunda-bpm-identity-keycloak</artifactId>
-			<version>1.5.0</version>
+			<version>2.0.0</version>
 		</dependency>
 
 
