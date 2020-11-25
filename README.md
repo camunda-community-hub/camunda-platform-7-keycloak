@@ -161,7 +161,7 @@ In order to setup Spring Boot's OAuth2 security add the following Maven dependen
 	  <artifactId>spring-boot-starter-oauth2-client</artifactId>
 	</dependency>
 
-Insert a KeycloakAuthenticationProvider as follows:
+What we need is a bridge between Spring Security and Camunda. Hence insert a KeycloakAuthenticationProvider as follows:
 
     /**
      * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
@@ -208,9 +208,6 @@ Last but not least add a security configuration and enable OAuth2 SSO:
     @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
     public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Inject
-        private KeycloakLogoutHandler keycloakLogoutHandler;
-        
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             
