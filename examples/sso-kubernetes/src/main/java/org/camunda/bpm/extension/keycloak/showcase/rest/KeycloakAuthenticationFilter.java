@@ -11,13 +11,15 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.spin.Spin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
 
 /**
  * Keycloak Authentication Filter - used for REST API Security.
@@ -30,12 +32,16 @@ public class KeycloakAuthenticationFilter implements Filter {
 	/** Access to Camunda's IdentityService. */
 	private IdentityService identityService;
 	
+	/** Access to the OAuth2 client service. */
+	OAuth2AuthorizedClientService clientService;
+	
 	/**
 	 * Creates a new KeycloakAuthenticationFilter.
 	 * @param identityService access to Camunda's IdentityService
 	 */
-	public KeycloakAuthenticationFilter(IdentityService identityService) {
+	public KeycloakAuthenticationFilter(IdentityService identityService, OAuth2AuthorizedClientService clientService) {
 		this.identityService = identityService;
+		this.clientService = clientService;
 	}
 
 	/**
@@ -45,16 +51,20 @@ public class KeycloakAuthenticationFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-        // Get the Bearer Token and extract claims
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
-        String accessToken = details.getTokenValue();
-        String claims = JwtHelper.decode(accessToken).getClaims();
-        
-        // Extract user ID from Token claims -depending on Keycloak Identity Provider configuration
-        // String userId = Spin.JSON(claims).prop("sub").stringValue();
-        String userId = Spin.JSON(claims).prop("email").stringValue(); // useEmailAsCamundaUserId = true
-        // String userId = Spin.JSON(claims).prop("preferred_username").stringValue(); // useUsernameAsCamundaUserId = true
+	    // Extract user-name-attribute of the JWT / OAuth2 token
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userId = null;
+		if (authentication instanceof JwtAuthenticationToken) {
+			userId = ((JwtAuthenticationToken)authentication).getName();
+		} else if (authentication.getPrincipal() instanceof OidcUser) {
+			userId = ((OidcUser)authentication.getPrincipal()).getName();
+		} else {
+			throw new ServletException("Invalid authentication request token");
+		}
+        if (StringUtils.isEmpty(userId)) {
+        	throw new ServletException("Unable to extract user-name-attribute from token");
+        }
+
         LOG.debug("Extracted userId from bearer token: {}", userId);
 
         try {
@@ -77,5 +87,4 @@ public class KeycloakAuthenticationFilter implements Filter {
         	.forEach( g -> groupIds.add(g.getId()));
         return groupIds;
     }
-
 }

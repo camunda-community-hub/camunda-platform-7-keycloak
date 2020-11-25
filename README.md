@@ -77,25 +77,24 @@ Known limitations:
 
 Maven Dependencies:
 
-		<dependency>
-			<groupId>org.camunda.bpm.extension</groupId>
-			<artifactId>camunda-bpm-identity-keycloak</artifactId>
-			<version>2.0.0</version>
-		</dependency>
-
+    <dependency>
+        <groupId>org.camunda.bpm.extension</groupId>
+        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+        <version>2.0.0</version>
+    </dependency>
 
 Add the following class to your Camunda Spring Boot application in order to activate the Keycloak Identity Provider Plugin:
 
-	package <your-package>;
-	
-	import org.springframework.boot.context.properties.ConfigurationProperties;
-	import org.springframework.stereotype.Component;
-	import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
-	
-	@Component
-	@ConfigurationProperties(prefix="plugin.identity.keycloak")
-	public class KeycloakIdentityProvider extends KeycloakIdentityProviderPlugin {
-	}
+    package <your-package>;
+    
+    import org.springframework.boot.context.properties.ConfigurationProperties;
+    import org.springframework.stereotype.Component;
+    import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+    
+    @Component
+    @ConfigurationProperties(prefix="plugin.identity.keycloak")
+    public class KeycloakIdentityProvider extends KeycloakIdentityProviderPlugin {
+    }
 
 Configuration in `application.yaml` will then look as follows:
 
@@ -149,134 +148,139 @@ A complete list of configuration options can be found below:
 
 ## Activating Single Sign On
 
-In this part, we’ll discuss how to activate SSO – Single Sign On – for the Camunda Web App using Spring Boots Security OAuth2 capabilities in combination with this plugin and Keycloak as authorization server.
+In this part, we’ll discuss how to activate SSO – Single Sign On – for the Camunda Web App using Spring Boot and Spring Security 5.2.x OAuth 2.0 Client capabilities in combination with this plugin and Keycloak as authorization server.
 
 In order to setup Spring Boot's OAuth2 security add the following Maven dependencies to your project:
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security.oauth.boot</groupId>
-			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
-			<version>2.1.5.RELEASE</version>
-		</dependency>
+	<dependency>
+	  <groupId>org.springframework.boot</groupId>
+	  <artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+	<dependency>
+	  <groupId>org.springframework.boot</groupId>
+	  <artifactId>spring-boot-starter-oauth2-client</artifactId>
+	</dependency>
 
 Insert a KeycloakAuthenticationProvider as follows:
 
-	/**
-	 * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
-	 */
-	public class KeycloakAuthenticationProvider extends ContainerBasedAuthenticationProvider {
-	
-	    @Override
-	    public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
-	
-	    	// Extract authentication details
-	        OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-	        if (authentication == null) {
-	            return AuthenticationResult.unsuccessful();
-	        }
-	        Authentication userAuthentication = authentication.getUserAuthentication();
-	        if (userAuthentication == null || userAuthentication.getDetails() == null) {
-	            return AuthenticationResult.unsuccessful();
-	        }
-	        
-	        // Extract user ID from Keycloak authentication result - which is part of the requested user info
-	        @SuppressWarnings("unchecked")
-	        String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("sub");
-	        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email"); // useEmailAsCamundaUserId = true
-	        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username"); // useUsernameAsCamundaUserId = true
-	        if (StringUtils.isEmpty(userId)) {
-	            return AuthenticationResult.unsuccessful();
-	        }
-	
-	        // Authentication successful
-	        AuthenticationResult authenticationResult = new AuthenticationResult(userId, true);
-	        authenticationResult.setGroups(getUserGroups(userId, engine));
-	
-	        return authenticationResult;
-	    }
-	
-	    private List<String> getUserGroups(String userId, ProcessEngine engine){
-	        List<String> groupIds = new ArrayList<>();
-	        // query groups using KeycloakIdentityProvider plugin
-	        engine.getIdentityService().createGroupQuery().groupMember(userId).list()
-	        	.forEach( g -> groupIds.add(g.getId()));
-	        return groupIds;
-	    }
-	
-	}
-	
+    /**
+     * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
+     */
+    public class KeycloakAuthenticationProvider extends ContainerBasedAuthenticationProvider {
+
+        @Override
+        public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
+
+            // Extract user-name-attribute of the OAuth2 token
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!(authentication instanceof OAuth2AuthenticationToken) || !(authentication.getPrincipal() instanceof OidcUser)) {
+                return AuthenticationResult.unsuccessful();
+            }
+            String userId = ((OidcUser)authentication.getPrincipal()).getName();
+            if (StringUtils.isEmpty(userId)) {
+                return AuthenticationResult.unsuccessful();
+            }
+
+            // Authentication successful
+            AuthenticationResult authenticationResult = new AuthenticationResult(userId, true);
+            authenticationResult.setGroups(getUserGroups(userId, engine));
+
+            return authenticationResult;
+        }
+
+        private List<String> getUserGroups(String userId, ProcessEngine engine){
+            List<String> groupIds = new ArrayList<>();
+            // query groups using KeycloakIdentityProvider plugin
+            engine.getIdentityService().createGroupQuery().groupMember(userId).list()
+                .forEach( g -> groupIds.add(g.getId()));
+            return groupIds;
+        }
+
+    }
+
 Last but not least add a security configuration and enable OAuth2 SSO:
 
-	/**
-	 * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
-	 */
-	@Configuration
-	@EnableOAuth2Sso
-	public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	    @Override
-	    protected void configure(HttpSecurity http) throws Exception {
-	    	http
-	    	.csrf().ignoringAntMatchers("/api/**")
-	    	.and()
-	        .antMatcher("/**")
-	        .authorizeRequests()
-	          .antMatchers("/app/**")
-	          .authenticated()
-	        .anyRequest()
-	          .permitAll()
-	        ;
-	    }
-	
-	    @SuppressWarnings({ "rawtypes", "unchecked" })
-	    @Bean
-	    public FilterRegistrationBean containerBasedAuthenticationFilter(){
-	
-	        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-	        filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
-	        filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "<your-package>.sso.KeycloakAuthenticationProvider"));
-	        filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
-	        filterRegistration.addUrlPatterns("/app/*");
-	        return filterRegistration;
-	    }
-	
-		@Bean
-		public RequestContextListener requestContextListener() {
-			return new RequestContextListener();
-		}
-	}
-	
+    /**
+    * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
+    */
+    @ConditionalOnMissingClass("org.springframework.test.context.junit4.SpringJUnit4ClassRunner")
+    @Configuration
+    @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
+    public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Inject
+        private KeycloakLogoutHandler keycloakLogoutHandler;
+        
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            
+            http
+            .csrf().ignoringAntMatchers("/api/**")
+            .and()
+            .requestMatchers().antMatchers("/**").and()
+            .authorizeRequests(
+                authorizeRequests ->
+                authorizeRequests
+                .antMatchers("/login**", "/oauth2/authorization**")
+                .permitAll()
+                .antMatchers("/app/**", "/api/**", "/lib/**")
+                .authenticated())
+            .oauth2Login()
+            ;
+        }
+
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        @Bean
+        public FilterRegistrationBean containerBasedAuthenticationFilter(){
+
+            FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
+            filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
+            filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakAuthenticationProvider"));
+            filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
+            filterRegistration.addUrlPatterns("/app/*");
+            return filterRegistration;
+        }
+    
+        @Bean
+        @Order(0)
+        public RequestContextListener requestContextListener() {
+            return new RequestContextListener();
+        }
+    }
+
 Finally configure Spring Security with your Keycloak Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
 
-	security:
-	  oauth2:
-	    client:
-	      client-id: camunda-identity-service
-	      client-secret: yyy2121abc21def2121ghi212132121abc21def2121ghi2121eyyy
-	      accessTokenUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/token
-	      userAuthorizationUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/auth
-	      scope: openid profile email
-	    resource:
-	      userInfoUri: https://<your-keycloak-server>/auth/realms/<realm-name>/protocol/openid-connect/userinfo
+    # Spring Boot Security OAuth2 SSO
+    spring.security.oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: camunda-identity-service
+            client-secret: yyy2121abc21def2121ghi212132121abc21def2121ghi2121eyyy
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope: openid, profile, email
+        provider:
+          keycloak:
+            token-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/token
+            authorization-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/auth
+            user-info-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/userinfo
+            jwk-set-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/certs
+            issuer-uri: https://<your-keycloak-server>/auth/realms/camunda
+            # set user-name-attribute one of: 
+            # - sub                -> default; using keycloak ID as camunda user ID
+            # - email              -> useEmailAsCamundaUserId=true
+            # - preferred_username -> useUsernameAsCamundaUserId=true
+            user-name-attribute: email
 
-**Beware**: SSO will only work that way in case you have the KeycloakIdentityProviderPlugin's property `useEmailAsCamundaUserId` set to default which is `false`. If you want to use the email attribute as Camunda's user ID, the extraction in the Authentication Provider must be implemented as follows:
+**Beware**: You have to set the parameter ``user-name-attribute`` of the ``spring.security.oauth2.client.provider.keycloak`` in a way that it matches the configuration of your KeycloakIdentityProviderPlugin: 
 
-	// Extract email from Keycloak authentication result - which is part of the requested user info
-	@SuppressWarnings("unchecked")
-	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email");
-	
-Keep in mind that Keycloak's `ID` is definitely unique which might not always be the case for the `email` attribute, depending on your setup.
-Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
+* `useEmailAsCamundaUserId: true` - set `user-name-attribute: email`
+* `useUsernameAsCamundaUserId: true` - set `user-name-attribute: preferred_username`
+* neither of the above two, using Keycloak's ID as default - set `user-name-attribute: sub`
 
-In case you have activated the flag `useUsernameAsCamundaUserId` the extraction in the Authentication Provider must be changed in a similar way and can be implemented as follows:
-
-	// Extract username from Keycloak authentication result - which is part of the requested user info
-	@SuppressWarnings("unchecked")
-	String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username");
+Keep in mind that Keycloak's `email` attribute might not always be unique, depending on your setup. Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
 
 ## Sample Spring Boot Project with SSO on Kubernetes
 
@@ -298,19 +302,19 @@ A description on how to install the plugin on a JBoss/Wildfly can be found under
 
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
 
-	version: "3.3"
-	
-	services:
-	  jboss.keycloak:
-	    build: .
-	    image: jboss/keycloak
-	    restart: always
-	    environment:
-	      TZ: Europe/Berlin
-	      KEYCLOAK_USER: keycloak
-	      KEYCLOAK_PASSWORD: keycloak1!
-	    ports:
-	      - "8443:8443"
+    version: "3.3"
+    
+    services:
+      jboss.keycloak:
+        build: .
+        image: jboss/keycloak
+        restart: always
+        environment:
+          TZ: Europe/Berlin
+          KEYCLOAK_USER: keycloak
+          KEYCLOAK_PASSWORD: keycloak1!
+        ports:
+          - "8443:8443"
 
 For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
 

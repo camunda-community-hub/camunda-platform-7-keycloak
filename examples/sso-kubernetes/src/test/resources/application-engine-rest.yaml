@@ -28,24 +28,37 @@ keycloak:
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
   client.secret: ${KEYCLOAK_CLIENT_SECRET:7979d2a6-eacc-43b1-afe0-54cea181fadc}
 
-# Spring Boot SSO OAuth2 Security
-security:
+# Spring Boot Security OAuth2 SSO
+spring.security:
   oauth2:
     client:
-      client-id: ${keycloak.client.id}
-      client-secret: ${keycloak.client.secret}
-      accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-      scope: openid profile email
-    resource:
-      userInfoUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+      registration:
+        keycloak:
+          provider: keycloak
+          client-id: ${keycloak.client.id}
+          client-secret: ${keycloak.client.secret}
+          authorization-grant-type: authorization_code
+          redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+          scope: openid, profile, email
+      provider:
+        keycloak:
+          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+          authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+          user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+          jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+          issuer-uri: ${keycloak.url.token}/auth/realms/camunda
+          # set user-name-attribute one of: 
+          # - sub                -> default; using keycloak ID as camunda user ID
+          # - email              -> useEmailAsCamundaUserId=true
+          # - preferred_username -> useUsernameAsCamundaUserId=true
+          user-name-attribute: email
 
 logging.level.org.springframework.security: DEBUG
 
 # Camunda Rest API
 rest.security:
   enabled: true
-  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+  provider: keycloak
   required-audience: camunda-rest-api
 
 # Camunda Keycloak Identity Provider Plugin

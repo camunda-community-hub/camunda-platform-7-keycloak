@@ -19,17 +19,16 @@ public class RestApiSecurityConfigurationProperties {
 	 * 
 	 * Rest Security is enabled by default. Switch off by setting this flag to {@code false}.
 	 */
-	@SuppressWarnings("unused")
 	private Boolean enabled = true;
 
 	/** 
-	 * rest.security.jwk-set-url:
+	 * rest.security.provider:
 	 * 
-	 * JWK Set URL (e.g. https://<keycloak-host:port>/auth/realms/camunda/protocol/openid-connect/certs).
+	 * The name of the spring.security.oauth2.client.provider to use
 	 */
 	@NotEmpty
-	private String jwkSetUrl;
-	
+	private String provider;
+
 	/** 
 	 * rest.security.required-audience:
 	 * 
@@ -37,22 +36,8 @@ public class RestApiSecurityConfigurationProperties {
 	 */
 	@NotEmpty
 	private String requiredAudience;
-
+	
 	// ------------------------------------------------------------------------
-
-	/**
-	 * @return the jwkSetUrl
-	 */
-	public String getJwkSetUrl() {
-		return jwkSetUrl;
-	}
-
-	/**
-	 * @param jwkSetUrl the jwkSetUrl to set
-	 */
-	public void setJwkSetUrl(String jwkSetUrl) {
-		this.jwkSetUrl = jwkSetUrl;
-	}
 
 	/**
 	 * @return the requiredAudience
@@ -66,6 +51,34 @@ public class RestApiSecurityConfigurationProperties {
 	 */
 	public void setRequiredAudience(String requiredAudience) {
 		this.requiredAudience = requiredAudience;
+	}
+
+	/**
+	 * @return the enabled
+	 */
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	/**
+	 * @param enabled the enabled to set
+	 */
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/**
+	 * @return the provider
+	 */
+	public String getProvider() {
+		return provider;
+	}
+
+	/**
+	 * @param provider the provider to set
+	 */
+	public void setProvider(String provider) {
+		this.provider = provider;
 	} 
 
 }

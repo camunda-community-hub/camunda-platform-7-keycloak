@@ -49,13 +49,13 @@ public class RestApiSecurityConfigTest {
 	
 	private  RestTemplate restTemplate = new RestTemplate();
 
-	@Value("${security.oauth2.client.accessTokenUri}")
+	@Value("${spring.security.oauth2.client.provider.keycloak.token-uri}")
 	private String accessTokenUri;
 	
-	@Value("${security.oauth2.client.client-id}")
+	@Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
 	private String clientId;
 	
-	@Value("${security.oauth2.client.client-secret}")
+	@Value("${spring.security.oauth2.client.registration.keycloak.client-secret}")
 	private String clientSecret;
 
 	/** Local server's HTTP port allocated at runtime. */

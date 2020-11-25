@@ -1,7 +1,6 @@
 package org.camunda.bpm.extension.keycloak.showcase.sso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,8 @@ import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.util.StringUtils;
 
 /**
@@ -22,21 +22,12 @@ public class KeycloakAuthenticationProvider extends ContainerBasedAuthentication
     @Override
     public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
 
-    	// Extract authentication details
-        OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            return AuthenticationResult.unsuccessful();
-        }
-        Authentication userAuthentication = authentication.getUserAuthentication();
-        if (userAuthentication == null || userAuthentication.getDetails() == null) {
-            return AuthenticationResult.unsuccessful();
-        }
-        
-        // Extract user ID from Keycloak authentication result - which is part of the requested user info
-        @SuppressWarnings("unchecked")
-        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("sub");
-        String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("email"); // useEmailAsCamundaUserId = true
-        // String userId = ((HashMap<String, String>) userAuthentication.getDetails()).get("preferred_username"); // useUsernameAsCamundaUserId = true
+        // Extract user-name-attribute of the OAuth2 token
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (!(authentication instanceof OAuth2AuthenticationToken) || !(authentication.getPrincipal() instanceof OidcUser)) {
+			return AuthenticationResult.unsuccessful();
+		}
+        String userId = ((OidcUser)authentication.getPrincipal()).getName();
         if (StringUtils.isEmpty(userId)) {
             return AuthenticationResult.unsuccessful();
         }

@@ -2,7 +2,7 @@
 
 ## What it does
 
-This is a basic showcase for a Camunda Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak).
+This is a basic showcase for a Camunda Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) in combination with the OAuth 2.0 Client and Resource Server implementation of Spring Security 5.2.x.
 
 You will not only login using Keycloak (or if configured using your preferred social identity provider)
 
@@ -74,7 +74,7 @@ Use a ``docker-compose.yml`` file as follows:
 
 The image ``gunnaraccso/keycloak.server`` has been derived from the original ``jboss/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker image](https://hub.docker.com/r/jboss/keycloak/).
 
-The only thing you have to adapt for local tests is the **Redirect URI** of the Camuna Identity Service Client. Login at the [Keycloak Admin Console](https://localhost:9001/auth/admin/master/console/#/) using user/password as configured above and set ``http://localhost:8080/camunda/login`` as Valid Redirect URI configuration at the Camunda Identity Service client:
+The only thing you have to adapt for local tests is the **Redirect URI** of the Camuna Identity Service Client. Login at the [Keycloak Admin Console](https://localhost:9001/auth/admin/master/console/#/) using user/password as configured above and add ``http://localhost:8080/camunda/*`` as Valid Redirect URI configuration to the Camunda Identity Service client:
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
@@ -122,17 +122,32 @@ The additional configuration parts in ``applicaton.yaml`` are as follows:
 	  # SSO Token requests. Send from the application to Keycloak
 	  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
 
-	# Spring Boot SSO OAuth2 Security
-	security:
-	  oauth2:
-	    client:
-	      client-id: ${keycloak.client.id}
-	      client-secret: ${keycloak.client.secret}
-	      accessTokenUri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-	      userAuthorizationUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-	      scope: openid profile email
-	    resource:
-	      userInfoUri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+	# Spring Boot Security OAuth2 SSO
+	spring.security:
+	oauth2:
+		client:
+		registration:
+			keycloak:
+			provider: keycloak
+			client-id: ${keycloak.client.id}
+			client-secret: ${keycloak.client.secret}
+			authorization-grant-type: authorization_code
+			redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+			scope: openid, profile, email
+		provider:
+			keycloak:
+			token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+			authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+			user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+			jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+			issuer-uri: ${keycloak.url.token}/auth/realms/camunda
+			# set user-name-attribute one of: 
+			# - sub                -> default; using keycloak ID as camunda user ID
+			# - email              -> useEmailAsCamundaUserId=true
+			# - preferred_username -> useUsernameAsCamundaUserId=true
+			user-name-attribute: preferred_username
+
+You'll find the security configuraton setup in ``WebAppSecurityConfig``. Please be aware of the ``KeycloakAuthenticationProvider`` which is the bridge between Spring Security and Camunda.
 
 ### Optional Security for the Camunda REST Api
 
@@ -149,7 +164,7 @@ The additional configuration in ``application.yaml`` is simple and self explaini
 	# Camunda Rest API
 	rest.security:
 	  enabled: true
-	  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+	  provider: keycloak
 	  required-audience: camunda-rest-api
 
 To induce keycloak to include the expected audience claim in delivered tokens, we configure a custom Client Scope named ``camunda-rest-api``:
@@ -165,22 +180,26 @@ This ensures, that only users authenticated at the Camunda-Identity-Service are 
 
 The security implementation snippets for the REST Api part can be found in package ``org.camunda.bpm.extension.keycloak.showcase.rest``. 
 
-Besides a typical implementation of a ``ResourceServerConfigurerAdapter`` we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. It's job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
+Besides a typical Web security configuration ``RestApiSecurityConfig`` including OAuth 2.0 Resource Server support we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. It's job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-        // Get the Bearer Token and extract claims
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
-        String accessToken = details.getTokenValue();
-        String claims = JwtHelper.decode(accessToken).getClaims();
-        
-        // Extract user ID from Token claims -depending on Keycloak Identity Provider configuration
-        // String userId = Spin.JSON(claims).prop("sub").stringValue();
-        String userId = Spin.JSON(claims).prop("email").stringValue(); // useEmailAsCamundaUserId = true
-        // String userId = Spin.JSON(claims).prop("preferred_username").stringValue(); // useUsernameAsCamundaUserId = true
+	    // Extract user-name-attribute of the JWT / OAuth2 token
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userId = null;
+		if (authentication instanceof JwtAuthenticationToken) {
+			userId = ((JwtAuthenticationToken)authentication).getName();
+		} else if (authentication.getPrincipal() instanceof OidcUser) {
+			userId = ((OidcUser)authentication.getPrincipal()).getName();
+		} else {
+			throw new ServletException("Invalid authentication request token");
+		}
+        if (StringUtils.isEmpty(userId)) {
+        	throw new ServletException("Unable to extract user-name-attribute from token");
+        }
+
         LOG.debug("Extracted userId from bearer token: {}", userId);
 
         try {
@@ -247,7 +266,7 @@ The Kubernetes setup can be found in directory ``k8s``. It contains a subfolder 
 In order to make Keycloak run with Kubernetes you have to be aware of two things:
 * Activate the ``PROXY_ADDRESS_FORWARDING`` option for Keycloak.
 * Activate ``nginx.ingress.kubernetes.io/ssl-redirect`` in your ingress service.
-* The Redirect URI within Keycloak's Camunda-Identity-Service Client should be ``/camunda/login/*``.
+* The Redirect URI within Keycloak's Camunda-Identity-Service Client should be ``/camunda/*``.
 
 Keep in mind that the included ``keycloak/deployment.yaml`` is only a test setup. Adapt to your own needs.
 

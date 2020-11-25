@@ -10,7 +10,7 @@ spring.datasource:
 # Camunda Rest API
 rest.security:
   enabled: false
-  jwk-set-url: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+  provider: keycloak
   required-audience: camunda-rest-api
 
 # disable redis
