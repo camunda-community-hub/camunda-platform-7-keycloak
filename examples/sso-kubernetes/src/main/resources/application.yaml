@@ -8,14 +8,6 @@ spring:
   jersey:
     application-path: /engine-rest
 
-# Redis Session Cache not yet in use
-#  session:
-#    store-type: ${SESSION_STORE_TYPE:none}
-#    redis.flush-mode: immediate
-#  redis:
-#    host: ${REDIS_HOST:localhost}
-#    port: ${REDIS_PORT:6379}
-
 camunda.bpm:
   history-level: audit
   authorization:
@@ -62,11 +54,11 @@ spring.security:
           scope: openid, profile, email
       provider:
         keycloak:
-          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+          issuer-uri: ${keycloak.url.auth}/auth/realms/camunda
           authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
           user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
           jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
-          issuer-uri: ${keycloak.url.token}/auth/realms/camunda
           # set user-name-attribute one of: 
           # - sub                -> default; using keycloak ID as camunda user ID
           # - email              -> useEmailAsCamundaUserId=true

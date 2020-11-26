@@ -78,17 +78,6 @@
           <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
 
-		<!-- Redis Session Cache
-		<dependency>
-			<groupId>org.springframework.session</groupId>
-			<artifactId>spring-session-data-redis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-		-->
-		
 		<!-- Keycloak Identity Prover Plugin  -->
 		<dependency>
 	        <groupId>org.camunda.bpm.extension</groupId>

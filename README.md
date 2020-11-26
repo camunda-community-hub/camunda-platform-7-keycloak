@@ -260,11 +260,11 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
             scope: openid, profile, email
         provider:
           keycloak:
-            token-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/token
+            issuer-uri: https://<your-keycloak-server>/auth/realms/camunda
             authorization-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/auth
             user-info-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/userinfo
+            token-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/token
             jwk-set-uri: https://<your-keycloak-server>/auth/realms/camunda/protocol/openid-connect/certs
-            issuer-uri: https://<your-keycloak-server>/auth/realms/camunda
             # set user-name-attribute one of: 
             # - sub                -> default; using keycloak ID as camunda user ID
             # - email              -> useEmailAsCamundaUserId=true

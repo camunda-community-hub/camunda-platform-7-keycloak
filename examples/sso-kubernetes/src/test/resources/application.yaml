@@ -12,8 +12,3 @@ rest.security:
   enabled: false
   provider: keycloak
   required-audience: camunda-rest-api
-
-# disable redis
-spring.data.redis.repositories.enabled: false
-spring.autoconfigure.exclude:
-    - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration

@@ -128,24 +128,24 @@ The additional configuration parts in ``applicaton.yaml`` are as follows:
       client:
         registration:
           keycloak:
-          provider: keycloak
-          client-id: ${keycloak.client.id}
-          client-secret: ${keycloak.client.secret}
-          authorization-grant-type: authorization_code
-          redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-          scope: openid, profile, email
+            provider: keycloak
+            client-id: ${keycloak.client.id}
+            client-secret: ${keycloak.client.secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope: openid, profile, email
         provider:
           keycloak:
-          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-          authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-          user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
-          jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
-          issuer-uri: ${keycloak.url.token}/auth/realms/camunda
-          # set user-name-attribute one of: 
-          # - sub                -> default; using keycloak ID as camunda user ID
-          # - email              -> useEmailAsCamundaUserId=true
-          # - preferred_username -> useUsernameAsCamundaUserId=true
-          user-name-attribute: preferred_username
+            issuer-uri: ${keycloak.url.auth}/auth/realms/camunda
+            authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+            user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+            token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+            jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+            # set user-name-attribute one of: 
+            # - sub                -> default; using keycloak ID as camunda user ID
+            # - email              -> useEmailAsCamundaUserId=true
+            # - preferred_username -> useUsernameAsCamundaUserId=true
+            user-name-attribute: preferred_username
 
 You'll find the security configuraton setup in ``WebAppSecurityConfig``. Please be aware of the ``KeycloakAuthenticationProvider`` which is the bridge between Spring Security and Camunda.
 

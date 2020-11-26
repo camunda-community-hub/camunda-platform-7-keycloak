@@ -62,11 +62,6 @@ spec:
            image: busybox:1.28
            command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
          hostAliases:
-         - ip: 172.19.96.1
+         - ip: 172.29.112.1
            hostnames:
            - armstrong02
-# Redis Session Cache not yet in use
-#           - name: SESSION_STORE_TYPE
-#             value: redis
-#           - name: REDIS_HOST
-#             value: redis-service

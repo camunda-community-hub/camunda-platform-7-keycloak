@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: keycloak-showcase-ingress
@@ -16,11 +16,17 @@ spec:
     http:
       paths:
         - path: /camunda
+          pathType: Prefix
           backend:
-            serviceName: keycloak-showcase-service
-            servicePort: 8080
+            service:
+              name: keycloak-showcase-service
+              port:
+                number: 8080
         - path: /auth
+          pathType: Prefix
           backend:
-            serviceName: keycloak-server-service
-            servicePort: 8080
+            service:
+              name: keycloak-server-service
+              port:
+                number: 8080
             

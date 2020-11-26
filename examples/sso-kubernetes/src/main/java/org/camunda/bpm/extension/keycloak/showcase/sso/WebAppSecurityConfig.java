@@ -39,7 +39,7 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests(
        		authorizeRequests ->
        		authorizeRequests
-       		.antMatchers("/login**", "/oauth2/authorization**")
+       		.antMatchers("/login**", "/oauth2/authorization**", "/actuator**")
        		.permitAll()
        		.antMatchers("/app/**", "/api/**", "/lib/**")
        		.authenticated())
@@ -79,16 +79,4 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 	    return new RequestContextListener();
 	}
 	
-	/**
-	 * Configures the OAuth2 TokenStore for Redis Cache usage.
-	 * @param redisConnectionFactory the Redis Connection Factoryf
-	 * @return Redis prepared TokenStore
-	 */
-	/* Redis Session Cache not yet in use
-	@Bean
-	@Primary
-	public TokenStore tokenStore(RedisConnectionFactory redisConnectionFactory) {
-	    return new RedisTokenStore(redisConnectionFactory);
-	}
-	*/
 }

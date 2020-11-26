@@ -5,12 +5,6 @@ kubectl delete -f ./ingress-service.yaml
 kubectl delete -f ./deployment.yaml
 kubectl delete -f ./service.yaml
 
-# delete redis
-#cd ./redis
-#kubectl delete -f ./deployment.yaml
-#kubectl delete -f ./service.yaml
-#cd ..
-
 # delete keycloak
 cd ./keycloak
 kubectl delete -f ./deployment.yaml
