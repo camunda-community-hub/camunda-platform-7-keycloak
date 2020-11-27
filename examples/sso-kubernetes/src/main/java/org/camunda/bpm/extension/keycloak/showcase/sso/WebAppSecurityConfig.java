@@ -39,10 +39,11 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests(
        		authorizeRequests ->
        		authorizeRequests
-       		.antMatchers("/login**", "/oauth2/authorization**", "/actuator**")
-       		.permitAll()
        		.antMatchers("/app/**", "/api/**", "/lib/**")
-       		.authenticated())
+       		.authenticated()
+       		.anyRequest()
+       		.permitAll()
+       		)
 	    .oauth2Login()
 	    .and()
 	      .logout()
