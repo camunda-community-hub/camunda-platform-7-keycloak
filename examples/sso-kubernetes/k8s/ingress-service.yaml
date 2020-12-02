@@ -9,20 +9,21 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-samesite: "none"
     nginx.ingress.kubernetes.io/session-cookie-conditional-samesite-none: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1$2
 
 spec:
   rules:
   - host: armstrong02
     http:
       paths:
-        - path: /camunda
+        - path: /(camunda)(.*)(/|$)
           pathType: Prefix
           backend:
             service:
               name: keycloak-showcase-service
               port:
                 number: 8080
-        - path: /auth
+        - path: /(auth)(.*)(/|$)
           pathType: Prefix
           backend:
             service:
