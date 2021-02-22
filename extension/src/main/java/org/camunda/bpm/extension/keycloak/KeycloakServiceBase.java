@@ -2,15 +2,19 @@ package org.camunda.bpm.extension.keycloak;
 
 import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -114,6 +118,66 @@ public abstract class KeycloakServiceBase {
 	// General helper methods
 	//-------------------------------------------------------------------------
 
+	/**
+	 * Builds the list of groups that will be whitelisted = allowed in groupQueries from config-property 
+	 * @return List of groups
+	 */
+	protected ArrayList<String> buildGroupWhitelist(){
+		ArrayList<String> whitelistedGroups = new ArrayList<String>();
+		
+		if (!StringUtils.isEmpty(this.keycloakConfiguration.getKeycloakGroupFilterWhitelist())){
+			whitelistedGroups= (ArrayList<String>) Arrays.stream(this.keycloakConfiguration.getKeycloakGroupFilterWhitelist().split(","))
+					.map(el -> el.trim())
+					.collect(Collectors.toList());
+		}
+		return whitelistedGroups;
+		
+	}
+	
+	/**
+	 * 
+	 * @param groupName name of group to check
+	 * @param whitelistedGroups list of whitelisted groups
+	 * @return {@code true} if group-name is in the list of white-listed groups
+	 */
+	protected boolean isGroupWhitelisted(String groupName,ArrayList<String> whitelistedGroups) {
+		//The admin-group is always whitelisted
+		if (keycloakConfiguration.getAdministratorGroupName()!=null) {
+			if (this.keycloakConfiguration.administratorGroupName.equalsIgnoreCase(groupName)){
+				return true;
+			}
+		}
+		if (whitelistedGroups.stream()
+				.filter(el -> el.equalsIgnoreCase(groupName))
+				.findFirst()
+				.isPresent())
+		{
+			return true;
+		}
+		
+		return false;
+	}
+
+	/**
+	 * 
+	 * @param groupName name of group to check
+	 * @return {@code true} if group-name starts with prefix
+	 */
+	protected boolean matchesGroupPrefix(String groupName) {
+		//The admin-group is always ok
+		if (keycloakConfiguration.getAdministratorGroupName()!=null) {
+			if (this.keycloakConfiguration.administratorGroupName.equalsIgnoreCase(groupName)){
+				return true;
+			}
+		}
+		//case-insensitive matching
+		if (groupName.toLowerCase().startsWith(this.keycloakConfiguration.getKeycloakGroupFilterPrefix().toLowerCase())) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Return the maximum result size of Keycloak queries as String.
 	 * @return maximum results for Keycloak search requests

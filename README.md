@@ -136,6 +136,8 @@ A complete list of configuration options can be found below:
 | `proxyUri` | Optional URI of a proxy to use. Default: `null`, example: `http://proxy:81`.<br />*Since 2.0.0* |
 | `proxyUser` | Optional username for proxy authentication. Default: `null`.<br />*Since 2.0.0* |
 | `proxyPassword` | Optional password for proxy authentication. Default: `null`.<br />*Since 2.0.0* |
+| `keycloakGroupFilterPrefix` | Only get groups from Keycloak that start with a prefix e.g. camunda_. Match is case-insensitive Default: `null`.<br />*Since 2.0.1-SNAPSHOT* |
+| `keycloakGroupFilterWhitelist` | Only get groups from Keycloak that are listed here - separated by comma. Match is case-insensitive. Takes precedence over keycloakGroupFilterPrefix. Default: `null`.<br />*Since 2.0.1-SNAPSHOT* |
 <!--
 | `charset` | Charset to use for REST communication with Keycloak Server. Default: `UTF-8`.<br />*Since 1.1.0* |
 -->

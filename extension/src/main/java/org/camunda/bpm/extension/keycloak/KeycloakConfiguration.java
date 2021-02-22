@@ -71,6 +71,14 @@ public class KeycloakConfiguration {
 	protected String proxyUser = null;
 
 	protected String proxyPassword = null;
+	
+	/** Only get groups from Keycloak that start with a prefix e.g. camunda_ */
+	protected String keycloakGroupFilterPrefix = null;
+	
+	/** Only get groups from Keycloak that are listed here - separated by comma */
+	protected String keycloakGroupFilterWhitelist = null;
+
+
 
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -296,6 +304,23 @@ public class KeycloakConfiguration {
 		this.proxyPassword = proxyPassword;
 	}
 
+	public String getKeycloakGroupFilterPrefix() {
+		return keycloakGroupFilterPrefix;
+	}
+
+	public void setKeycloakGroupFilterPrefix(String keycloakGroupFilterPrefix) {
+		this.keycloakGroupFilterPrefix = keycloakGroupFilterPrefix;
+	}
+
+	public String getKeycloakGroupFilterWhitelist() {
+		return keycloakGroupFilterWhitelist;
+	}
+
+	public void setKeycloakGroupFilterWhitelist(String keycloakGroupFilterWhitelist) {
+		this.keycloakGroupFilterWhitelist = keycloakGroupFilterWhitelist;
+	}
+
+	
 	//-------------------------------------------------------------------------
 	// Helpers
 	//-------------------------------------------------------------------------
@@ -311,5 +336,6 @@ public class KeycloakConfiguration {
 		}
 		return url;
 	}
+
 	
 }

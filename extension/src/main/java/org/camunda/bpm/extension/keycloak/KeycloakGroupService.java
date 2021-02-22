@@ -5,8 +5,10 @@ import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.identity.Group;
@@ -27,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import camundajar.impl.scala.Array;
 
 /**
  * Implementation of group queries against Keycloak's REST API.
@@ -137,9 +141,41 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			}
 
 			JsonArray searchResult = parseAsJsonArray(response.getBody());
+
+			//build whitelist
+			ArrayList<String> whitelistedGroups = buildGroupWhitelist();
+			
 			for (int i = 0; i < searchResult.size(); i++) {
 				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
 				Group group = transformGroup(keycloakGroup);
+
+				//perform whitelist check
+				if (!whitelistedGroups.isEmpty()) {
+					//check if this group is one of the whitelisted groups
+					if(!isGroupWhitelisted(group.getName(),whitelistedGroups)) {
+						if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+							resultLogger.append(group);
+							resultLogger.append(" based on ");
+							resultLogger.append(keycloakGroup.toString());
+							resultLogger.append(" because it is not whitelisted, ");
+						}
+						continue;						
+					}
+				}
+				
+				//Prefix-Filter set ? Apply only if whitelisting is not active
+				if ((!StringUtils.isEmpty(this.keycloakConfiguration.getKeycloakGroupFilterPrefix())) && (whitelistedGroups.isEmpty())){
+					if (!matchesGroupPrefix(group.getName())) {
+						if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+							resultLogger.append("skip ");
+							resultLogger.append(group);
+							resultLogger.append(" based on ");
+							resultLogger.append(keycloakGroup.toString());
+							resultLogger.append(" because group-prefix does not match , ");
+						}
+						continue;
+					}
+				}
 
 				// client side check of further query filters
 				if (!matches(query.getId(), group.getId())) continue;
@@ -232,9 +268,42 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 				// for non ID queries search in subgroups as well
 				searchResult = flattenSubGroups(parseAsJsonArray(response.getBody()), new JsonArray());
 			}
+
+			//build whitelist
+			ArrayList<String> whitelistedGroups = buildGroupWhitelist();
+			
 			for (int i = 0; i < searchResult.size(); i++) {
 				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
 				Group group = transformGroup(keycloakGroup);
+				
+				//perform whitelist check
+				if (!whitelistedGroups.isEmpty()) {
+					//check if this group is one of the whitelisted groups
+					if(!isGroupWhitelisted(group.getName(),whitelistedGroups)) {
+						if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+							resultLogger.append("skip ");
+							resultLogger.append(group);
+							resultLogger.append(" based on ");
+							resultLogger.append(keycloakGroup.toString());
+							resultLogger.append(" because it is not whitelisted, ");
+						}
+						continue;						
+					}
+				}
+				
+				//Prefix-Filter set ? Apply only if whitelisting is not active
+				if ((!StringUtils.isEmpty(this.keycloakConfiguration.getKeycloakGroupFilterPrefix())) && (whitelistedGroups.isEmpty())){
+					if (!matchesGroupPrefix(group.getName())) {
+						if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+							resultLogger.append("skip ");
+							resultLogger.append(group);
+							resultLogger.append(" based on ");
+							resultLogger.append(keycloakGroup.toString());
+							resultLogger.append(" because group-prefix does not match , ");
+						}
+						continue;
+					}
+				}
 				
 				// client side check of further query filters
 				if (!matches(query.getIds(), group.getId())) continue;
