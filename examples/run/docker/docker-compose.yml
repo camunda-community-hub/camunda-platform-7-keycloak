@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+
+  keycloak:
+    image: gunnaraccso/keycloak.server:12.0.4
+    restart: always
+    env_file:
+      - ./env/keycloak.env
+    ports:
+      - "9001:8443"
+      - "9000:8080"
+
+  camunda:
+    build: .
+    ports: 
+      - 8080:8080
+    env_file:
+      - ./env/camunda.env
+    depends_on:
+      - keycloak
+    restart: always
+    volumes:
+      - ./config/default.yml:/camunda/configuration/default.yml
+      - ./config/production.yml:/camunda/configuration/production.yml
+

@@ -41,3 +41,19 @@ Please be aware that you have to **delete** the following properties:
 The Keycloak Identity Provider is a ReadOnly Identity Provider and thus not allowed to create users upon startup.
 
 For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) itself.
+
+## Docker Sample Setup
+
+Within the subdirectory `docker` you'll find a basic sample consisting of:
+
+* ``Dockerfile``: custom Docker image consisting of Camunda BPM Run and the Keycloak Identity Provider Plugin. Adapt Camunda and plugin versions to your own needs.
+* ``docker-compose.yml``: simple setup consisting of the custom Camunda Keycloak Docker image and a preconfigured Keycloak instance with the ``camunda-identity-service`` client and a Camunda admin user and group.
+
+Usage:
+
+1. ``docker-compose build``
+2. ``docker-compose up -d``
+3. Login at ``http://localhost:8080`` using ``camunda`` / ``camunda1!`` and use Cockpit / Tasklist / Admin.
+4. Keycloak is available under ``https://localhost:9001``. Login with ``keycloak`` / ``keycloak1!``.
+
+**Beware**: This is not production ready, still using a H2 database for each of the instances, but might help you to understand the configuration basics.

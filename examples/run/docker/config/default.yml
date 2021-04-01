@@ -1,0 +1,39 @@
+# Find more available configuration properties on the following pages of the documentation.
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#configure-camunda-bpm-run
+# https://docs.camunda.org/manual/latest/user-guide/spring-boot-integration/configuration/#camunda-engine-properties
+
+camunda.bpm:
+  run:
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#cross-origin-resource-sharing
+    cors:
+      enabled: true
+      allowed-origins: "*"
+  authorization.enabled: true
+  
+# datasource configuration is required
+spring.datasource:
+  url: jdbc:h2:./camunda-h2-default/process-engine;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
+  driver-class-name: org.h2.Driver
+  username: sa
+  password: sa
+
+# Camunda Keycloak Identity Provider Plugin
+# Externalized Keycloak configuration
+keycloak:
+  # Keycloak access for the Identity Provider plugin.
+  host: ${KEYCLOAK_HOST}
+  realm: ${KEYCLOAK_REALM:camunda}
+  # Keycloak Camunda Identity Client
+  client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET}
+
+plugin.identity.keycloak:
+  keycloakIssuerUrl: ${keycloak.host}/auth/realms/${keycloak.realm}
+  keycloakAdminUrl: ${keycloak.host}/auth/admin/realms/${keycloak.realm}
+  clientId: ${keycloak.client.id}
+  clientSecret: ${keycloak.client.secret}
+  useEmailAsCamundaUserId: false
+  useUsernameAsCamundaUserId: true
+  useGroupPathAsCamundaGroupId: true
+  administratorGroupName: camunda-admin
+  disableSSLCertificateValidation: true

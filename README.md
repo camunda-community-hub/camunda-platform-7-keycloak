@@ -279,6 +279,12 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
 
 Keep in mind that Keycloak's `email` attribute might not always be unique, depending on your setup. Email uniqueness can be configured on a per realm level depending on the setting *Login with email*.
 
+## Quickstart
+
+As a quickstart into using and configuring the plugin we recommend to have a look at the [Installation on Camunda BPM Run](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/run). You'll find a chapter "Docker Sample Setup" at the end of the README. This is a simple starting point.
+
+If your intention is a complete SSO setup on Kubernetes you'll be more happy with the next reference.
+
 ## Sample Spring Boot Project with SSO on Kubernetes
 
 A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/sso-kubernetes). See directory `examples`.

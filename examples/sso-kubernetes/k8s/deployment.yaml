@@ -62,6 +62,6 @@ spec:
            image: busybox:1.28
            command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
          hostAliases:
-         - ip: 172.28.16.1
+         - ip: 172.21.48.1
            hostnames:
            - armstrong02
