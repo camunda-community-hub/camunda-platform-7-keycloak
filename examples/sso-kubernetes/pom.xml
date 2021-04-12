@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.assert</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>8.0.0</version>
+			<version>${version.bpm.assert}</version>
 			<scope>test</scope>
 		</dependency>
 

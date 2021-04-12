@@ -24,6 +24,7 @@
 		<version.camunda>7.14.0</version.camunda>
 		<!-- <version.camunda>7.14.0-ee</version.camunda> -->
 		<version.springBoot>2.3.4.RELEASE</version.springBoot>
+        <version.bpm.assert>8.0.0</version.bpm.assert>
 	</properties>
 
     <dependencyManagement>
@@ -130,7 +131,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.assert</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>8.0.0</version>
+			<version>${version.bpm.assert}</version>
 			<scope>test</scope>
 		</dependency>
 
