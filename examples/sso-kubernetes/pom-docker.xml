@@ -21,10 +21,10 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-		<version.camunda>7.14.0</version.camunda>
-		<!-- <version.camunda>7.14.0-ee</version.camunda> -->
-		<version.springBoot>2.3.4.RELEASE</version.springBoot>
-        <version.bpm.assert>8.0.0</version.bpm.assert>
+	    <version.camunda>7.15.0</version.camunda>
+	    <!-- <version.camunda>7.15.0-ee</version.camunda> -->
+	    <version.springBoot>2.4.4</version.springBoot>
+	    <version.bpm.assert>10.0.0</version.bpm.assert>
 	</properties>
 
     <dependencyManagement>
@@ -134,6 +134,12 @@
 			<version>${version.bpm.assert}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.extension</groupId>
+          <artifactId>camunda-bpm-junit5</artifactId>
+          <version>1.0.0</version>
+          <scope>test</scope>
+        </dependency>
 
 		<!-- java util logging => slf4j -->
 		<dependency>
@@ -209,6 +215,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.22.2</version>
 						<configuration>
 						</configuration>
 					</plugin>

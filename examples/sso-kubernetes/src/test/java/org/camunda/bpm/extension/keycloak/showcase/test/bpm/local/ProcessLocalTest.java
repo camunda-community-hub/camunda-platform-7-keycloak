@@ -8,7 +8,7 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -18,14 +18,14 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.camunda.bpm.extension.keycloak.showcase.ProcessConstants.Variable;
 import org.camunda.bpm.extension.keycloak.showcase.task.LoggerDelegate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -46,8 +46,10 @@ public class ProcessLocalTest {
 	/**
 	 * Access to the process engine.
 	 */
-	@Rule
-	public ProcessEngineRule rule = new ProcessEngineRule("camunda.local.cfg.xml", true);
+	@RegisterExtension
+	ProcessEngineExtension extension = ProcessEngineExtension.builder()
+	  .configurationResource("camunda.local.cfg.xml")
+	  .build();
 	
 	/**
 	 * Mock for the sample service task.
@@ -58,20 +60,20 @@ public class ProcessLocalTest {
 	/**
 	 * Setup the test case.
 	 */
-	@Before
+	@BeforeEach
 	public void setup() {
 		// Initialize and register mocks
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		Mocks.register("logger", loggerTask);
 
 		// Initialize BPM Assert
-		init(rule.getProcessEngine());
+		init(extension.getProcessEngine());
 	}
 
 	/**
 	 * Tear down test case.
 	 */
-	@After
+	@AfterEach
 	public void tearDown() {
 		// Reset mocks
 		reset(loggerTask);
@@ -105,7 +107,7 @@ public class ProcessLocalTest {
 		// check user task and approve user
 		assertThat(pi).isWaitingAt("ApproveUser");
 		Task task = task();
-		assertNotNull("User task expected", task);
+		assertNotNull(task, "User task expected");
 		complete(task, withVariables("approved", Boolean.TRUE));
 
 		// check service task (asynchronous continuation)
@@ -134,7 +136,7 @@ public class ProcessLocalTest {
 		// check user task and do not approve user
 		assertThat(pi).isWaitingAt("ApproveUser");
 		Task task = task();
-		assertNotNull("User task expected", task);
+		assertNotNull(task, "User task expected");
 		complete(task, withVariables("approved", Boolean.FALSE));
 
 		// check corresponding process end

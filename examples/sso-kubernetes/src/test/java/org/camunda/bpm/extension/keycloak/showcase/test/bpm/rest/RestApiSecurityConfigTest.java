@@ -1,19 +1,18 @@
 package org.camunda.bpm.extension.keycloak.showcase.test.bpm.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.init;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.http.entity.ContentType;
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,18 +26,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * Tests the security of the engine's REST interface.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = "engine-rest")
-@Ignore("Runs only with Keycloak backend")
+@Disabled("Runs only with Keycloak backend")
 public class RestApiSecurityConfigTest {
 
 	private static final String REST_API_USER = "camunda";
@@ -66,7 +65,7 @@ public class RestApiSecurityConfigTest {
 		LogFactory.useSlf4jLogging(); // MyBatis
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		// init BPM assert
 		init(processEngine);
@@ -121,7 +120,7 @@ public class RestApiSecurityConfigTest {
 	    		+ "&grant_type=password",
 				headers);
 	    ResponseEntity<String> response = restTemplate.postForEntity(accessTokenUri, request, String.class);
-	    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	    
 	    JSONObject json = new JSONObject(response.getBody());
 		return json.getString("access_token");

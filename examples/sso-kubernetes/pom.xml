@@ -98,6 +98,12 @@
 			<version>${version.bpm.assert}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.extension</groupId>
+          <artifactId>camunda-bpm-junit5</artifactId>
+          <version>1.0.0</version>
+          <scope>test</scope>
+        </dependency>
 
 		<!-- java util logging => slf4j -->
 		<dependency>
