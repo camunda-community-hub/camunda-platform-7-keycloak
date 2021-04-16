@@ -203,25 +203,24 @@ Last but not least add a security configuration and enable OAuth2 SSO:
     /**
     * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
     */
-    @ConditionalOnMissingClass("org.springframework.test.context.junit4.SpringJUnit4ClassRunner")
+    @ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
     @Configuration
     @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
     public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            
             http
             .csrf().ignoringAntMatchers("/api/**")
             .and()
             .requestMatchers().antMatchers("/**").and()
-            .authorizeRequests(
-                authorizeRequests ->
+              .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                .antMatchers("/login**", "/oauth2/authorization**")
-                .permitAll()
                 .antMatchers("/app/**", "/api/**", "/lib/**")
-                .authenticated())
+                .authenticated()
+                .anyRequest()
+                .permitAll()
+              )
             .oauth2Login()
             ;
         }

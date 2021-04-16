@@ -1,10 +1,18 @@
-const doFetch = window.fetch;
-window.fetch = function() {
-    // Intercept calling logout
-    if (arguments[0] === '/camunda/api/admin/auth/user/default/logout') {
-      // do whatever you want to do on logout
-      window.location.href = "logout"
-    } else {
-      return doFetch.apply(this, arguments)
-    }
-}
+let observer = new MutationObserver(() => {
+  // find the logout button
+  const logoutButton = document.querySelectorAll(".logout > a")[0];
+  // once the button is present add the event listener
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      window.location.href = "logout";
+    });
+    observer.disconnect();
+  }
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: false,
+  characterData: false
+});

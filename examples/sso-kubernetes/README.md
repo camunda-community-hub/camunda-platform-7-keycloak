@@ -49,7 +49,7 @@ The following description is a quick start. A more detailed description will fol
 1.  Start Keycloak Server as described below.
 2.  Run this project as Spring Boot App.
 3.  Point a new private window of your browser to ``localhost:8080/camunda``
-4.  Login with camunda@accso.de / camunda1!
+4.  Login with camunda / camunda1!
 5.  Choose the admin console and browse users and groups from Keycloak
 
 ### Keycloak server - local test setup
@@ -61,7 +61,7 @@ Use a ``docker-compose.yml`` file as follows:
     services:
       jboss.keycloak:
         build: .
-    #    image: jboss/keycloak:10.0.1
+    #    image: jboss/keycloak:12.0.4
         image: gunnaraccso/keycloak.server:10.0.1
         restart: always
         environment:
@@ -101,8 +101,8 @@ The main configuration part in ``applicaton.yaml`` is as follows:
       keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
       clientId: ${keycloak.client.id}
       clientSecret: ${keycloak.client.secret}
-      useEmailAsCamundaUserId: true
-      useUsernameAsCamundaUserId: false
+      useEmailAsCamundaUserId: false
+      useUsernameAsCamundaUserId: true
       useGroupPathAsCamundaGroupId: true
       administratorGroupName: camunda-admin
       disableSSLCertificateValidation: true
@@ -211,6 +211,67 @@ Besides a typical Web security configuration ``RestApiSecurityConfig`` including
     }
 
 A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore it is ignored as standard.
+
+### Logging out from Cockpit
+
+Doing a SSO logout (assuming that this is desired) using the Camunda Cockpit's logout menu button requires us to send a logout request to Keycloak. In order to achieve this we have to intercept the original logout functionality, then delegate the logout to our own logout handler which in turn redirects the logout request to Keycloak.
+
+#### Intercepting the original logout
+
+In order to intercept the logout you have to provide a custom ``config.js`` file, located in the ``app/{admin|tasklist|welcome}/scripts/`` directory of the Camunda webapps. You'll find the custom configuration under ``src/main/resources/META-INF/resources/webjars/camunda`` of this showcase. It simply configures a custom logout script:
+
+    export default {
+      customScripts: [
+        'custom/logout'
+      ]
+    };
+
+The script adds an event listener to the logout button as follows:
+
+    let observer = new MutationObserver(() => {
+      // find the logout button
+      const logoutButton = document.querySelectorAll(".logout > a")[0];
+      // once the button is present add the event listener
+      if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+          window.location.href = "logout";
+        });
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: false
+    });
+
+With that in place we get a custom logout request to the server, which can be handled by our Keycloak specific logout handler.
+
+#### Providing a logout handler
+
+In order to provide a Keycloak specific logout handler, we first have to add the handler to the WebAppSecurity configuration:
+
+	@Inject
+	private KeycloakLogoutHandler keycloakLogoutHandler;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+        ...
+	    .oauth2Login()
+	    .and()
+	      .logout()
+	      .logoutRequestMatcher(new AntPathRequestMatcher("/app/**/logout"))
+	      .logoutSuccessHandler(keycloakLogoutHandler)
+        ;
+    }
+
+The handler itself (see ``org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to
+``http://<keycloak-server>/auth/realms/camunda/protocol/openid-connect/logout?redirect_uri=http://<camunda-server>/camunda``.
+
+So the logout button now redirects to the Keycloak logout URL which then redirects back to the Camunda Cockpit. Because we're not authenticated any more, Spring Security will then start a new authentication flow.
 
 ## Kubernetes Setup
 
