@@ -1,12 +1,15 @@
 let observer = new MutationObserver(() => {
   // find the logout button
   const logoutButton = document.querySelectorAll(".logout > a")[0];
-  // once the button is present add the event listener
+  // once the button is present replace it with new functionality
   if (logoutButton) {
-    logoutButton.addEventListener("click", () => {
-      // do whatever you want to do on logout
-      window.location.href = "logout";
-    });
+    var parent = logoutButton.parentElement
+    parent.removeChild(logoutButton)
+    var newLogout = document.createElement('a');
+    newLogout.setAttribute('className', 'ng-binding')
+    newLogout.innerText = logoutButton.innerText.replaceAll('\n', '');
+    newLogout.setAttribute('href', 'logout'); // call server side logout handler
+    parent.appendChild(newLogout)
     observer.disconnect();
   }
 });
