@@ -214,11 +214,11 @@ A unit test checking the REST Api security is provided in class ``RestApiSecurit
 
 ### Logging out from Cockpit
 
-Doing a SSO logout (assuming that this is desired) using the Camunda Cockpit's logout menu button requires us to send a logout request to Keycloak. In order to achieve this we have to intercept the original logout functionality, then delegate the logout to our own logout handler which in turn redirects the logout request to Keycloak.
+Doing a SSO logout (assuming that this is desired) using the Camunda Cockpit's logout menu button requires us to send a logout request to Keycloak. In order to achieve this we have to replace the original logout functionality, then delegate the logout to our own logout handler which in turn redirects the logout request to Keycloak.
 
-#### Intercepting the original logout
+#### Replacing the original logout
 
-In order to intercept the logout you have to provide a custom ``config.js`` file, located in the ``app/{admin|tasklist|welcome}/scripts/`` directory of the Camunda webapps. You'll find the custom configuration under ``src/main/resources/META-INF/resources/webjars/camunda`` of this showcase. It simply configures a custom logout script:
+In order to replace the UI's logout functionality you have to provide a custom ``config.js`` file, located in the ``app/{admin|tasklist|welcome}/scripts/`` directory of the Camunda webapps. You'll find the custom configuration under ``src/main/resources/META-INF/resources/webjars/camunda`` of this showcase. It simply configures a custom logout script:
 
     export default {
       customScripts: [
@@ -226,16 +226,20 @@ In order to intercept the logout you have to provide a custom ``config.js`` file
       ]
     };
 
-The script adds an event listener to the logout button as follows:
+The configured script replaces the logout button functionality as follows:
 
     let observer = new MutationObserver(() => {
       // find the logout button
       const logoutButton = document.querySelectorAll(".logout > a")[0];
-      // once the button is present add the event listener
+      // once the button is present replace it with new functionality
       if (logoutButton) {
-        logoutButton.addEventListener("click", () => {
-          window.location.href = "logout";
-        });
+        var parent = logoutButton.parentElement
+        parent.removeChild(logoutButton)
+        var newLogout = document.createElement('a');
+        newLogout.setAttribute('className', 'ng-binding')
+        newLogout.innerText = logoutButton.innerText.replaceAll('\n', '');
+        newLogout.setAttribute('href', 'logout'); // call server side logout handler
+        parent.appendChild(newLogout)
         observer.disconnect();
       }
     });
