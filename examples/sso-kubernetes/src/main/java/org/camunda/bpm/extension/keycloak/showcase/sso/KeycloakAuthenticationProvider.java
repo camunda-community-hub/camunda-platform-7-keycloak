@@ -28,7 +28,7 @@ public class KeycloakAuthenticationProvider extends ContainerBasedAuthentication
 			return AuthenticationResult.unsuccessful();
 		}
         String userId = ((OidcUser)authentication.getPrincipal()).getName();
-        if (StringUtils.isEmpty(userId)) {
+        if (!StringUtils.hasLength(userId)) {
             return AuthenticationResult.unsuccessful();
         }
 
