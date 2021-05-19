@@ -15,6 +15,7 @@ import org.camunda.bpm.engine.impl.UserQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -39,7 +39,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param restTemplate REST template
 	 * @param keycloakContextProvider Keycloak context provider
 	 */
-	public KeycloakUserService(KeycloakConfiguration keycloakConfiguration, RestTemplate restTemplate,
+	public KeycloakUserService(KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate,
 			KeycloakContextProvider keycloakContextProvider) {
 		super(keycloakConfiguration, restTemplate, keycloakContextProvider);
 	}
@@ -57,8 +57,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			// check whether configured admin user ID can be resolved as a real keycloak user ID
 			try {
 				ResponseEntity<String> response = restTemplate.exchange(
-						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + configuredAdminUserId, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + configuredAdminUserId, HttpMethod.GET, String.class);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 					return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "email");
 				}
@@ -81,8 +80,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			// check whether configured admin user ID can be resolved as username
 			try {
 				ResponseEntity<String> response = restTemplate.exchange(
-						keycloakConfiguration.getKeycloakAdminUrl() + "/users?username=" + configuredAdminUserId, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+						keycloakConfiguration.getKeycloakAdminUrl() + "/users?username=" + configuredAdminUserId, HttpMethod.GET, String.class);
 				JsonObject user = findFirst(parseAsJsonArray(response.getBody()), "username", configuredAdminUserId);
 				if (user != null) {
 					if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
@@ -130,7 +128,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			// get members of this group
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/groups/" + keyCloakID + "/members?max=" + getMaxQueryResultSize(), 
-					HttpMethod.GET, keycloakContextProvider.createApiRequestEntity(), String.class);
+					HttpMethod.GET, String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
 						"Unable to read group members from " + keycloakConfiguration.getKeycloakAdminUrl()
@@ -225,8 +223,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			} else {
 				// Create user search filter
 				String userFilter = createUserSearchFilter(query);
-				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/users" + userFilter, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/users" + userFilter, HttpMethod.GET, String.class);
 			}
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
@@ -350,8 +347,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			}
 
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET, String.class);
 			String result = (keycloakConfiguration.isUseEmailAsCamundaUserId() || keycloakConfiguration.isUseUsernameAsCamundaUserId())
 					? response.getBody()
 					: "[" + response.getBody() + "]";

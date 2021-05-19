@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -41,7 +41,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param keycloakContextProvider Keycloak context provider
 	 */
 	public KeycloakGroupService(KeycloakConfiguration keycloakConfiguration,
-			RestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
+			KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
 		super(keycloakConfiguration, restTemplate, keycloakContextProvider);
 	}
 
@@ -58,8 +58,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			// check whether configured admin group can be resolved as path
 			try {
 				ResponseEntity<String> response = restTemplate.exchange(
-						keycloakConfiguration.getKeycloakAdminUrl() + "/group-by-path/" + configuredAdminGroupName, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+						keycloakConfiguration.getKeycloakAdminUrl() + "/group-by-path/" + configuredAdminGroupName, HttpMethod.GET, String.class);
 				if (keycloakConfiguration.isUseGroupPathAsCamundaGroupId()) {
 					return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "path").substring(1); // remove trailing '/'
 				}
@@ -71,8 +70,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			// check whether configured admin group can be resolved as group name
 			try {
 				ResponseEntity<String> response = restTemplate.exchange(
-						keycloakConfiguration.getKeycloakAdminUrl() + "/groups?search=" + configuredAdminGroupName, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+						keycloakConfiguration.getKeycloakAdminUrl() + "/groups?search=" + configuredAdminGroupName, HttpMethod.GET, String.class);
 				// filter search result for exact group name, including subgroups
 				JsonArray result = flattenSubGroups(parseAsJsonArray(response.getBody()), new JsonArray());
 				JsonArray groups = new JsonArray();
@@ -129,7 +127,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			// get groups of this user
 			ResponseEntity<String> response = restTemplate.exchange(
 					keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + keyCloakID + "/groups?max=" + getMaxQueryResultSize(), 
-					HttpMethod.GET, keycloakContextProvider.createApiRequestEntity(), String.class);
+					HttpMethod.GET, String.class);
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
 						"Unable to read user groups from " + keycloakConfiguration.getKeycloakAdminUrl()
@@ -216,8 +214,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 				response = requestGroupById(query.getId());
 			} else {
 				String groupFilter = createGroupSearchFilter(query); // only pre-filter of names possible
-				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/groups" + groupFilter, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/groups" + groupFilter, HttpMethod.GET, String.class);
 			}
 			if (!response.getStatusCode().equals(HttpStatus.OK)) {
 				throw new IdentityProviderException(
@@ -343,8 +340,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 			}
 
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET, String.class);
 			String result = "[" + response.getBody() + "]";
 			return new ResponseEntity<String>(result, response.getHeaders(), response.getStatusCode());
 		} catch (HttpClientErrorException hcee) {

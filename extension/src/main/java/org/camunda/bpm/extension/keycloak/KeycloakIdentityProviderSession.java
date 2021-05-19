@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpEntity;
@@ -29,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonObject;
 
@@ -39,7 +39,7 @@ import com.google.gson.JsonObject;
 public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider {
 
 	protected KeycloakConfiguration keycloakConfiguration;
-	protected RestTemplate restTemplate;
+	protected KeycloakRestTemplate restTemplate;
 	protected KeycloakContextProvider keycloakContextProvider;
 	
 	protected KeycloakUserService userService;
@@ -51,7 +51,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 * @param restTemplate REST template
 	 * @param keycloakContextProvider Keycloak context provider
 	 */
-	public KeycloakIdentityProviderSession(KeycloakConfiguration keycloakConfiguration, RestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
+	public KeycloakIdentityProviderSession(KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
 		this.keycloakContextProvider = keycloakContextProvider;
@@ -217,8 +217,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		try {
 			if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 				ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/users?email=" + userId, HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + "/users?email=" + userId, HttpMethod.GET, String.class);
 				JsonObject result = findFirst(parseAsJsonArray(response.getBody()), "email", userId);
 				if (result != null) {
 					return getJsonString(result, "username");
@@ -226,8 +225,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 				throw new KeycloakUserNotFoundException(userId + " not found - email unknown");
 			} else {
 				ResponseEntity<String> response = restTemplate.exchange(
-						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + userId, HttpMethod.GET,
-						keycloakContextProvider.createApiRequestEntity(), String.class);
+						keycloakConfiguration.getKeycloakAdminUrl() + "/users/" + userId, HttpMethod.GET, String.class);
 				return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "username");
 			}
 		} catch (JsonException je) {

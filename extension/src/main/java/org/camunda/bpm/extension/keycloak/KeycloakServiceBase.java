@@ -9,10 +9,10 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 public abstract class KeycloakServiceBase {
 
 	protected KeycloakConfiguration keycloakConfiguration;
-	protected RestTemplate restTemplate;
+	protected KeycloakRestTemplate restTemplate;
 	protected KeycloakContextProvider keycloakContextProvider;
 
 	/**
@@ -35,7 +35,7 @@ public abstract class KeycloakServiceBase {
 	 * @param keycloakContextProvider Keycloak context provider
 	 */
 	public KeycloakServiceBase(KeycloakConfiguration keycloakConfiguration,
-			RestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
+			KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
 		this.keycloakContextProvider = keycloakContextProvider;
@@ -64,8 +64,7 @@ public abstract class KeycloakServiceBase {
 		
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET, String.class);
 			JsonArray resultList = parseAsJsonArray(response.getBody());
 			JsonObject result = findFirst(resultList,
 					keycloakConfiguration.isUseUsernameAsCamundaUserId() ? "username" : "email",
@@ -102,8 +101,7 @@ public abstract class KeycloakServiceBase {
 		
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET,
-					keycloakContextProvider.createApiRequestEntity(), String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + groupSearch, HttpMethod.GET, String.class);
 			return parseAsJsonObjectAndGetMemberAsString(response.getBody(), "id");
 		} catch (JsonException je) {
 			throw new KeycloakGroupNotFoundException(groupId + " not found - path unknown", je);

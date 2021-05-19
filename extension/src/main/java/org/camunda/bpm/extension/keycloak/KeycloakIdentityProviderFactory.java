@@ -20,10 +20,10 @@ import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -40,7 +40,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	protected KeycloakConfiguration keycloakConfiguration;
 	protected KeycloakContextProvider keycloakContextProvider;
 
-	protected RestTemplate restTemplate = new RestTemplate();
+	protected KeycloakRestTemplate restTemplate = new KeycloakRestTemplate();
 
 	/**
 	 * Creates a new Keycloak session factory.

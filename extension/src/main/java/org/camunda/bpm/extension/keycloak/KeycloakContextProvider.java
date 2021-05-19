@@ -4,6 +4,7 @@ import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
+import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
 import org.springframework.http.HttpEntity;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonObject;
 
@@ -25,7 +25,7 @@ public class KeycloakContextProvider {
 	private final static KeycloakPluginLogger LOG = KeycloakPluginLogger.INSTANCE;
 
 	protected KeycloakConfiguration keycloakConfiguration;
-	protected RestTemplate restTemplate;
+	protected KeycloakRestTemplate restTemplate;
 
 	protected KeycloakContext context;
 	
@@ -34,9 +34,10 @@ public class KeycloakContextProvider {
 	 * @param keycloakConfiguration the Keycloak configuration
 	 * @param restTemplate REST template
 	 */
-	public KeycloakContextProvider(KeycloakConfiguration keycloakConfiguration, RestTemplate restTemplate) {
+	public KeycloakContextProvider(KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
+		restTemplate.registerKeycloakContextProvider(this);
 	}
 	
 	/**
@@ -130,5 +131,11 @@ public class KeycloakContextProvider {
 		}
 		return context.createHttpRequestEntity();
 	}
-	
+
+	/**
+	 * Invalidates the current authorization context forcing to request a new token.
+	 */
+	public void invalidateToken() {
+		context = null;
+	}
 }
