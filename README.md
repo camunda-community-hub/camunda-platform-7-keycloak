@@ -1,3 +1,4 @@
+[![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
 # Keycloak Camunda Identity Provider Plugin
 
 ![Keycloak](doc/keycloak.png "https://www.keycloak.org/") 
