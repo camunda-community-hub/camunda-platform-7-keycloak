@@ -336,8 +336,6 @@ Running unit tests from Maven requires configuring the details of a running Keyc
 
 ------------------------------------------------------------
 
-License: [Apache License 2.0](https://opensource.org/licenses/Apache-2.0)
-
 That's it. Have a happy Keycloak experience and focus on what really matters: the core processes of your customer.
 
 Brought to you by:
@@ -345,3 +343,19 @@ Brought to you by:
 ![Accso](doc/ACCSO-Logo.png "https://accso.de/")
 
 [Gunnar von der Beck](https://www.xing.com/profile/Gunnar_vonderBeck/portfolio "XING Profile"), [Accso - Accelerated Solutions GmbH](https://accso.de/ "https://accso.de/")
+
+------------------------------------------------------------
+
+## Resources
+
+* [Issue Tracker](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak/issues)
+* [Contributing](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak/blob/master/CONTRIBUTING.md)
+
+## Maintainer
+
+* [Gunnar von der Beck](https://github.com/VonDerBeck)
+
+## License 
+
+License: [Apache License 2.0](https://opensource.org/licenses/Apache-2.0)
+
