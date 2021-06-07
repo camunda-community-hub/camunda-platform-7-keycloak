@@ -1,14 +1,4 @@
----
-name: Camunda Community Hub Pull Request Template
-about: Use this template when opening a new pull request in this Camunda Community extension
-  repository.
-title: ''
-labels: ''
-assignees: ''
-
----
-
-# Camunda Community Hub Pull Request Template
+# Camunda Keycloak Identity Provider Pull Request
 
 <!--- Provide a general summary of your changes in the issue title above. Do not @ GitHub users in your pull request title. If your extension is still a work in progress, please add [WIP] to the title so that your pull request will not be flagged as mergable. When your PR is ready to be merged, you can remove [WIP] from the title. -->
 
