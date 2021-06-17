@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
@@ -168,6 +169,8 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
 				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
 				kcp.setClientSecret(CLIENT_SECRET);
+				kcp.getCache().setEnabled(true);
+				kcp.setCustomHttpRequestInterceptors(Collections.singletonList(new CountingHttpRequestInterceptor()));
 				return kcp;
 			}
 		}
@@ -180,6 +183,8 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		this.clearCache();
+		CountingHttpRequestInterceptor.resetCount();
 	}
 
 	/**
@@ -188,6 +193,19 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		this.clearCache();
+		CountingHttpRequestInterceptor.resetCount();
+	}
+
+	/**
+	 * clears the query cache so each test can start with a clean slate
+	 */
+	private void clearCache() {
+		processEngineConfiguration.getProcessEnginePlugins()
+						.stream()
+						.filter(KeycloakIdentityProviderPlugin.class::isInstance)
+						.map(KeycloakIdentityProviderPlugin.class::cast)
+						.forEach(KeycloakIdentityProviderPlugin::clearCache);
 	}
 
 	// ------------------------------------------------------------------------
@@ -524,7 +542,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * Deletes a group.
 	 * @param headers HttpHeaders including the Authorization header / acces token
 	 * @param realm the realm name
-	 * @param userId the user ID
+	 * @param groupId the group ID
 	 */
 	static void deleteGroup(HttpHeaders headers, String realm, String groupId) {
 		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups/" + groupId, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);

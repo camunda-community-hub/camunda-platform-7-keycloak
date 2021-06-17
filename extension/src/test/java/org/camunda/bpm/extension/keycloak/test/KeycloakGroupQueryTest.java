@@ -1,6 +1,7 @@
 package org.camunda.bpm.extension.keycloak.test;
 
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.List;
 
@@ -8,6 +9,8 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.extension.keycloak.KeycloakGroupQuery;
+import org.camunda.bpm.extension.keycloak.KeycloakGroupQueryProxy;
 
 /**
  * Tests group queries.
@@ -15,8 +18,19 @@ import org.camunda.bpm.engine.identity.Group;
 public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest {
 
 	public void testQueryNoFilter() {
+		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
 		List<Group> groupList = identityService.createGroupQuery().list();
 		assertEquals(9, groupList.size());
+
+		// non cached query. http request count should have increased
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+		// run query again
+		assertEquals(9, identityService.createGroupQuery().list().size());
+
+		// request count should be same as before
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 	}
 
 	public void testQueryUnlimitedList() {
@@ -25,9 +39,20 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	}
 	
 	public void testQueryPaging() {
+		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
 		// First page
 		List<Group> result = identityService.createGroupQuery().listPage(0, 3);
 		assertEquals(3, result.size());
+
+		// non cached query. http request count should have increased
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+		// run query again
+		assertEquals(3, identityService.createGroupQuery().listPage(0, 3).size());
+
+		// request count should be same as before
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 
 		// Next page
 		List<Group> resultNext = identityService.createGroupQuery().listPage(3, 3);
@@ -43,6 +68,8 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	}
 
 	public void testFilterByGroupId() {
+		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
 		Group group = identityService.createGroupQuery().groupId(GROUP_ID_ADMIN).singleResult();
 		assertNotNull(group);
 
@@ -50,6 +77,15 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertEquals(GROUP_ID_ADMIN, group.getId());
 		assertEquals("camunda-admin", group.getName());
 		assertEquals("SYSTEM", group.getType());
+
+		// non cached query. http request count should have increased
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+		// run query again
+		assertEquals(group, identityService.createGroupQuery().groupId(GROUP_ID_ADMIN).singleResult());
+
+		// request count should be same as before
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 
 		group = identityService.createGroupQuery().groupId("whatever").singleResult();
 		assertNull(group);
@@ -175,6 +211,8 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	}
 
 	public void testOrderByGroupId() {
+		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupId().desc().list();
 		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getId().compareTo(groupList.get(1).getId()) > 0);
@@ -182,6 +220,15 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertTrue(groupList.get(2).getId().compareTo(groupList.get(3).getId()) > 0);
 		assertTrue(groupList.get(5).getId().compareTo(groupList.get(6).getId()) > 0);
 		assertTrue(groupList.get(6).getId().compareTo(groupList.get(7).getId()) > 0);
+
+		// non cached query. http request count should have increased
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+		// run query again
+		assertEquals(9, identityService.createGroupQuery().orderByGroupId().desc().list().size());
+
+		// request count should be same as before
+		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 	}
 
 	public void testOrderByGroupName() {
@@ -202,6 +249,28 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertTrue(groupList.get(2).getType().compareTo(groupList.get(3).getType()) >= 0);
 		assertTrue(groupList.get(5).getType().compareTo(groupList.get(6).getType()) >= 0);
 		assertTrue(groupList.get(6).getType().compareTo(groupList.get(7).getType()) >= 0);
+	}
+
+	public void testQueryObjectEquality() {
+
+		KeycloakGroupQuery q1 = (KeycloakGroupQuery) identityService.createGroupQuery();
+		KeycloakGroupQuery q2 = (KeycloakGroupQuery) identityService.createGroupQuery();
+
+		assertNotSame(q1, q2); // not the same object (by identity)
+		assertNotEquals(q1, q2); // not equal
+
+		assertNotSame(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2)); // not the same object
+		assertEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2)); // but they are equal
+
+		q1.groupId("id1");
+
+		// not equal because first query has a filter
+		assertNotEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2));
+
+		q2.groupId("id1");
+
+		// equal now because second query also has same filter
+		assertEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2));
 	}
 
 	protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {

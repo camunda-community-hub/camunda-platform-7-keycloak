@@ -179,5 +179,11 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 											+ ": charset '" + charset + "' not supported in your JVM");
 		}
 	}
-	
+
+	/**
+	 * immediately clear entries from cache
+	 */
+	public void clearCache() {
+		this.keycloakIdentityProviderFactory.clearCache();
+	}
 }

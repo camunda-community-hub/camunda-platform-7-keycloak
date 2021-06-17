@@ -16,10 +16,14 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.TrustStrategy;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.extension.keycloak.cache.CacheFactory;
+import org.camunda.bpm.extension.keycloak.cache.QueryCache;
 import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -31,6 +35,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Keycloak Identity Provider Session Factory.
@@ -40,6 +45,9 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	protected KeycloakConfiguration keycloakConfiguration;
 	protected KeycloakContextProvider keycloakContextProvider;
 
+	protected QueryCache<KeycloakUserQueryProxy, List<User>> userQueryCache;
+	protected QueryCache<KeycloakGroupQueryProxy, List<Group>> groupQueryCache;
+
 	protected KeycloakRestTemplate restTemplate = new KeycloakRestTemplate();
 
 	/**
@@ -48,6 +56,8 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	 */
 	public KeycloakIdentityProviderFactory(KeycloakConfiguration keycloakConfiguration) {
 		this.keycloakConfiguration = keycloakConfiguration;
+		this.userQueryCache = CacheFactory.create(keycloakConfiguration.getCache());
+		this.groupQueryCache = CacheFactory.create(keycloakConfiguration.getCache());
 
 		// Create REST template with pooling HTTP client
 		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -104,6 +114,8 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 			}
 		}
 
+		restTemplate.getInterceptors().addAll(keycloakConfiguration.getCustomHttpRequestInterceptors());
+		
 		// Create Keycloak context provider for access token handling
 		keycloakContextProvider = new KeycloakContextProvider(keycloakConfiguration, restTemplate);
 	}
@@ -117,11 +129,20 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	}
 
 	/**
+	 * immediately clear entries from cache
+	 */
+	public void clearCache() {
+		this.userQueryCache.clear();
+		this.groupQueryCache.clear();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Session openSession() {
-		return new KeycloakIdentityProviderSession(keycloakConfiguration, restTemplate, keycloakContextProvider);
+		return new KeycloakIdentityProviderSession(
+						keycloakConfiguration, restTemplate, keycloakContextProvider, userQueryCache, groupQueryCache);
 	}
 
 }

@@ -9,6 +9,10 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.extension.keycloak.KeycloakUserQuery;
+import org.camunda.bpm.extension.keycloak.KeycloakUserQueryProxy;
+
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * User query test for the Keycloak identity provider.
@@ -16,8 +20,19 @@ import org.camunda.bpm.engine.identity.User;
 public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest {
 
   public void testQueryNoFilter() {
+    int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
     List<User> result = identityService.createUserQuery().list();
     assertEquals(5, result.size());
+
+    // non cached query. http request count should have increased
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+    // run query again
+    assertEquals(5, identityService.createUserQuery().list().size());
+
+    // request count should be same as before
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
   }
 
   public void testQueryUnlimitedList() {
@@ -26,11 +41,22 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
   }
   
   public void testQueryPaging() {
-	  // First page
+    int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
+    // First page
 	  List<User> result = identityService.createUserQuery().listPage(0, 2);
 	  assertEquals(2, result.size());
-	  
-	  // Next page
+
+    // non cached query. http request count should have increased
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+    // run query again
+    assertEquals(2, identityService.createUserQuery().listPage(0, 2).size());
+
+    // request count should be same as before
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+    // Next page
 	  List<User> resultNext = identityService.createUserQuery().listPage(2, 10);
 	  assertEquals(3, resultNext.size());
 	  
@@ -39,6 +65,8 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
   }
 
   public void testFilterByUserId() {
+    int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
     User user = identityService.createUserQuery().userId("camunda@accso.de").singleResult();
     assertNotNull(user);
 
@@ -47,6 +75,15 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     assertEquals("Admin", user.getFirstName());
     assertEquals("Camunda", user.getLastName());
     assertEquals("camunda@accso.de", user.getEmail());
+
+    // non cached query. http request count should have increased
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+    // run query again
+    assertEquals(user, identityService.createUserQuery().userId("camunda@accso.de").singleResult());
+
+    // request count should be same as before
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 
     user = identityService.createUserQuery().userId("non-existing").singleResult();
     assertNull(user);
@@ -217,10 +254,21 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
   }
   
   public void testOrderByUserId() {
-	  List<User> result = identityService.createUserQuery().orderByUserId().desc().list();
-	  assertEquals(5, result.size());
-	  assertTrue(result.get(0).getId().compareTo(result.get(1).getId()) > 0);
-	  assertTrue(result.get(1).getId().compareTo(result.get(2).getId()) > 0);
+	  int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
+
+    List<User> result = identityService.createUserQuery().orderByUserId().desc().list();
+    assertEquals(5, result.size());
+    assertTrue(result.get(0).getId().compareTo(result.get(1).getId()) > 0);
+    assertTrue(result.get(1).getId().compareTo(result.get(2).getId()) > 0);
+
+    // non cached query. http request count should have increased
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
+
+    // run query again
+    assertEquals(5, identityService.createUserQuery().orderByUserId().desc().list().size());
+
+    // request count should be same as before
+    assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
   }
 
   public void testOrderByUserEmail() {
@@ -268,6 +316,28 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
       assertTrue("Wrong exception", ex.getMessage().contains("Native user queries are not supported for Keycloak"));
     }
 
+  }
+
+  public void testQueryObjectEquality() {
+
+    KeycloakUserQuery q1 = (KeycloakUserQuery) identityService.createUserQuery();
+    KeycloakUserQuery q2 = (KeycloakUserQuery) identityService.createUserQuery();
+
+    assertNotSame(q1, q2); // not the same object (identity)
+    assertNotEquals(q1, q2); // not equal
+
+    assertNotSame(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2)); // not the same object
+    assertEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2)); // but is equal
+
+    q1.userId("id1");
+
+    // not equal because first query has a filter
+    assertNotEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2));
+
+    q2.userId("id1");
+
+    // equal now because second query also has same filter
+    assertEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2));
   }
 
   protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {

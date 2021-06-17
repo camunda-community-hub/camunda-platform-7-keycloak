@@ -1,6 +1,11 @@
 package org.camunda.bpm.extension.keycloak;
 
+import org.camunda.bpm.extension.keycloak.cache.CacheConfiguration;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Java Bean holding Keycloak configuration</p>
@@ -72,6 +77,12 @@ public class KeycloakConfiguration {
 
 	protected String proxyPassword = null;
 
+	/** the query cache configuration */
+	protected CacheConfiguration cache = new CacheConfiguration();
+
+	/** custom interceptors to modify behaviour of default KeycloakRestTemplate */
+	protected List<ClientHttpRequestInterceptor> customHttpRequestInterceptors = new ArrayList<>();
+	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
 	//-------------------------------------------------------------------------
@@ -294,6 +305,34 @@ public class KeycloakConfiguration {
 
 	public void setProxyPassword(String proxyPassword) {
 		this.proxyPassword = proxyPassword;
+	}
+
+	/**
+	 * @return the query cache configuration
+	 */
+	public CacheConfiguration getCache() {
+		return cache;
+	}
+
+	/**
+	 * @param cache the query cache configuration
+	 */
+	public void setCache(CacheConfiguration cache) {
+		this.cache = cache;
+	}
+
+	/**
+	 * @return the custom http request interceptors
+	 */
+	public List<ClientHttpRequestInterceptor> getCustomHttpRequestInterceptors() {
+		return customHttpRequestInterceptors;
+	}
+
+	/**
+	 * @param customHttpRequestInterceptors the custom http request interceptors 
+	 */
+	public void setCustomHttpRequestInterceptors(List<ClientHttpRequestInterceptor> customHttpRequestInterceptors) {
+		this.customHttpRequestInterceptors = customHttpRequestInterceptors;
 	}
 
 	//-------------------------------------------------------------------------
