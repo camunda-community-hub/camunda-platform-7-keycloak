@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.extension.keycloak.KeycloakUserQuery;
-import org.camunda.bpm.extension.keycloak.KeycloakUserQueryProxy;
+import org.camunda.bpm.extension.keycloak.CacheableKeycloakUserQuery;
 
 import static org.junit.Assert.assertNotEquals;
 
@@ -326,18 +326,18 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     assertNotSame(q1, q2); // not the same object (identity)
     assertNotEquals(q1, q2); // not equal
 
-    assertNotSame(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2)); // not the same object
-    assertEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2)); // but is equal
+    assertNotSame(CacheableKeycloakUserQuery.of(q1), CacheableKeycloakUserQuery.of(q2)); // not the same object
+    assertEquals(CacheableKeycloakUserQuery.of(q1), CacheableKeycloakUserQuery.of(q2)); // but are equal
 
     q1.userId("id1");
 
     // not equal because first query has a filter
-    assertNotEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2));
+    assertNotEquals(CacheableKeycloakUserQuery.of(q1), CacheableKeycloakUserQuery.of(q2));
 
     q2.userId("id1");
 
     // equal now because second query also has same filter
-    assertEquals(KeycloakUserQueryProxy.of(q1), KeycloakUserQueryProxy.of(q2));
+    assertEquals(CacheableKeycloakUserQuery.of(q1), CacheableKeycloakUserQuery.of(q2));
   }
 
   protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {

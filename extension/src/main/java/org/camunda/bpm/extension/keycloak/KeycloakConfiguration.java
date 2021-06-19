@@ -1,11 +1,7 @@
 package org.camunda.bpm.extension.keycloak;
 
-import org.camunda.bpm.extension.keycloak.cache.CacheConfiguration;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
 
 /**
  * <p>Java Bean holding Keycloak configuration</p>
@@ -77,11 +73,18 @@ public class KeycloakConfiguration {
 
 	protected String proxyPassword = null;
 
-	/** the query cache configuration */
-	protected CacheConfiguration cache = new CacheConfiguration();
+	/** determines if queries to keycloak are cached. default: false */
+	private boolean cacheEnabled;
 
-	/** custom interceptors to modify behaviour of default KeycloakRestTemplate */
-	protected List<ClientHttpRequestInterceptor> customHttpRequestInterceptors = new ArrayList<>();
+	/**
+	 * maximum size of the cache. least used entries are evicted when this limit is reached. default: 500
+	 * for more details on this eviction behaviour, please check the documentation of the 
+	 * QueryCache implementation. The default QueryCache implementation is CaffeineCache.
+	 */
+	private int maxCacheSize = 500;
+
+	/** time after which a cached entry is evicted. default: 15 minutes	 */
+	private Duration cacheExpirationTimeout = Duration.ofMinutes(15);
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -308,31 +311,52 @@ public class KeycloakConfiguration {
 	}
 
 	/**
-	 * @return the query cache configuration
+	 * @return boolean indicating if caching is enabled
 	 */
-	public CacheConfiguration getCache() {
-		return cache;
+	public boolean isCacheEnabled() {
+		return this.cacheEnabled;
 	}
 
 	/**
-	 * @param cache the query cache configuration
+	 * @return the maximum size of the query cache
 	 */
-	public void setCache(CacheConfiguration cache) {
-		this.cache = cache;
+	public int getMaxCacheSize() {
+		return this.maxCacheSize;
 	}
 
 	/**
-	 * @return the custom http request interceptors
+	 * @return the expiry timeout for cached entries
 	 */
-	public List<ClientHttpRequestInterceptor> getCustomHttpRequestInterceptors() {
-		return customHttpRequestInterceptors;
+	public Duration getCacheExpirationTimeout() {
+		return this.cacheExpirationTimeout;
 	}
 
 	/**
-	 * @param customHttpRequestInterceptors the custom http request interceptors 
+	 * @param cacheEnabled boolean indicating whether or not caching is enabled
 	 */
-	public void setCustomHttpRequestInterceptors(List<ClientHttpRequestInterceptor> customHttpRequestInterceptors) {
-		this.customHttpRequestInterceptors = customHttpRequestInterceptors;
+	public void setCacheEnabled(boolean cacheEnabled) {
+		this.cacheEnabled = cacheEnabled;
+	}
+
+	/**
+	 * @param maxCacheSize the maximum size of the query cache
+	 */
+	public void setMaxCacheSize(int maxCacheSize) {
+		this.maxCacheSize = maxCacheSize;
+	}
+
+	/**
+	 * @param cacheExpirationTimeout the expiry timeout for cached entries
+	 */
+	public void setCacheExpirationTimeout(Duration cacheExpirationTimeout) {
+		this.cacheExpirationTimeout = cacheExpirationTimeout;
+	}
+
+	/**
+	 * @param cacheExpirationTimeout the textual representation of the expiry timeout for cached entries
+	 */
+	public void setCacheExpirationTimeout(String cacheExpirationTimeout) {
+		this.cacheExpirationTimeout = Duration.parse(cacheExpirationTimeout);
 	}
 
 	//-------------------------------------------------------------------------

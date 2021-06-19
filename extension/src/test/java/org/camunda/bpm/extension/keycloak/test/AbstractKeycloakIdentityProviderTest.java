@@ -169,7 +169,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
 				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
 				kcp.setClientSecret(CLIENT_SECRET);
-				kcp.getCache().setEnabled(true);
+				kcp.setCacheEnabled(true);
 				kcp.setCustomHttpRequestInterceptors(Collections.singletonList(new CountingHttpRequestInterceptor()));
 				return kcp;
 			}

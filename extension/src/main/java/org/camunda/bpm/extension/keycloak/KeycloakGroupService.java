@@ -108,7 +108,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query - including a userId criteria
 	 * @return list of matching groups
 	 */
-	public List<Group> requestGroupsByUserId(KeycloakGroupQueryProxy query) {
+	public List<Group> requestGroupsByUserId(CacheableKeycloakGroupQuery query) {
 		String userId = query.getUserId();
 		List<Group> groupList = new ArrayList<>();
 
@@ -155,7 +155,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query - not including a userId criteria
 	 * @return list of matching groups
 	 */
-	public List<Group> requestGroupsWithoutUserId(KeycloakGroupQueryProxy query) {
+	public List<Group> requestGroupsWithoutUserId(CacheableKeycloakGroupQuery query) {
 		List<Group> groupList = new ArrayList<>();
 
 		try {
@@ -248,7 +248,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query
 	 * @return request query
 	 */
-	private String createGroupSearchFilter(KeycloakGroupQueryProxy query) {
+	private String createGroupSearchFilter(CacheableKeycloakGroupQuery query) {
 		StringBuilder filter = new StringBuilder();
 		if (!StringUtils.isEmpty(query.getName())) {
 			addArgument(filter, "search", query.getName());

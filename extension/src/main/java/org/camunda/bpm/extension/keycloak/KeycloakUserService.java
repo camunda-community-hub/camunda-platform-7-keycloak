@@ -109,7 +109,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query - including a groupId criteria
 	 * @return list of matching users
 	 */
-	public List<User> requestUsersByGroupId(KeycloakUserQueryProxy query) {
+	public List<User> requestUsersByGroupId(CacheableKeycloakUserQuery query) {
 		String groupId = query.getGroupId();
 		List<User> userList = new ArrayList<>();
 
@@ -165,7 +165,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query - not including a groupId criteria
 	 * @return list of matching users
 	 */
-	public List<User> requestUsersWithoutGroupId(KeycloakUserQueryProxy query) {
+	public List<User> requestUsersWithoutGroupId(CacheableKeycloakUserQuery query) {
 		List<User> userList = new ArrayList<>();
 
 		try {
@@ -264,7 +264,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query
 	 * @return request query
 	 */
-	private String createUserSearchFilter(KeycloakUserQueryProxy query) {
+	private String createUserSearchFilter(CacheableKeycloakUserQuery query) {
 		StringBuilder filter = new StringBuilder();
 		if (!StringUtils.isEmpty(query.getEmail())) {
 			addArgument(filter, "email", query.getEmail());

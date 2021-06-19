@@ -46,8 +46,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	protected KeycloakUserService userService;
 	protected KeycloakGroupService groupService;
 
-	protected QueryCache<KeycloakUserQueryProxy, List<User>> userQueryCache;
-	protected QueryCache<KeycloakGroupQueryProxy, List<Group>> groupQueryCache;
+	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
+	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
 
 	/**
 	 * Creates a new session.
@@ -57,7 +57,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 */
 	public KeycloakIdentityProviderSession(
 					KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider,
-					QueryCache<KeycloakUserQueryProxy, List<User>> userQueryCache, QueryCache<KeycloakGroupQueryProxy, List<Group>> groupQueryCache) {
+					QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache, QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
 		this.keycloakContextProvider = keycloakContextProvider;
@@ -139,7 +139,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 
 		List<User> allMatchingUsers = userQueryCache
-						.getOrCompute(KeycloakUserQueryProxy.of(userQuery), this::doFindUserByQueryCriteria);
+						.getOrCompute(CacheableKeycloakUserQuery.of(userQuery), this::doFindUserByQueryCriteria);
 
 		List<User> processedUsers = userService.postProcessResults(userQuery, allMatchingUsers, resultLogger);
 
@@ -156,7 +156,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 * @param userQuery the user query
 	 * @return list of matching users
 	 */
-	private List<User> doFindUserByQueryCriteria(KeycloakUserQueryProxy userQuery) {
+	private List<User> doFindUserByQueryCriteria(CacheableKeycloakUserQuery userQuery) {
 		if (StringUtils.hasLength(userQuery.getGroupId())) {
 			// search within the members of a single group
 			return userService.requestUsersByGroupId(userQuery);
@@ -324,7 +324,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		}
 
 		List<Group> allMatchingGroups = groupQueryCache
-						.getOrCompute(KeycloakGroupQueryProxy.of(groupQuery), this::doFindGroupByQueryCriteria);
+						.getOrCompute(CacheableKeycloakGroupQuery.of(groupQuery), this::doFindGroupByQueryCriteria);
 
 		List<Group> processedGroups = groupService.postProcessResults(groupQuery, allMatchingGroups, resultLogger);
 
@@ -341,7 +341,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 * @param groupQuery the group query
 	 * @return list of matching groups
 	 */
-	private List<Group> doFindGroupByQueryCriteria(KeycloakGroupQueryProxy groupQuery) {
+	private List<Group> doFindGroupByQueryCriteria(CacheableKeycloakGroupQuery groupQuery) {
 		if (StringUtils.hasLength(groupQuery.getUserId())) {
 			// if restriction on userId is provided, we're searching within the groups of a single user
 			return groupService.requestGroupsByUserId(groupQuery);

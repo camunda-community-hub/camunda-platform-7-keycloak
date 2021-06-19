@@ -6,6 +6,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationService;
@@ -19,6 +20,7 @@ import org.camunda.bpm.extension.keycloak.KeycloakConfiguration;
 import org.camunda.bpm.extension.keycloak.KeycloakIdentityProviderFactory;
 import org.camunda.bpm.extension.keycloak.KeycloakIdentityProviderSession;
 import org.camunda.bpm.extension.keycloak.util.KeycloakPluginLogger;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.util.StringUtils;
 
 /**
@@ -35,6 +37,9 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 	private boolean authorizationEnabled;
 	
 	private KeycloakIdentityProviderFactory keycloakIdentityProviderFactory = null;
+
+	/** custom interceptors to modify behaviour of default KeycloakRestTemplate */
+	private List<ClientHttpRequestInterceptor> customHttpRequestInterceptors = Collections.emptyList();
 
 	/**
 	 * {@inheritDoc}
@@ -58,7 +63,7 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 			// add the configured administrator to the engine configuration later: potentially needs translation to user ID
 		}
 
-		keycloakIdentityProviderFactory = new KeycloakIdentityProviderFactory(this);
+		keycloakIdentityProviderFactory = new KeycloakIdentityProviderFactory(this, customHttpRequestInterceptors);
 		processEngineConfiguration.setIdentityProviderSessionFactory(keycloakIdentityProviderFactory);
 
 		LOG.pluginActivated(getClass().getSimpleName(), processEngineConfiguration.getProcessEngineName());
@@ -185,5 +190,12 @@ public class KeycloakIdentityProviderPlugin extends KeycloakConfiguration implem
 	 */
 	public void clearCache() {
 		this.keycloakIdentityProviderFactory.clearCache();
+	}
+
+	/**
+	 * @param customHttpRequestInterceptors the custom http request interceptors 
+	 */
+	public void setCustomHttpRequestInterceptors(List<ClientHttpRequestInterceptor> customHttpRequestInterceptors) {
+		this.customHttpRequestInterceptors = customHttpRequestInterceptors;
 	}
 }

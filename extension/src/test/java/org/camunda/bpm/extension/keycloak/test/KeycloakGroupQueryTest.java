@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.extension.keycloak.KeycloakGroupQuery;
-import org.camunda.bpm.extension.keycloak.KeycloakGroupQueryProxy;
+import org.camunda.bpm.extension.keycloak.CacheableKeycloakGroupQuery;
 
 /**
  * Tests group queries.
@@ -259,18 +259,18 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertNotSame(q1, q2); // not the same object (by identity)
 		assertNotEquals(q1, q2); // not equal
 
-		assertNotSame(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2)); // not the same object
-		assertEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2)); // but they are equal
+		assertNotSame(CacheableKeycloakGroupQuery.of(q1), CacheableKeycloakGroupQuery.of(q2)); // not the same object
+		assertEquals(CacheableKeycloakGroupQuery.of(q1), CacheableKeycloakGroupQuery.of(q2)); // but they are equal
 
 		q1.groupId("id1");
 
 		// not equal because first query has a filter
-		assertNotEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2));
+		assertNotEquals(CacheableKeycloakGroupQuery.of(q1), CacheableKeycloakGroupQuery.of(q2));
 
 		q2.groupId("id1");
 
 		// equal now because second query also has same filter
-		assertEquals(KeycloakGroupQueryProxy.of(q1), KeycloakGroupQueryProxy.of(q2));
+		assertEquals(CacheableKeycloakGroupQuery.of(q1), CacheableKeycloakGroupQuery.of(q2));
 	}
 
 	protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {

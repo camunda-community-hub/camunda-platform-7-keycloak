@@ -22,9 +22,11 @@ import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.extension.keycloak.cache.CacheConfiguration;
 import org.camunda.bpm.extension.keycloak.cache.CacheFactory;
 import org.camunda.bpm.extension.keycloak.cache.QueryCache;
 import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
@@ -45,19 +47,25 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	protected KeycloakConfiguration keycloakConfiguration;
 	protected KeycloakContextProvider keycloakContextProvider;
 
-	protected QueryCache<KeycloakUserQueryProxy, List<User>> userQueryCache;
-	protected QueryCache<KeycloakGroupQueryProxy, List<Group>> groupQueryCache;
+	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
+	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
 
 	protected KeycloakRestTemplate restTemplate = new KeycloakRestTemplate();
 
 	/**
 	 * Creates a new Keycloak session factory.
 	 * @param keycloakConfiguration the Keycloak configuration
+	 * @param customHttpRequestInterceptors custom interceptors to modify behaviour of default KeycloakRestTemplate
 	 */
-	public KeycloakIdentityProviderFactory(KeycloakConfiguration keycloakConfiguration) {
+	public KeycloakIdentityProviderFactory(
+					KeycloakConfiguration keycloakConfiguration, List<ClientHttpRequestInterceptor> customHttpRequestInterceptors) {
+
 		this.keycloakConfiguration = keycloakConfiguration;
-		this.userQueryCache = CacheFactory.create(keycloakConfiguration.getCache());
-		this.groupQueryCache = CacheFactory.create(keycloakConfiguration.getCache());
+
+		CacheConfiguration cacheConfiguration = CacheConfiguration.from(keycloakConfiguration);
+
+		this.userQueryCache = CacheFactory.create(cacheConfiguration);
+		this.groupQueryCache = CacheFactory.create(cacheConfiguration);
 
 		// Create REST template with pooling HTTP client
 		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -86,7 +94,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 			httpClient.setConnectionManager(connectionManager);
 		}
 
-		// confgure proxy if set
+		// configure proxy if set
 		if (StringUtils.hasLength(keycloakConfiguration.getProxyUri())) {
 			final URI proxyUri = URI.create(keycloakConfiguration.getProxyUri());
 			final HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
@@ -114,7 +122,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 			}
 		}
 
-		restTemplate.getInterceptors().addAll(keycloakConfiguration.getCustomHttpRequestInterceptors());
+		restTemplate.getInterceptors().addAll(customHttpRequestInterceptors);
 		
 		// Create Keycloak context provider for access token handling
 		keycloakContextProvider = new KeycloakContextProvider(keycloakConfiguration, restTemplate);
