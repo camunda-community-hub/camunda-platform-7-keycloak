@@ -41,7 +41,7 @@
     <property name="useEmailAsCamundaUserId" value="true" />
 
     <property name="cacheEnabled" value="true" />
-    <property name="cacheExpirationTimeout" value="5" />
+    <property name="cacheExpirationTimeoutMin" value="5" />
     <property name="customHttpRequestInterceptors"  >
       <list>
         <bean class="org.camunda.bpm.extension.keycloak.test.CountingHttpRequestInterceptor"/>

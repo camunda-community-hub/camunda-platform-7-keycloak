@@ -348,7 +348,7 @@ public class KeycloakConfiguration {
 	/**
 	 * @param cacheExpirationTimeoutMin the expiry timeout in minutes for cached entries
 	 */
-	public void setCacheExpirationTimeout(int cacheExpirationTimeoutMin) {
+	public void setCacheExpirationTimeoutMin(int cacheExpirationTimeoutMin) {
 		this.cacheExpirationTimeoutMin = cacheExpirationTimeoutMin;
 	}
 
