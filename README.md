@@ -152,7 +152,7 @@ A complete list of configuration options can be found below:
 | `proxyPassword` | Optional password for proxy authentication. Default: `null`.<br />*Since 2.0.0* |
 | `cacheEnabled` | Enable caching of queries to keycloak to improve performance. Default: `false`.<br />*Since 2.2.0* |
 | `maxCacheSize` | Maximum size of the cache. Least used entries are evicted when this limit is reached. Default: `500`.<br />*Since 2.2.0* |
-| `cacheExpirationTimeout` | Time after which a cached entry is evicted. Default: `PT15M (15 minutes)`.<br />*Since 2.2.0* |
+| `cacheExpirationTimeoutMin` | Time (in minutes) after which a cached entry is evicted. Default: `15 minutes`.<br />*Since 2.2.0* |
 <!--
 | `charset` | Charset to use for REST communication with Keycloak Server. Default: `UTF-8`.<br />*Since 1.1.0* |
 -->

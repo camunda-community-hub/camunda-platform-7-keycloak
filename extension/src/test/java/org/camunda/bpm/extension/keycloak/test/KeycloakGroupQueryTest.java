@@ -9,8 +9,8 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.extension.keycloak.KeycloakGroupQuery;
 import org.camunda.bpm.extension.keycloak.CacheableKeycloakGroupQuery;
+import org.camunda.bpm.extension.keycloak.KeycloakGroupQuery;
 
 /**
  * Tests group queries.
@@ -18,41 +18,19 @@ import org.camunda.bpm.extension.keycloak.CacheableKeycloakGroupQuery;
 public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest {
 
 	public void testQueryNoFilter() {
-		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
-
 		List<Group> groupList = identityService.createGroupQuery().list();
 		assertEquals(9, groupList.size());
-
-		// non cached query. http request count should have increased
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
-
-		// run query again
-		assertEquals(9, identityService.createGroupQuery().list().size());
-
-		// request count should be same as before
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 	}
 
 	public void testQueryUnlimitedList() {
 		List<Group> groupList = identityService.createGroupQuery().unlimitedList();
 		assertEquals(9, groupList.size());
 	}
-	
-	public void testQueryPaging() {
-		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
 
+	public void testQueryPaging() {
 		// First page
 		List<Group> result = identityService.createGroupQuery().listPage(0, 3);
 		assertEquals(3, result.size());
-
-		// non cached query. http request count should have increased
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
-
-		// run query again
-		assertEquals(3, identityService.createGroupQuery().listPage(0, 3).size());
-
-		// request count should be same as before
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 
 		// Next page
 		List<Group> resultNext = identityService.createGroupQuery().listPage(3, 3);
@@ -68,8 +46,6 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	}
 
 	public void testFilterByGroupId() {
-		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
-
 		Group group = identityService.createGroupQuery().groupId(GROUP_ID_ADMIN).singleResult();
 		assertNotNull(group);
 
@@ -77,15 +53,6 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertEquals(GROUP_ID_ADMIN, group.getId());
 		assertEquals("camunda-admin", group.getName());
 		assertEquals("SYSTEM", group.getType());
-
-		// non cached query. http request count should have increased
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
-
-		// run query again
-		assertEquals(group, identityService.createGroupQuery().groupId(GROUP_ID_ADMIN).singleResult());
-
-		// request count should be same as before
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 
 		group = identityService.createGroupQuery().groupId("whatever").singleResult();
 		assertNull(group);
@@ -116,7 +83,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertEquals(2, result.size());
 	}
 	*/
-	
+
 	public void testFilterByGroupTypeAndGroupId() {
 		Group group = identityService.createGroupQuery().groupType("SYSTEM").groupId(GROUP_ID_SYSTEM_READONLY).singleResult();
 		assertNotNull(group);
@@ -126,12 +93,12 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertEquals("cam-read-only", group.getName());
 		assertEquals("SYSTEM", group.getType());
 	}
-	
-	
+
+
 	public void testFilterByGroupIdIn() {
 		List<Group> groups = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
-				.list();
+						.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
+						.list();
 
 		assertEquals(2, groups.size());
 		for (Group group : groups) {
@@ -143,29 +110,29 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 
 	public void testFilterByGroupIdInAndType() {
 		Group group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
-				.groupType("WORKFLOW")
-				.singleResult();
+						.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
+						.groupType("WORKFLOW")
+						.singleResult();
 		assertNotNull(group);
 		assertEquals("manager", group.getName());
-		
+
 		group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
-				.groupType("SYSTEM")
-				.singleResult();
+						.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
+						.groupType("SYSTEM")
+						.singleResult();
 		assertNotNull(group);
 		assertEquals("camunda-admin", group.getName());
 	}
 
 	public void testFilterByGroupIdInAndUserId() {
 		Group group = identityService.createGroupQuery()
-				.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
-				.groupMember("camunda@accso.de")
-				.singleResult();
+						.groupIdIn(GROUP_ID_ADMIN, GROUP_ID_MANAGER)
+						.groupMember("camunda@accso.de")
+						.singleResult();
 		assertNotNull(group);
 		assertEquals("camunda-admin", group.getName());
 	}
-	
+
 	public void testFilterByGroupName() {
 		Group group = identityService.createGroupQuery().groupName("manager").singleResult();
 		assertNotNull(group);
@@ -189,7 +156,7 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		group = identityService.createGroupQuery().groupNameLike("what*").singleResult();
 		assertNull(group);
 	}
-	
+
 	public void testFilterByGroupNameAndGroupNameLike() {
 		Group group = identityService.createGroupQuery().groupNameLike("ma*").groupName("manager").singleResult();
 		assertNotNull(group);
@@ -211,8 +178,6 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 	}
 
 	public void testOrderByGroupId() {
-		int countBefore = CountingHttpRequestInterceptor.getHttpRequestCount();
-
 		List<Group> groupList = identityService.createGroupQuery().orderByGroupId().desc().list();
 		assertEquals(9, groupList.size());
 		assertTrue(groupList.get(0).getId().compareTo(groupList.get(1).getId()) > 0);
@@ -220,15 +185,6 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 		assertTrue(groupList.get(2).getId().compareTo(groupList.get(3).getId()) > 0);
 		assertTrue(groupList.get(5).getId().compareTo(groupList.get(6).getId()) > 0);
 		assertTrue(groupList.get(6).getId().compareTo(groupList.get(7).getId()) > 0);
-
-		// non cached query. http request count should have increased
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
-
-		// run query again
-		assertEquals(9, identityService.createGroupQuery().orderByGroupId().desc().list().size());
-
-		// request count should be same as before
-		assertEquals(countBefore + 1, CountingHttpRequestInterceptor.getHttpRequestCount());
 	}
 
 	public void testOrderByGroupName() {

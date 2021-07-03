@@ -21,7 +21,7 @@ public class CacheConfiguration {
 
 	public static CacheConfiguration from(KeycloakConfiguration keycloakConfiguration) {
 		return new CacheConfiguration(keycloakConfiguration.isCacheEnabled(),
-						keycloakConfiguration.getMaxCacheSize(), keycloakConfiguration.getCacheExpirationTimeout());
+						keycloakConfiguration.getMaxCacheSize(), Duration.ofMinutes(keycloakConfiguration.getCacheExpirationTimeoutMin()));
 	}
 
 	public boolean isEnabled() {

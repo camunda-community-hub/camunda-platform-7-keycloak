@@ -64,8 +64,8 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 
 		CacheConfiguration cacheConfiguration = CacheConfiguration.from(keycloakConfiguration);
 
-		this.userQueryCache = CacheFactory.create(cacheConfiguration);
-		this.groupQueryCache = CacheFactory.create(cacheConfiguration);
+		this.setUserQueryCache(CacheFactory.create(cacheConfiguration));
+		this.setGroupQueryCache(CacheFactory.create(cacheConfiguration));
 
 		// Create REST template with pooling HTTP client
 		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -134,6 +134,20 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	@Override
 	public Class<?> getSessionType() {
 		return ReadOnlyIdentityProvider.class;
+	}
+
+	/**
+	 * @param userQueryCache set the queryCache for user queries 
+	 */
+	public void setUserQueryCache(QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache) {
+		this.userQueryCache = userQueryCache;
+	}
+
+	/**
+	 * @param groupQueryCache set the queryCache for group queries
+	 */
+	public void setGroupQueryCache(QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache) {
+		this.groupQueryCache = groupQueryCache;
 	}
 
 	/**

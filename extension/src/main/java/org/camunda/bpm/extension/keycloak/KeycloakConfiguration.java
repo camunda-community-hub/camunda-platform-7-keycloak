@@ -84,7 +84,7 @@ public class KeycloakConfiguration {
 	private int maxCacheSize = 500;
 
 	/** time after which a cached entry is evicted. default: 15 minutes	 */
-	private Duration cacheExpirationTimeout = Duration.ofMinutes(15);
+	private int cacheExpirationTimeoutMin = 15;
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -325,10 +325,10 @@ public class KeycloakConfiguration {
 	}
 
 	/**
-	 * @return the expiry timeout for cached entries
+	 * @return the expiry timeout in minutes for cached entries
 	 */
-	public Duration getCacheExpirationTimeout() {
-		return this.cacheExpirationTimeout;
+	public int getCacheExpirationTimeoutMin() {
+		return this.cacheExpirationTimeoutMin;
 	}
 
 	/**
@@ -346,17 +346,10 @@ public class KeycloakConfiguration {
 	}
 
 	/**
-	 * @param cacheExpirationTimeout the expiry timeout for cached entries
+	 * @param cacheExpirationTimeoutMin the expiry timeout in minutes for cached entries
 	 */
-	public void setCacheExpirationTimeout(Duration cacheExpirationTimeout) {
-		this.cacheExpirationTimeout = cacheExpirationTimeout;
-	}
-
-	/**
-	 * @param cacheExpirationTimeout the textual representation of the expiry timeout for cached entries
-	 */
-	public void setCacheExpirationTimeout(String cacheExpirationTimeout) {
-		this.cacheExpirationTimeout = Duration.parse(cacheExpirationTimeout);
+	public void setCacheExpirationTimeout(int cacheExpirationTimeoutMin) {
+		this.cacheExpirationTimeoutMin = cacheExpirationTimeoutMin;
 	}
 
 	//-------------------------------------------------------------------------
