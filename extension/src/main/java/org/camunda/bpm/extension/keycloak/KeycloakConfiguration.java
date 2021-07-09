@@ -1,7 +1,6 @@
 package org.camunda.bpm.extension.keycloak;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 
 /**
  * <p>Java Bean holding Keycloak configuration</p>
@@ -67,23 +66,27 @@ public class KeycloakConfiguration {
 	/** Maximum result size for Keycloak user queries */
 	protected Integer maxResultSize = 250;
 
+	/** The optional proxy URI. */
 	protected String proxyUri = null;
 
+	/** The optional proxy user. */
 	protected String proxyUser = null;
 
+	/** The optional proxy password. */
 	protected String proxyPassword = null;
 
-	/** determines if queries to keycloak are cached. default: false */
+	/** Determines if queries to Keycloak are cached. default: false */
 	private boolean cacheEnabled;
 
 	/**
-	 * maximum size of the cache. least used entries are evicted when this limit is reached. default: 500
-	 * for more details on this eviction behaviour, please check the documentation of the 
+	 * Maximum size of the cache. Least used entries are evicted when this limit is reached. 
+	 * Default: 500.
+	 * For more details on this eviction behavior, please check the documentation of the 
 	 * QueryCache implementation. The default QueryCache implementation is CaffeineCache.
 	 */
 	private int maxCacheSize = 500;
 
-	/** time after which a cached entry is evicted. default: 15 minutes	 */
+	/** Time after which a cached entry is evicted. default: 15 minutes	 */
 	private int cacheExpirationTimeoutMin = 15;
 	
 	//-------------------------------------------------------------------------

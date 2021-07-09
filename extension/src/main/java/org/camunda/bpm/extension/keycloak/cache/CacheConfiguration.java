@@ -5,7 +5,7 @@ import org.camunda.bpm.extension.keycloak.KeycloakConfiguration;
 import java.time.Duration;
 
 /**
- * <p>Query Cache Configuration parsed from KeycloakConfiguration</p>
+ * Query Cache Configuration as parsed from KeycloakConfiguration.
  */
 public class CacheConfiguration {
 
@@ -19,6 +19,11 @@ public class CacheConfiguration {
 		this.expirationTimeout = expirationTimeout;
 	}
 
+	/**
+	 * Creates a new cache configuration out of the overal Keycloak configuration.
+	 * @param keycloakConfiguration the Keycloak Identity Provider configuration.
+	 * @return the resulting cache configuration
+	 */
 	public static CacheConfiguration from(KeycloakConfiguration keycloakConfiguration) {
 		return new CacheConfiguration(keycloakConfiguration.isCacheEnabled(),
 						keycloakConfiguration.getMaxCacheSize(), Duration.ofMinutes(keycloakConfiguration.getCacheExpirationTimeoutMin()));

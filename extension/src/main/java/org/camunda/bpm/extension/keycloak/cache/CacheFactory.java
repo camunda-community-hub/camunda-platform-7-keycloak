@@ -1,12 +1,14 @@
 package org.camunda.bpm.extension.keycloak.cache;
 
 /**
- * Creates implementations of QueryCache based on provided configuration
- **/
+ * Factory for creating a QueryCache.
+ */
 public class CacheFactory {
 
   /**
-   * @param configuration the configuration defining the caching behaviour
+   * Creates implementations of QueryCache based on the provided configuration.
+   * 
+   * @param configuration the configuration defining the caching behavior
    * @return The created QueryCache implementation
    */
   public static <K, V> QueryCache<K, V> create(CacheConfiguration configuration) {

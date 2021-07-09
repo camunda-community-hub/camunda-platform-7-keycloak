@@ -193,12 +193,14 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	}
 
 	/**
+	 * Post processes a Keycloak query result.
 	 * @param query the original query
-	 * @param groupList the full list of results returned from keycloak without client side filters
+	 * @param groupList the full list of results returned from Keycloak without client side filters
 	 * @param resultLogger the log accumulator
-	 * @return the client side filtered, sorted and paginated list of groups
+	 * @return final result with client side filtered, sorted and paginated list of groups
 	 */
 	public List<Group> postProcessResults(KeycloakGroupQuery query, List<Group> groupList, StringBuilder resultLogger) {
+		// apply client side filtering
 		Stream<Group> processed = groupList.stream().filter(group -> isValid(query, group, resultLogger));
 		
 		// sort groups according to query criteria
@@ -216,6 +218,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	}
 
 	/**
+	 * Post processing query filter. Checks if a single group is valid.
 	 * @param query the original query
 	 * @param group the group to validate
 	 * @param resultLogger the log accumulator
@@ -250,10 +253,10 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 */
 	private String createGroupSearchFilter(CacheableKeycloakGroupQuery query) {
 		StringBuilder filter = new StringBuilder();
-		if (!StringUtils.isEmpty(query.getName())) {
+		if (StringUtils.hasLength(query.getName())) {
 			addArgument(filter, "search", query.getName());
 		}
-		if (!StringUtils.isEmpty(query.getNameLike())) {
+		if (StringUtils.hasLength(query.getNameLike())) {
 			addArgument(filter, "search", query.getNameLike().replaceAll("[%,\\*]", ""));
 		}
 		addArgument(filter, "max", getMaxQueryResultSize());

@@ -137,11 +137,11 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			for (int i = 0; i < searchResult.size(); i++) {
 				JsonObject keycloakUser = getJsonObjectAtIndex(searchResult, i);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId() && 
-						StringUtils.isEmpty(getJsonString(keycloakUser, "email"))) {
+						!StringUtils.hasLength(getJsonString(keycloakUser, "email"))) {
 					continue;
 				}
 				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
-						StringUtils.isEmpty(getJsonString(keycloakUser, "username"))) {
+						!StringUtils.hasLength(getJsonString(keycloakUser, "username"))) {
 					continue;
 				}
 				userList.add(transformUser(keycloakUser));
@@ -172,7 +172,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			// get members of this group
 			ResponseEntity<String> response = null;
 
-			if (!StringUtils.isEmpty(query.getId())) {
+			if (StringUtils.hasLength(query.getId())) {
 				response = requestUserById(query.getId());
 			} else {
 				// Create user search filter
@@ -189,11 +189,11 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			for (int i = 0; i < searchResult.size(); i++) {
 				JsonObject keycloakUser = getJsonObjectAtIndex(searchResult, i);
 				if (keycloakConfiguration.isUseEmailAsCamundaUserId() && 
-						StringUtils.isEmpty(getJsonString(keycloakUser, "email"))) {
+						!StringUtils.hasLength(getJsonString(keycloakUser, "email"))) {
 					continue;
 				}
 				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
-						StringUtils.isEmpty(getJsonString(keycloakUser, "username"))) {
+						!StringUtils.hasLength(getJsonString(keycloakUser, "username"))) {
 					continue;
 				}
 
@@ -208,12 +208,14 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	}
 
 	/**
+	 * Post processes a Keycloak query result.
 	 * @param query the original query
-	 * @param userList the full list of results returned from keycloak without client side filters
+	 * @param userList the full list of results returned from Keycloak without client side filters
 	 * @param resultLogger the log accumulator
-	 * @return the client side filtered, sorted and paginated list of users
+	 * @return final result with the client side filtered, sorted and paginated list of users
 	 */
 	public List<User> postProcessResults(KeycloakUserQuery query, List<User> userList, StringBuilder resultLogger) {
+		// apply client side filtering
 		Stream<User> processed = userList.stream().filter(user -> isValid(query, user, resultLogger));
 
 		// sort users according to query criteria
@@ -230,6 +232,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	}
 
 	/**
+	 * Post processing query filter. Checks if a single user is valid.
 	 * @param query the original query
 	 * @param user the user to validate
 	 * @param resultLogger the log accumulator
@@ -240,12 +243,12 @@ public class KeycloakUserService extends KeycloakServiceBase {
 		// beware: looks like most attributes are treated as 'like' queries on Keycloak
 		//         and must therefore be seen as a sort of pre-filter only
 		if (!matches(query.getId(), user.getId())) return false;
-		if (!matches(query.getEmail(), user.getEmail())) return false;
-		if (!matches(query.getFirstName(), user.getFirstName())) return false;
-		if (!matches(query.getLastName(), user.getLastName())) return false;
 		if (!matches(query.getIds(), user.getId())) return false;
+		if (!matches(query.getEmail(), user.getEmail())) return false;
 		if (!matchesLike(query.getEmailLike(), user.getEmail())) return false;
+		if (!matches(query.getFirstName(), user.getFirstName())) return false;
 		if (!matchesLike(query.getFirstNameLike(), user.getFirstName())) return false;
+		if (!matches(query.getLastName(), user.getLastName())) return false;
 		if (!matchesLike(query.getLastNameLike(), user.getLastName())) return false;
 
 		if(isAuthenticatedUser(user.getId()) || isAuthorized(READ, USER, user.getId())) {
@@ -266,22 +269,22 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 */
 	private String createUserSearchFilter(CacheableKeycloakUserQuery query) {
 		StringBuilder filter = new StringBuilder();
-		if (!StringUtils.isEmpty(query.getEmail())) {
+		if (StringUtils.hasLength(query.getEmail())) {
 			addArgument(filter, "email", query.getEmail());
 		}
-		if (!StringUtils.isEmpty(query.getEmailLike())) {
+		if (StringUtils.hasLength(query.getEmailLike())) {
 			addArgument(filter, "email", query.getEmailLike().replaceAll("[%,\\*]", ""));
 		}
-		if (!StringUtils.isEmpty(query.getFirstName())) {
+		if (StringUtils.hasLength(query.getFirstName())) {
 			addArgument(filter, "firstName", query.getFirstName());
 		}
-		if (!StringUtils.isEmpty(query.getFirstNameLike())) {
+		if (StringUtils.hasLength(query.getFirstNameLike())) {
 			addArgument(filter, "firstName", query.getFirstNameLike().replaceAll("[%,\\*]", ""));
 		}
-		if (!StringUtils.isEmpty(query.getLastName())) {
+		if (StringUtils.hasLength(query.getLastName())) {
 			addArgument(filter, "lastName", query.getLastName());
 		}
-		if (!StringUtils.isEmpty(query.getLastNameLike())) {
+		if (StringUtils.hasLength(query.getLastNameLike())) {
 			addArgument(filter, "lastName", query.getLastNameLike().replaceAll("[%,\\*]", ""));
 		}
 		addArgument(filter, "max", getMaxQueryResultSize());
@@ -343,7 +346,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 		}
 		user.setFirstName(getJsonString(result, "firstName"));
 		user.setLastName(getJsonString(result, "lastName"));
-		if (StringUtils.isEmpty(user.getFirstName()) && StringUtils.isEmpty(user.getLastName())) {
+		if (!StringUtils.hasLength(user.getFirstName()) && !StringUtils.hasLength(user.getLastName())) {
 			user.setFirstName(getJsonString(result, "username"));
 		}
 		user.setEmail(getJsonString(result, "email"));

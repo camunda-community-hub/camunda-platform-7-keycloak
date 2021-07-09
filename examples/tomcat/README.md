@@ -18,8 +18,11 @@ For the records - included dependencies are:
 * org.springframework:spring-core
 * org.springframework:spring-jcl
 * org.apache.httpcomponents:httpclient
-* org.apache.httpcomponents:httpcore
-* commons-codec:commons-codec
+	* org.apache.httpcomponents:httpcore
+	* commons-codec:commons-codec
+* com.github.ben-manes.caffeine:caffeine
+	* org.checkerframework:checker-qual
+	* com.google.errorprone:error_prone_annotations
 
 The dependencies are shaded into the ``keycloakjar`` package namespace.
 

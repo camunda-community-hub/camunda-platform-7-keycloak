@@ -40,6 +40,11 @@
           <artifactId>gson</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
 	</dependencies>
 
 	<build>
@@ -97,6 +102,18 @@
 								    <pattern>com.google.gson</pattern>
 								    <shadedPattern>keycloakjar.com.google.gson</shadedPattern>
 								</relocation>
+                                <relocation>
+                                    <pattern>org.checkerframework</pattern>
+                                    <shadedPattern>keycloakjar.org.checkerframework</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.errorprone.annotations</pattern>
+                                    <shadedPattern>keycloakjar.com.google.errorprone.annotations</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.github.benmanes.caffeine</pattern>
+                                    <shadedPattern>keycloakjar.com.github.benmanes.caffeine</shadedPattern>
+                                </relocation>
 							</relocations>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
