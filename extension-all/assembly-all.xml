@@ -9,11 +9,13 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
+      <useProjectArtifact>true</useProjectArtifact>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
       <unpack>true</unpack>
       <scope>compile</scope>
       <includes>
       	  <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
+          <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak-all</include>
       </includes>
     </dependencySet>
   </dependencySets>
