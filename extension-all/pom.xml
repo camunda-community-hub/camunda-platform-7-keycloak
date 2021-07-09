@@ -91,12 +91,12 @@
 							</artifactSet>
  							<relocations>
 								<relocation>
-									<pattern>org.springframework</pattern>
-									<shadedPattern>keycloakjar.org.springframework</shadedPattern>
-								</relocation>
-								<relocation>
 									<pattern>org.apache</pattern>
 									<shadedPattern>keycloakjar.org.apache</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.springframework</pattern>
+									<shadedPattern>keycloakjar.org.springframework</shadedPattern>
 								</relocation>
 								<relocation>
 								    <pattern>com.google.gson</pattern>
