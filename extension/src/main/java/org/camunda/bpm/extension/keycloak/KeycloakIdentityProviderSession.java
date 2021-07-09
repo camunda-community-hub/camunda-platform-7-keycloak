@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.extension.keycloak.cache.QueryCache;
 import org.camunda.bpm.extension.keycloak.json.JsonException;
 import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.camunda.bpm.extension.keycloak.util.ContentType;
@@ -44,20 +45,28 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	
 	protected KeycloakUserService userService;
 	protected KeycloakGroupService groupService;
-	
+
+	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
+	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
+
 	/**
 	 * Creates a new session.
 	 * @param keycloakConfiguration the Keycloak configuration
 	 * @param restTemplate REST template
 	 * @param keycloakContextProvider Keycloak context provider
 	 */
-	public KeycloakIdentityProviderSession(KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider) {
+	public KeycloakIdentityProviderSession(
+					KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider,
+					QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache, QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
 		this.keycloakContextProvider = keycloakContextProvider;
 		
 		this.userService = new KeycloakUserService(keycloakConfiguration, restTemplate, keycloakContextProvider);
 		this.groupService = new  KeycloakGroupService(keycloakConfiguration, restTemplate, keycloakContextProvider);
+
+		this.userQueryCache = userQueryCache;
+		this.groupQueryCache = groupQueryCache;
 	}
 	
 	@Override
@@ -118,12 +127,37 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	/**
-	 * find users meeting given user query criteria.
+	 * find users meeting given user query criteria (with cache lookup).
 	 * @param userQuery the user query
 	 * @return list of matching users
 	 */
 	protected List<User> findUserByQueryCriteria(KeycloakUserQuery userQuery) {
-		if (!StringUtils.isEmpty(userQuery.getGroupId())) {
+		StringBuilder resultLogger = new StringBuilder();
+
+		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+			resultLogger.append("Keycloak group query results: [");
+		}
+
+		List<User> allMatchingUsers = userQueryCache
+						.getOrCompute(CacheableKeycloakUserQuery.of(userQuery), this::doFindUserByQueryCriteria);
+
+		List<User> processedUsers = userService.postProcessResults(userQuery, allMatchingUsers, resultLogger);
+
+		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+			resultLogger.append("]");
+			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
+		}
+
+		return processedUsers;
+	}
+
+	/**
+	 * find users meeting given user query criteria (without cache lookup).
+	 * @param userQuery the user query
+	 * @return list of matching users
+	 */
+	private List<User> doFindUserByQueryCriteria(CacheableKeycloakUserQuery userQuery) {
+		if (StringUtils.hasLength(userQuery.getGroupId())) {
 			// search within the members of a single group
 			return userService.requestUsersByGroupId(userQuery);
 		} else {
@@ -157,12 +191,12 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	public boolean checkPassword(String userId, String password) {
 
 		// engine can't work without users
-		if (StringUtils.isEmpty(userId)) {
+		if (!StringUtils.hasLength(userId)) {
 			return false;
 		}
 
 		// prevent missing/empty passwords - we do not support anonymous login
-		if (StringUtils.isEmpty(password)) {
+		if (!StringUtils.hasLength(password)) {
 			return false;
 		}
 		
@@ -193,12 +227,9 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 			}
 			throw new IdentityProviderException("Unable to authenticate user at " + keycloakConfiguration.getKeycloakIssuerUrl(),
 					hcee);
-		} catch (RestClientException rce) {
+		} catch (RestClientException | UnsupportedEncodingException rce) {
 			throw new IdentityProviderException("Unable to authenticate user at " + keycloakConfiguration.getKeycloakIssuerUrl(),
 					rce);
-		} catch (UnsupportedEncodingException uee) {
-			throw new IdentityProviderException("Unable to authenticate user at " + keycloakConfiguration.getKeycloakIssuerUrl(),
-					uee);
 		}
 
 	}
@@ -281,12 +312,37 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	}
 
 	/**
-	 * find groups meeting given group query criteria.
+	 * find groups meeting given group query criteria (with cache lookup and post processing).
 	 * @param groupQuery the group query
 	 * @return list of matching groups
 	 */
 	protected List<Group> findGroupByQueryCriteria(KeycloakGroupQuery groupQuery) {
-		if (!StringUtils.isEmpty(groupQuery.getUserId())) {
+		StringBuilder resultLogger = new StringBuilder();
+
+		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+			resultLogger.append("Keycloak group query results: [");
+		}
+
+		List<Group> allMatchingGroups = groupQueryCache
+						.getOrCompute(CacheableKeycloakGroupQuery.of(groupQuery), this::doFindGroupByQueryCriteria);
+
+		List<Group> processedGroups = groupService.postProcessResults(groupQuery, allMatchingGroups, resultLogger);
+
+		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+			resultLogger.append("]");
+			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
+		}
+
+		return processedGroups;
+	}
+
+	/**
+	 * find all groups meeting given group query criteria (without cache lookup or post processing).
+	 * @param groupQuery the group query
+	 * @return list of matching groups
+	 */
+	private List<Group> doFindGroupByQueryCriteria(CacheableKeycloakGroupQuery groupQuery) {
+		if (StringUtils.hasLength(groupQuery.getUserId())) {
 			// if restriction on userId is provided, we're searching within the groups of a single user
 			return groupService.requestGroupsByUserId(groupQuery);
 		} else {

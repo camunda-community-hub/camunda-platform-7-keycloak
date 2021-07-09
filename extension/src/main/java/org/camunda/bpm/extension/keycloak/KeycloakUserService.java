@@ -5,8 +5,11 @@ import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.Direction;
@@ -106,14 +109,9 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query - including a groupId criteria
 	 * @return list of matching users
 	 */
-	public List<User> requestUsersByGroupId(KeycloakUserQuery query) {
+	public List<User> requestUsersByGroupId(CacheableKeycloakUserQuery query) {
 		String groupId = query.getGroupId();
 		List<User> userList = new ArrayList<>();
-
-		StringBuilder resultLogger = new StringBuilder();
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("Keycloak user query results: [");
-		}
 
 		try {
 			//  get Keycloak specific groupID
@@ -122,7 +120,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 				keyCloakID = getKeycloakGroupID(groupId);
 			} catch (KeycloakGroupNotFoundException e) {
 				// group not found: empty search result
-				return userList;
+				return Collections.emptyList();
 			}
 
 			// get members of this group
@@ -146,58 +144,19 @@ public class KeycloakUserService extends KeycloakServiceBase {
 						StringUtils.isEmpty(getJsonString(keycloakUser, "username"))) {
 					continue;
 				}
-				UserEntity user = transformUser(keycloakUser);
-
-				// client side check of further query filters
-				if (!matches(query.getId(), user.getId())) continue;
-				if (!matches(query.getIds(), user.getId())) continue;
-				if (!matches(query.getEmail(), user.getEmail())) continue;
-				if (!matchesLike(query.getEmailLike(), user.getEmail())) continue;
-				if (!matches(query.getFirstName(), user.getFirstName())) continue;
-				if (!matchesLike(query.getFirstNameLike(), user.getFirstName())) continue;
-				if (!matches(query.getLastName(), user.getLastName())) continue;
-				if (!matchesLike(query.getLastNameLike(), user.getLastName())) continue;
-				
-				if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
-					userList.add(user);
-	
-					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-						resultLogger.append(user);
-						resultLogger.append(" based on ");
-						resultLogger.append(keycloakUser.toString());
-						resultLogger.append(", ");
-					}
-				}
+				userList.add(transformUser(keycloakUser));
 			}
 
 		} catch (HttpClientErrorException hcee) {
 			// if groupID is unknown server answers with HTTP 404 not found
 			if (hcee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-				return userList;
+				return Collections.emptyList();
 			}
 			throw hcee;
-		} catch (RestClientException rce) {
+		} catch (RestClientException | JsonException rce) {
 			throw new IdentityProviderException("Unable to query members of group " + groupId, rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query members of group " + groupId, je);
 		}
 
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("]");
-			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
-		}
-
-		// sort users according to query criteria
-		if (query.getOrderingProperties().size() > 0) {
-			userList.sort(new UserComparator(query.getOrderingProperties()));
-		}
-
-		// paging
-		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
-			userList = userList.subList(query.getFirstResult(), 
-					Math.min(userList.size(), query.getFirstResult() + query.getMaxResults()));
-		}
-		
 		return userList;
 	}
 
@@ -206,13 +165,8 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query - not including a groupId criteria
 	 * @return list of matching users
 	 */
-	public List<User> requestUsersWithoutGroupId(KeycloakUserQuery query) {
+	public List<User> requestUsersWithoutGroupId(CacheableKeycloakUserQuery query) {
 		List<User> userList = new ArrayList<>();
-
-		StringBuilder resultLogger = new StringBuilder();
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("Keycloak user query results: [");
-		}
 
 		try {
 			// get members of this group
@@ -243,55 +197,66 @@ public class KeycloakUserService extends KeycloakServiceBase {
 					continue;
 				}
 
-				UserEntity user = transformUser(keycloakUser);
-
-				// client side check of further query filters
-				// beware: looks like most attributes are treated as 'like' queries on Keycloak
-				//         and must therefore be seen as a sort of pre-filter only
-				if (!matches(query.getId(), user.getId())) continue;
-				if (!matches(query.getEmail(), user.getEmail())) continue;
-				if (!matches(query.getFirstName(), user.getFirstName())) continue;
-				if (!matches(query.getLastName(), user.getLastName())) continue;
-				if (!matches(query.getIds(), user.getId())) continue;
-				if (!matchesLike(query.getEmailLike(), user.getEmail())) continue;
-				if (!matchesLike(query.getFirstNameLike(), user.getFirstName())) continue;
-				if (!matchesLike(query.getLastNameLike(), user.getLastName())) continue;
-				
-				if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
-					userList.add(user);
-	
-					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-						resultLogger.append(user);
-						resultLogger.append(" based on ");
-						resultLogger.append(keycloakUser.toString());
-						resultLogger.append(", ");
-					}
-				}
+				userList.add(transformUser(keycloakUser));
 			}
 
-		} catch (RestClientException rce) {
+		} catch (RestClientException | JsonException rce) {
 			throw new IdentityProviderException("Unable to query users", rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query users", je);
 		}
 
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("]");
-			KeycloakPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
-		}
+		return userList;
+	}
+
+	/**
+	 * @param query the original query
+	 * @param userList the full list of results returned from keycloak without client side filters
+	 * @param resultLogger the log accumulator
+	 * @return the client side filtered, sorted and paginated list of users
+	 */
+	public List<User> postProcessResults(KeycloakUserQuery query, List<User> userList, StringBuilder resultLogger) {
+		Stream<User> processed = userList.stream().filter(user -> isValid(query, user, resultLogger));
 
 		// sort users according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
-			userList.sort(new UserComparator(query.getOrderingProperties()));
+			processed = processed.sorted(new UserComparator(query.getOrderingProperties()));
 		}
-		
+
 		// paging
 		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
-			userList = userList.subList(query.getFirstResult(), 
-					Math.min(userList.size(), query.getFirstResult() + query.getMaxResults()));
+			processed = processed.skip(query.getFirstResult()).limit(query.getMaxResults());
 		}
-		
-		return userList;
+
+		return processed.collect(Collectors.toList());
+	}
+
+	/**
+	 * @param query the original query
+	 * @param user the user to validate
+	 * @param resultLogger the log accumulator
+	 * @return a boolean indicating if the user is valid for current query
+	 */
+	private boolean isValid(KeycloakUserQuery query, User user, StringBuilder resultLogger) {
+		// client side check of further query filters
+		// beware: looks like most attributes are treated as 'like' queries on Keycloak
+		//         and must therefore be seen as a sort of pre-filter only
+		if (!matches(query.getId(), user.getId())) return false;
+		if (!matches(query.getEmail(), user.getEmail())) return false;
+		if (!matches(query.getFirstName(), user.getFirstName())) return false;
+		if (!matches(query.getLastName(), user.getLastName())) return false;
+		if (!matches(query.getIds(), user.getId())) return false;
+		if (!matchesLike(query.getEmailLike(), user.getEmail())) return false;
+		if (!matchesLike(query.getFirstNameLike(), user.getFirstName())) return false;
+		if (!matchesLike(query.getLastNameLike(), user.getLastName())) return false;
+
+		if(isAuthenticatedUser(user.getId()) || isAuthorized(READ, USER, user.getId())) {
+			if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+				resultLogger.append(user);
+				resultLogger.append(", ");
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -299,7 +264,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	 * @param query the user query
 	 * @return request query
 	 */
-	private String createUserSearchFilter(KeycloakUserQuery query) {
+	private String createUserSearchFilter(CacheableKeycloakUserQuery query) {
 		StringBuilder filter = new StringBuilder();
 		if (!StringUtils.isEmpty(query.getEmail())) {
 			addArgument(filter, "email", query.getEmail());
@@ -393,8 +358,10 @@ public class KeycloakUserService extends KeycloakServiceBase {
 		private final static int EMAIL = 1;
 		private final static int FIRST_NAME = 2;
 		private final static int LAST_NAME = 3;
-		private int[] order;
-		private boolean[] desc;
+
+		private final int[] order;
+		private final boolean[] desc;
+
 		public UserComparator(List<QueryOrderingProperty> orderList) {
 			// Prepare query ordering
 			this.order = new int[orderList.size()];

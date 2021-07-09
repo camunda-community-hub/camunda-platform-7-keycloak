@@ -1,6 +1,7 @@
 package org.camunda.bpm.extension.keycloak;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 /**
  * <p>Java Bean holding Keycloak configuration</p>
@@ -72,6 +73,19 @@ public class KeycloakConfiguration {
 
 	protected String proxyPassword = null;
 
+	/** determines if queries to keycloak are cached. default: false */
+	private boolean cacheEnabled;
+
+	/**
+	 * maximum size of the cache. least used entries are evicted when this limit is reached. default: 500
+	 * for more details on this eviction behaviour, please check the documentation of the 
+	 * QueryCache implementation. The default QueryCache implementation is CaffeineCache.
+	 */
+	private int maxCacheSize = 500;
+
+	/** time after which a cached entry is evicted. default: 15 minutes	 */
+	private int cacheExpirationTimeoutMin = 15;
+	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
 	//-------------------------------------------------------------------------
@@ -294,6 +308,48 @@ public class KeycloakConfiguration {
 
 	public void setProxyPassword(String proxyPassword) {
 		this.proxyPassword = proxyPassword;
+	}
+
+	/**
+	 * @return boolean indicating if caching is enabled
+	 */
+	public boolean isCacheEnabled() {
+		return this.cacheEnabled;
+	}
+
+	/**
+	 * @return the maximum size of the query cache
+	 */
+	public int getMaxCacheSize() {
+		return this.maxCacheSize;
+	}
+
+	/**
+	 * @return the expiry timeout in minutes for cached entries
+	 */
+	public int getCacheExpirationTimeoutMin() {
+		return this.cacheExpirationTimeoutMin;
+	}
+
+	/**
+	 * @param cacheEnabled boolean indicating whether or not caching is enabled
+	 */
+	public void setCacheEnabled(boolean cacheEnabled) {
+		this.cacheEnabled = cacheEnabled;
+	}
+
+	/**
+	 * @param maxCacheSize the maximum size of the query cache
+	 */
+	public void setMaxCacheSize(int maxCacheSize) {
+		this.maxCacheSize = maxCacheSize;
+	}
+
+	/**
+	 * @param cacheExpirationTimeoutMin the expiry timeout in minutes for cached entries
+	 */
+	public void setCacheExpirationTimeoutMin(int cacheExpirationTimeoutMin) {
+		this.cacheExpirationTimeoutMin = cacheExpirationTimeoutMin;
 	}
 
 	//-------------------------------------------------------------------------

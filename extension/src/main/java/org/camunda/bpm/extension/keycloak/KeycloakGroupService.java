@@ -5,8 +5,11 @@ import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.identity.Group;
@@ -105,14 +108,9 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query - including a userId criteria
 	 * @return list of matching groups
 	 */
-	public List<Group> requestGroupsByUserId(KeycloakGroupQuery query) {
+	public List<Group> requestGroupsByUserId(CacheableKeycloakGroupQuery query) {
 		String userId = query.getUserId();
 		List<Group> groupList = new ArrayList<>();
-
-		StringBuilder resultLogger = new StringBuilder();
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("Keycloak group query results: [");
-		}
 
 		try {
 			//  get Keycloak specific userID
@@ -121,7 +119,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 				keyCloakID = getKeycloakUserID(userId);
 			} catch (KeycloakUserNotFoundException e) {
 				// user not found: empty search result
-				return groupList;
+				return Collections.emptyList();
 			}
 
 			// get groups of this user
@@ -136,61 +134,20 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 
 			JsonArray searchResult = parseAsJsonArray(response.getBody());
 			for (int i = 0; i < searchResult.size(); i++) {
-				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
-				Group group = transformGroup(keycloakGroup);
-
-				// client side check of further query filters
-				if (!matches(query.getId(), group.getId())) continue;
-				if (!matches(query.getIds(), group.getId())) continue;
-				if (!matches(query.getName(), group.getName())) continue;
-				if (!matchesLike(query.getNameLike(), group.getName())) continue;
-				if (!matches(query.getType(), group.getType())) continue;
-
-				// authenticated user is always allowed to query his own groups
-				// otherwise READ authentication is required
-				boolean isAuthenticatedUser = isAuthenticatedUser(userId);
-				if (isAuthenticatedUser || isAuthorized(READ, GROUP, group.getId())) {
-					groupList.add(group);
-
-					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-						resultLogger.append(group);
-						resultLogger.append(" based on ");
-						resultLogger.append(keycloakGroup.toString());
-						resultLogger.append(", ");
-					}
-				}
+				groupList.add(transformGroup(getJsonObjectAtIndex(searchResult, i)));
 			}
 
 		} catch (HttpClientErrorException hcee) {
 			// if userID is unknown server answers with HTTP 404 not found
 			if (hcee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-				return groupList;
+				return Collections.emptyList();
 			}
 			throw hcee;
-		} catch (RestClientException rce) {
+		} catch (RestClientException | JsonException rce) {
 			throw new IdentityProviderException("Unable to query groups of user " + userId, rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query groups of user " + userId, je);
 		}
 
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("]");
-			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
-		}
-
-		// sort groups according to query criteria
-		if (query.getOrderingProperties().size() > 0) {
-			groupList.sort(new GroupComparator(query.getOrderingProperties()));
-		}
-
-		// paging
-		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
-			groupList = groupList.subList(query.getFirstResult(), 
-					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
-		}
-
-		// group queries in Keycloak do not consider the max attribute within the search request
-		return truncate(groupList, keycloakConfiguration.getMaxResultSize());
+		return groupList;
 	}
 	
 	/**
@@ -198,19 +155,14 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query - not including a userId criteria
 	 * @return list of matching groups
 	 */
-	public List<Group> requestGroupsWithoutUserId(KeycloakGroupQuery query) {
+	public List<Group> requestGroupsWithoutUserId(CacheableKeycloakGroupQuery query) {
 		List<Group> groupList = new ArrayList<>();
-
-		StringBuilder resultLogger = new StringBuilder();
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("Keycloak group query results: [");
-		}
 
 		try {
 			// get groups according to search criteria
-			ResponseEntity<String> response = null;
+			ResponseEntity<String> response;
 
-			if (!StringUtils.isEmpty(query.getId())) {
+			if (StringUtils.hasLength(query.getId())) {
 				response = requestGroupById(query.getId());
 			} else {
 				String groupFilter = createGroupSearchFilter(query); // only pre-filter of names possible
@@ -222,59 +174,73 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 								+ ": HTTP status code " + response.getStatusCodeValue());
 			}
 
-			JsonArray searchResult = null;
-			if (!StringUtils.isEmpty(query.getId())) {
+			JsonArray searchResult;
+			if (StringUtils.hasLength(query.getId())) {
 				searchResult = parseAsJsonArray(response.getBody());
 			} else {
 				// for non ID queries search in subgroups as well
 				searchResult = flattenSubGroups(parseAsJsonArray(response.getBody()), new JsonArray());
 			}
 			for (int i = 0; i < searchResult.size(); i++) {
-				JsonObject keycloakGroup = getJsonObjectAtIndex(searchResult, i);
-				Group group = transformGroup(keycloakGroup);
-				
-				// client side check of further query filters
-				if (!matches(query.getIds(), group.getId())) continue;
-				if (!matches(query.getName(), group.getName())) continue;
-				if (!matchesLike(query.getNameLike(), group.getName())) continue;
-				if (!matches(query.getType(), group.getType())) continue;
-				
-				if (isAuthorized(READ, GROUP, group.getId())) {
-					groupList.add(group);
-	
-					if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-						resultLogger.append(group);
-						resultLogger.append(" based on ");
-						resultLogger.append(keycloakGroup.toString());
-						resultLogger.append(", ");
-					}
-				}
+				groupList.add(transformGroup(getJsonObjectAtIndex(searchResult, i)));
 			}
 
-		} catch (RestClientException rce) {
+		} catch (RestClientException | JsonException rce) {
 			throw new IdentityProviderException("Unable to query groups", rce);
-		} catch (JsonException je) {
-			throw new IdentityProviderException("Unable to query groups", je);
 		}
 
-		if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
-			resultLogger.append("]");
-			KeycloakPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
-		}
+		return groupList;
+	}
 
+	/**
+	 * @param query the original query
+	 * @param groupList the full list of results returned from keycloak without client side filters
+	 * @param resultLogger the log accumulator
+	 * @return the client side filtered, sorted and paginated list of groups
+	 */
+	public List<Group> postProcessResults(KeycloakGroupQuery query, List<Group> groupList, StringBuilder resultLogger) {
+		Stream<Group> processed = groupList.stream().filter(group -> isValid(query, group, resultLogger));
+		
 		// sort groups according to query criteria
 		if (query.getOrderingProperties().size() > 0) {
-			groupList.sort(new GroupComparator(query.getOrderingProperties()));
+			processed = processed.sorted(new GroupComparator(query.getOrderingProperties()));
 		}
 
 		// paging
 		if ((query.getFirstResult() > 0) || (query.getMaxResults() < Integer.MAX_VALUE)) {
-			groupList = groupList.subList(query.getFirstResult(), 
-					Math.min(groupList.size(), query.getFirstResult() + query.getMaxResults()));
+			processed = processed.skip(query.getFirstResult()).limit(query.getMaxResults());
 		}
 
 		// group queries in Keycloak do not consider the max attribute within the search request
-		return truncate(groupList, keycloakConfiguration.getMaxResultSize());
+		return processed.limit(keycloakConfiguration.getMaxResultSize()).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param query the original query
+	 * @param group the group to validate
+	 * @param resultLogger the log accumulator
+	 * @return a boolean indicating if the group is valid for current query
+	 */
+	private boolean isValid(KeycloakGroupQuery query, Group group, StringBuilder resultLogger) {
+		// client side check of further query filters
+		if (!matches(query.getId(), group.getId())) return false;
+		if (!matches(query.getIds(), group.getId())) return false;
+		if (!matches(query.getName(), group.getName())) return false;
+		if (!matchesLike(query.getNameLike(), group.getName())) return false;
+		if (!matches(query.getType(), group.getType())) return false;
+
+		// authenticated user is always allowed to query his own groups
+		// otherwise READ authentication is required
+		boolean isAuthenticatedUser = isAuthenticatedUser(query.getUserId());
+		if (isAuthenticatedUser || isAuthorized(READ, GROUP, group.getId())) {
+			if (KeycloakPluginLogger.INSTANCE.isDebugEnabled()) {
+				resultLogger.append(group);
+				resultLogger.append(", ");
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -282,7 +248,7 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 * @param query the group query
 	 * @return request query
 	 */
-	private String createGroupSearchFilter(KeycloakGroupQuery query) {
+	private String createGroupSearchFilter(CacheableKeycloakGroupQuery query) {
 		StringBuilder filter = new StringBuilder();
 		if (!StringUtils.isEmpty(query.getName())) {
 			addArgument(filter, "search", query.getName());
@@ -406,8 +372,10 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 		private final static int GROUP_ID = 0;
 		private final static int NAME = 1;
 		private final static int TYPE = 2;
-		private int[] order;
-		private boolean[] desc;
+
+		private final int[] order;
+		private final boolean[] desc;
+
 		public GroupComparator(List<QueryOrderingProperty> orderList) {
 			// Prepare query ordering
 			this.order = new int[orderList.size()];
