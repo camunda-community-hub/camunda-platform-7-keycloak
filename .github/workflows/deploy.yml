@@ -49,7 +49,7 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
         gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
     - name: Deploy SNAPSHOT / Release
-      uses: camunda-community-hub/community-action-maven-release@v1
+      uses: camunda-community-hub/community-action-maven-release@v1.0.4
       with:
         maven-additional-options: clean
         release-version: ${{ github.event.release.tag_name }}
