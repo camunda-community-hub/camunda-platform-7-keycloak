@@ -51,7 +51,7 @@ jobs:
     - name: Deploy SNAPSHOT / Release
       uses: camunda-community-hub/community-action-maven-release@v1
       with:
-        maven-additional-options: clean
+        maven-release-options: clean
         release-version: ${{ github.event.release.tag_name }}
         release-profile: community-action-maven-release
         nexus-usr: ${{ secrets.NEXUS_USR }}
