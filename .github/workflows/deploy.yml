@@ -50,7 +50,6 @@ jobs:
         gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
     - name: Deploy SNAPSHOT / Release
       uses: camunda-community-hub/community-action-maven-release@v1.0.4
-      # uses: ./.github/actions/action-maven-release
       with:
         maven-release-options: -Dmaven.shade.phase=none
         release-version: ${{ github.event.release.tag_name }}
