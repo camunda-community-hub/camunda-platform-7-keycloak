@@ -58,14 +58,17 @@ runs:
       shell: bash
     - name: Run maven
       run: |-
+        echo Running Maven
         test -z "${{ inputs.run-tests }}" && SKIP_TESTS="-DskipTests"
         mvn -B ${{ inputs.maven-additional-options }} clean package ${SKIP_TESTS}
       shell: bash
     - name: Publish SNAPSHOT
       run: |-
+        echo Publish SNAPSHOT: deploy
         test -n "${{ inputs.release-version }}" && echo "::debug::Not publishing SNAPSHOT because release-version is set" && exit 0
         mvn -B ${{ inputs.maven-additional-options }} -DskipTests ${{ inputs.maven-release-options }} deploy
         find . -path '**target/nexus-staging/deferred/.index' -exec sed -i 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots/@g' {} +
+        echo Publish SNAPSHOT: deploy-staged
         mvn -B ${{ inputs.maven-additional-options }} -DskipTests ${{ inputs.maven-release-options }} org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged
       shell: bash
       env:
