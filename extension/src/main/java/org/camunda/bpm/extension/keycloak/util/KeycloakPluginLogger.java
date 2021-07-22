@@ -44,6 +44,10 @@ public class KeycloakPluginLogger extends BaseLogger {
 		logWarn("013", "REQUEST {} failed unauthorized - auto retry once with new token. Please check access token lifespan, session timeouts, etc.", request);
 	}
 	
+	public void missingRefreshToken() {
+		logWarn("014", "TOKEN refresh not possible - please activate the 'Use Refresh Tokens For Client Credentials Grant' option.");
+	}
+	
 	public void userNotFound(String userId, Exception exception) {
 		logWarn("020", "FIND userId {} failed: {}", userId, exception.getMessage());
 	}

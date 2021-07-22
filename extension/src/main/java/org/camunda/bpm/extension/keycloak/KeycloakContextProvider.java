@@ -123,10 +123,15 @@ public class KeycloakContextProvider {
 		if (context == null) {
 			context = openAuthorizationContext();
 		} else if (context.needsRefresh()) {
-			try {
-				context = refreshToken();
-			} catch (IdentityProviderException ipe) {
+			if (context.getRefreshToken() == null) {
+				LOG.missingRefreshToken();
 				context = openAuthorizationContext();
+			} else {
+				try {
+					context = refreshToken();
+				} catch (IdentityProviderException ipe) {
+					context = openAuthorizationContext();
+				}
 			}
 		}
 		return context.createHttpRequestEntity();
