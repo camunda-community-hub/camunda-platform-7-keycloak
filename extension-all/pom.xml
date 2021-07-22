@@ -75,7 +75,7 @@
 				<version>3.2.4</version>
 				<executions>
 					<execution>
-						<phase>${maven.shade.phase}</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>shade</goal>
 						</goals>

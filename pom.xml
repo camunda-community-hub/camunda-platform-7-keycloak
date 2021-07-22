@@ -30,9 +30,6 @@
 	<version.springBoot>2.4.4</version.springBoot>
 	<version.bpm.assert>10.0.0</version.bpm.assert>
 
-    <!-- set to 'none' in order to avoid running maven shade plugin -->
-    <maven.shade.phase>package</maven.shade.phase>
-    
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
