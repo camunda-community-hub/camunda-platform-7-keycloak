@@ -74,11 +74,13 @@ Known limitations:
 1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
 2.  Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
 	![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
-3.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (`master-realm` or `realm-management`, depending on whether you are using master or a separate realm):
+3. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" options within the "OpenID Connect Compatibility Modes" sections:
+	![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
+4.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (`master-realm` or `realm-management`, depending on whether you are using master or a separate realm):
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
-4.  Your client credentials can be found here:
+5.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
-5.  Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated Camunda admin group or Camunda admin user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
+6.  Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated Camunda admin group or Camunda admin user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
 	![KeycloakGroups](doc/keycloak-groups.png "Keycloak Realm Groups")
 
 ## Usage with Camunda Spring Boot
