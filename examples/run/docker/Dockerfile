@@ -2,7 +2,7 @@
 FROM camunda/camunda-bpm-platform:run-7.15.0
 
 # The Version of the Keycloak Identity Provider to use
-ENV IDENTITY_PROVIDER_VERSION=2.0.0
+ENV IDENTITY_PROVIDER_VERSION=2.1.0
 
 # Add Keycloak Identity Provider
 USER camunda
