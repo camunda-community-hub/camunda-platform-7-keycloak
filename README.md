@@ -74,7 +74,7 @@ Known limitations:
 1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
 2.  Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
 	![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
-3. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" sections (available in newer Keycloak versions):
+3. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" section (available in newer Keycloak versions):
 
 	![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
 4.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (`master-realm` or `realm-management`, depending on whether you are using master or a separate realm):
