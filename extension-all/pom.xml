@@ -123,6 +123,17 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<!-- exclude source generation through maven plugin -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+					  <id>prevent-source-plugin</id>
+					  <phase>none</phase>
+					</execution>
+				  </executions>
+			</plugin>
+			<plugin>
 				<!-- make sure javadocs are generated for camunda-bpm-identity-keycloak-all -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
