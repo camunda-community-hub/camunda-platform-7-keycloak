@@ -13,7 +13,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-bpm-identity-keycloak-root</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.2.0</version>
   <packaging>pom</packaging>
   <name>camunda BPM - engine plugins - identity - keycloak - root</name>
   <description>A Camunda Identity Provider Plugin for Keycloak</description>

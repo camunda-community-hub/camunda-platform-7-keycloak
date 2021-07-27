@@ -4,7 +4,7 @@
 	<parent>
 	  <groupId>org.camunda.bpm.extension</groupId>
 	  <artifactId>camunda-bpm-identity-keycloak-root</artifactId>
-	  <version>2.1.1-SNAPSHOT</version>
+	  <version>2.2.0</version>
 	</parent>
 
     <artifactId>camunda-bpm-identity-keycloak-run</artifactId>
