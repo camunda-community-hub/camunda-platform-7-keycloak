@@ -61,8 +61,8 @@ Use a ``docker-compose.yml`` file as follows:
     services:
       jboss.keycloak:
         build: .
-    #    image: jboss/keycloak:12.0.4
-        image: gunnaraccso/keycloak.server:10.0.1
+    #    image: jboss/keycloak:14.0.0
+        image: gunnaraccso/keycloak.server:14.0.0
         restart: always
         environment:
           TZ: Europe/Berlin

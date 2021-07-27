@@ -18,14 +18,19 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Current version: `2.1.0`<br >
+Current version: `2.2.0`<br >
 Tested with: Keycloak >= `5.0.0`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 #### Features
 
+New in Version `2.2.0`:
+
+* Optional Keycloak Query Cache - helps you to minimize requests to Keycloak and thus improve performance.
+* Minor optimization of refresh token handling in case it is missing at all.
+
 New in Version `2.1.0`:
 
-* Auto retry with refreshed new token in case of Keycloak HTTP 401 responses (more stability in case of misconfigurations)
+* Auto retry with refreshed new token in case of Keycloak HTTP 401 responses (more stability in case of misconfigurations).
 
 New in Version `2.0.0`:
 
@@ -91,7 +96,7 @@ Maven Dependencies:
     <dependency>
         <groupId>org.camunda.bpm.extension</groupId>
         <artifactId>camunda-bpm-identity-keycloak</artifactId>
-        <version>2.1.0</version>
+        <version>2.2.0</version>
     </dependency>
 
 Add the following class to your Camunda Spring Boot application in order to activate the Keycloak Identity Provider Plugin:
