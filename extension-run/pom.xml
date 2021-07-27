@@ -116,7 +116,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- exclude source generation through maven plugin -->
+				<!-- exclude source generation through maven plugin (already done by maven-shade) -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
@@ -127,15 +127,23 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- exclude javadocs generation through maven plugin -->
+				<!-- make sure javadocs are generated for camunda-bpm-identity-keycloak-run -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-					  <id>prevent-javadoc-plugin</id>
-					  <phase>none</phase>
-					</execution>
-				</executions>
+				<configuration>
+					<includeDependencySources>true</includeDependencySources>
+					<includeTransitiveDependencySources>true</includeTransitiveDependencySources>
+					<dependencySourceIncludes>
+						<include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
+					</dependencySourceIncludes>
+					<additionalDependencies>
+						<additionalDependency>
+							<groupId>junit</groupId>
+							<artifactId>junit</artifactId>
+							<version>4.12</version>
+						</additionalDependency>
+					</additionalDependencies>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
