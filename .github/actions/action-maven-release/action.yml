@@ -58,13 +58,13 @@ runs:
       shell: bash
     - name: Run maven
       run: |-
-        echo Run Maven Build
+        echo ===>>> Run Maven Build
         test -z "${{ inputs.run-tests }}" && SKIP_TESTS="-DskipTests"
         mvn -B ${{ inputs.maven-additional-options }} clean package ${SKIP_TESTS}
       shell: bash
     - name: Publish SNAPSHOT
       run: |-
-        echo Publish SNAPSHOT
+        echo ===>>> Publish SNAPSHOT
         test -n "${{ inputs.release-version }}" && echo "::debug::Not publishing SNAPSHOT because release-version is set" && exit 0
         mvn -B ${{ inputs.maven-additional-options }} -DskipTests ${{ inputs.maven-release-options }} clean deploy
         find . -path '**target/nexus-staging/deferred/.index' -exec sed -i 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots/@g' {} +
@@ -77,18 +77,16 @@ runs:
         MAVEN_PSW: ${{ inputs.maven-psw }}
     - name: Publish Maven Release
       run: |-
-        echo Publish Maven Release
+        echo ===>>> Publish Maven Release
         test -z "${{ inputs.release-version }}" && echo "::debug::Skipping Release because release-version is unset" && exit 0
         # 1. set version
-        echo set version
         mvn -B ${{ inputs.maven-additional-options }} versions:set org.codehaus.mojo:versions-maven-plugin:2.8.1:update-child-modules -DnewVersion=${{ inputs.release-version }}
         # 2. perform release
-        echo perform release
         mvn -B ${{ inputs.maven-additional-options }} ${RELEASE_PROFILE} ${{ inputs.maven-release-options }} -DskipTests -DnexusUrl=https://oss.sonatype.org/ -DserverId=central -Drelease-version=${{ inputs.release-version }} -Dgpg.sign initialize \
-          clean package source:jar javadoc:jar \
+          clean source:jar javadoc:jar \
           deploy org.apache.maven.plugins:maven-gpg-plugin:sign \
           nexus-staging:deploy
-        echo release deployed to nexus staging
+        echo ===>>> Successfully deployed release to nexus staging
       shell: bash
       env:
         NEXUS_USR: ${{ inputs.nexus-usr}}
