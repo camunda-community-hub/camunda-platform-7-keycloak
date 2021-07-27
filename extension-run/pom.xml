@@ -124,12 +124,19 @@
 					  <id>prevent-source-plugin</id>
 					  <phase>none</phase>
 					</execution>
-				  </executions>
+				</executions>
 			</plugin>
 			<plugin>
 				<!-- make sure javadocs are generated for camunda-bpm-identity-keycloak-run -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+					  <id>prevent-javadoc-plugin</id>
+					  <phase>none</phase>
+					</execution>
+				</executions>
+				<!--
 				<configuration>
 					<includeDependencySources>true</includeDependencySources>
 					<includeTransitiveDependencySources>true</includeTransitiveDependencySources>
@@ -144,6 +151,7 @@
 						</additionalDependency>
 					</additionalDependencies>
 				</configuration>
+				-->
 			</plugin>
 		</plugins>
 	</build>
