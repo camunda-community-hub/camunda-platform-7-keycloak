@@ -82,7 +82,7 @@ Known limitations:
 3. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" section (available in newer Keycloak versions):
 
 	![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
-4.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (`master-realm` or `realm-management`, depending on whether you are using master or a separate realm):
+4.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (choose `realm-management` or `master-realm`, depending on whether you are using a separate realm or master):
 	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
 5.  Your client credentials can be found here:
 	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
