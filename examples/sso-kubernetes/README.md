@@ -307,7 +307,7 @@ The Dockerfile is using a multi-stage Docker build starting with a maven Docker 
 
 The Docker build uses the separate standalone Maven `docker-pom.xml` as build file. When using the Camunda Enterprise Version you have to adapt the file ``settings-docker.xml`` and set your credentials of the Camunda Enterprise Maven Repository accordingly:
 
-```java
+```xml
 <!-- Maven Settings for Docker Build -->
 <servers>
     <server>

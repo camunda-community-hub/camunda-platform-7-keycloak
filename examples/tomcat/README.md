@@ -36,26 +36,26 @@ The last step is to edit the ``bpm-platform.xml`` file inside the folder ``$TOMC
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.camunda.org/schema/1.0/BpmPlatform ">
 ...
-	<process-engine name="default"> ...
-	<properties>...</properties>
-	<plugins>
-		...
-		<plugin>
-		<class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
-		<properties>
-			<property name="keycloakIssuerUrl">https://somehost:8443/auth/realms/camunda</property>
-			<property name="keycloakAdminUrl">https://somehost:8443/auth/admin/realms/camunda</property>
-			<property name="clientId">camunda-identity-service</property>
-			<property name="clientSecret">42xx42xx-42xx-42xx-42xx-42xx42xx42xx</property>
-			<property name="useUsernameAsCamundaUserId">true</property>
-			<property name="useGroupPathAsCamundaGroupId">true</property>
-			<property name="administratorGroupName">camunda-admin</property>
-			<property name="disableSSLCertificateValidation">true</property>
-		</properties>
-		</plugin>
-		...
-	</plugins>
-	</process-engine>
+    <process-engine name="default"> ...
+    <properties>...</properties>
+    <plugins>
+        ...
+        <plugin>
+        <class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
+        <properties>
+            <property name="keycloakIssuerUrl">https://somehost:8443/auth/realms/camunda</property>
+            <property name="keycloakAdminUrl">https://somehost:8443/auth/admin/realms/camunda</property>
+            <property name="clientId">camunda-identity-service</property>
+            <property name="clientSecret">42xx42xx-42xx-42xx-42xx-42xx42xx42xx</property>
+            <property name="useUsernameAsCamundaUserId">true</property>
+            <property name="useGroupPathAsCamundaGroupId">true</property>
+            <property name="administratorGroupName">camunda-admin</property>
+            <property name="disableSSLCertificateValidation">true</property>
+        </properties>
+        </plugin>
+        ...
+    </plugins>
+    </process-engine>
 </bpm-platform>
 ```
 
