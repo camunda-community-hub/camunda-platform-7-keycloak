@@ -56,21 +56,23 @@ The following description is a quick start. A more detailed description will fol
 
 Use a ``docker-compose.yml`` file as follows:
 
-    version: "3.3"
-    
-    services:
-      jboss.keycloak:
-        build: .
-    #    image: jboss/keycloak:14.0.0
-        image: gunnaraccso/keycloak.server:14.0.0
-        restart: always
-        environment:
-          TZ: Europe/Berlin
-          KEYCLOAK_USER: keycloak
-          KEYCLOAK_PASSWORD: keycloak1!
-        ports:
-          - "9001:8443"
-          - "9000:8080"
+```docker-compose
+version: "3.3"
+
+services:
+  jboss.keycloak:
+    build: .
+#    image: jboss/keycloak:14.0.0
+    image: gunnaraccso/keycloak.server:14.0.0
+    restart: always
+    environment:
+      TZ: Europe/Berlin
+      KEYCLOAK_USER: keycloak
+      KEYCLOAK_PASSWORD: keycloak1!
+    ports:
+      - "9001:8443"
+      - "9000:8080"
+```
 
 The image ``gunnaraccso/keycloak.server`` has been derived from the original ``jboss/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker image](https://hub.docker.com/r/jboss/keycloak/).
 
@@ -86,27 +88,29 @@ The class ``KeycloakIdentityProvider.java`` in package ``org.camunda.bpm.extensi
 
 The main configuration part in ``applicaton.yaml`` is as follows:
 
-    # Externalized Keycloak configuration
-    keycloak:
-      # Keycloak access for the Identity Provider plugin.
-      url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+```yml
+# Externalized Keycloak configuration
+keycloak:
+  # Keycloak access for the Identity Provider plugin.
+  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
 
-      # Keycloak Camunda Identity Client
-      client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
-      client.secret: ${KEYCLOAK_CLIENT_SECRET:42xx42xx-a17b-c63d-e26f-42xx42xx42xx42xx}
+  # Keycloak Camunda Identity Client
+  client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:42xx42xx-a17b-c63d-e26f-42xx42xx42xx42xx}
 
-    # Camunda Keycloak Identity Provider Plugin
-    plugin.identity.keycloak:
-      keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
-      keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
-      clientId: ${keycloak.client.id}
-      clientSecret: ${keycloak.client.secret}
-      useEmailAsCamundaUserId: false
-      useUsernameAsCamundaUserId: true
-      useGroupPathAsCamundaGroupId: true
-      administratorGroupName: camunda-admin
-      disableSSLCertificateValidation: true
-  
+# Camunda Keycloak Identity Provider Plugin
+plugin.identity.keycloak:
+  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
+  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+  clientId: ${keycloak.client.id}
+  clientSecret: ${keycloak.client.secret}
+  useEmailAsCamundaUserId: false
+  useUsernameAsCamundaUserId: true
+  useGroupPathAsCamundaGroupId: true
+  administratorGroupName: camunda-admin
+  disableSSLCertificateValidation: true
+```
+
 For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) 
 
 ### OAuth2 SSO Configuration
@@ -115,37 +119,38 @@ For OAuth2 SSO configuration see package ``org.camunda.bpm.extension.keycloak.sh
 
 The additional configuration parts in ``applicaton.yaml`` are as follows:
 
-    # Externalized Keycloak configuration
-    keycloak:
-      # SSO Authentication requests. Send by application as redirect to the browser
-      url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
-      # SSO Token requests. Send from the application to Keycloak
-      url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
+```yml
+# Externalized Keycloak configuration
+keycloak:
+  # SSO Authentication requests. Send by application as redirect to the browser
+  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
+  # SSO Token requests. Send from the application to Keycloak
+  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
 
-    # Spring Boot Security OAuth2 SSO
-    spring.security:
-    oauth2:
-      client:
-        registration:
-          keycloak:
-            provider: keycloak
-            client-id: ${keycloak.client.id}
-            client-secret: ${keycloak.client.secret}
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-            scope: openid, profile, email
-        provider:
-          keycloak:
-            issuer-uri: ${keycloak.url.auth}/auth/realms/camunda
-            authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-            user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
-            token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-            jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
-            # set user-name-attribute one of: 
-            # - sub                -> default; using keycloak ID as camunda user ID
-            # - email              -> useEmailAsCamundaUserId=true
-            # - preferred_username -> useUsernameAsCamundaUserId=true
-            user-name-attribute: preferred_username
+# Spring Boot Security OAuth2 SSO
+spring.security.oauth2:
+  client:
+    registration:
+      keycloak:
+        provider: keycloak
+        client-id: ${keycloak.client.id}
+        client-secret: ${keycloak.client.secret}
+        authorization-grant-type: authorization_code
+        redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+        scope: openid, profile, email
+    provider:
+      keycloak:
+        issuer-uri: ${keycloak.url.auth}/auth/realms/camunda
+        authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+        user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+        token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+        jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+        # set user-name-attribute one of: 
+        # - sub                -> default; using keycloak ID as camunda user ID
+        # - email              -> useEmailAsCamundaUserId=true
+        # - preferred_username -> useUsernameAsCamundaUserId=true
+        user-name-attribute: preferred_username
+```
 
 You'll find the security configuraton setup in ``WebAppSecurityConfig``. Please be aware of the ``KeycloakAuthenticationProvider`` which is the bridge between Spring Security and Camunda.
 
@@ -161,11 +166,13 @@ In order to secure Camunda's REST Api we're using standard JWT combined with Key
 
 The additional configuration in ``application.yaml`` is simple and self explaining:
 
-    # Camunda Rest API
-    rest.security:
-      enabled: true
-      provider: keycloak
-      required-audience: camunda-rest-api
+```yml
+# Camunda Rest API
+rest.security:
+  enabled: true
+  provider: keycloak
+  required-audience: camunda-rest-api
+```
 
 To induce keycloak to include the expected audience claim in delivered tokens, we configure a custom Client Scope named ``camunda-rest-api``:
 ![KeycloakClientScope](docs/Keycloak-Client-Scope.PNG)
@@ -182,33 +189,35 @@ The security implementation snippets for the REST Api part can be found in packa
 
 Besides a typical Web security configuration ``RestApiSecurityConfig`` including OAuth 2.0 Resource Server support we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. It's job is to pass the authenticated user id and groupIds to Camunda's IdentityService:
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+```java
+@Override
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
 
-        // Extract user-name-attribute of the JWT / OAuth2 token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = null;
-        if (authentication instanceof JwtAuthenticationToken) {
-            userId = ((JwtAuthenticationToken)authentication).getName();
-        } else if (authentication.getPrincipal() instanceof OidcUser) {
-            userId = ((OidcUser)authentication.getPrincipal()).getName();
-        } else {
-            throw new ServletException("Invalid authentication request token");
-        }
-        if (StringUtils.isEmpty(userId)) {
-            throw new ServletException("Unable to extract user-name-attribute from token");
-        }
-
-        LOG.debug("Extracted userId from bearer token: {}", userId);
-
-        try {
-            identityService.setAuthentication(userId, getUserGroups(userId));
-            chain.doFilter(request, response);
-        } finally {
-            identityService.clearAuthentication();
-        }
+    // Extract user-name-attribute of the JWT / OAuth2 token
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String userId = null;
+    if (authentication instanceof JwtAuthenticationToken) {
+        userId = ((JwtAuthenticationToken)authentication).getName();
+    } else if (authentication.getPrincipal() instanceof OidcUser) {
+        userId = ((OidcUser)authentication.getPrincipal()).getName();
+    } else {
+        throw new ServletException("Invalid authentication request token");
     }
+    if (StringUtils.isEmpty(userId)) {
+        throw new ServletException("Unable to extract user-name-attribute from token");
+    }
+
+    LOG.debug("Extracted userId from bearer token: {}", userId);
+
+    try {
+        identityService.setAuthentication(userId, getUserGroups(userId));
+        chain.doFilter(request, response);
+    } finally {
+        identityService.clearAuthentication();
+    }
+}
+```
 
 A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore it is ignored as standard.
 
@@ -220,36 +229,40 @@ Doing a SSO logout (assuming that this is desired) using the Camunda Cockpit's l
 
 In order to replace the UI's logout functionality you have to provide a custom ``config.js`` file, located in the ``app/{admin|tasklist|welcome}/scripts/`` directory of the Camunda webapps. You'll find the custom configuration under ``src/main/resources/META-INF/resources/webjars/camunda`` of this showcase. It simply configures a custom logout script:
 
-    export default {
-      customScripts: [
-        'custom/logout'
-      ]
-    };
+```javascript
+export default {
+  customScripts: [
+    'custom/logout'
+  ]
+};
+```
 
 The configured script replaces the logout button functionality as follows:
 
-    let observer = new MutationObserver(() => {
-      // find the logout button
-      const logoutButton = document.querySelectorAll(".logout > a")[0];
-      // once the button is present replace it with new functionality
-      if (logoutButton) {
-        var parent = logoutButton.parentElement
-        parent.removeChild(logoutButton)
-        var newLogout = document.createElement('a');
-        newLogout.setAttribute('className', 'ng-binding')
-        newLogout.innerText = logoutButton.innerText.replaceAll('\n', '');
-        newLogout.setAttribute('href', 'logout'); // call server side logout handler
-        parent.appendChild(newLogout)
-        observer.disconnect();
-      }
-    });
+```javascript
+let observer = new MutationObserver(() => {
+  // find the logout button
+  const logoutButton = document.querySelectorAll(".logout > a")[0];
+  // once the button is present replace it with new functionality
+  if (logoutButton) {
+    var parent = logoutButton.parentElement
+    parent.removeChild(logoutButton)
+    var newLogout = document.createElement('a');
+    newLogout.setAttribute('className', 'ng-binding')
+    newLogout.innerText = logoutButton.innerText.replaceAll('\n', '');
+    newLogout.setAttribute('href', 'logout'); // call server side logout handler
+    parent.appendChild(newLogout)
+    observer.disconnect();
+  }
+});
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: false,
-      characterData: false
-    });
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: false,
+  characterData: false
+});
+```
 
 With that in place we get a custom logout request to the server, which can be handled by our Keycloak specific logout handler.
 
@@ -257,20 +270,22 @@ With that in place we get a custom logout request to the server, which can be ha
 
 In order to provide a Keycloak specific logout handler, we first have to add the handler to the WebAppSecurity configuration:
 
-	@Inject
-	private KeycloakLogoutHandler keycloakLogoutHandler;
+```java
+@Inject
+private KeycloakLogoutHandler keycloakLogoutHandler;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        ...
-	    .oauth2Login()
-	    .and()
-	      .logout()
-	      .logoutRequestMatcher(new AntPathRequestMatcher("/app/**/logout"))
-	      .logoutSuccessHandler(keycloakLogoutHandler)
-        ;
-    }
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+      http
+      ...
+    .oauth2Login()
+    .and()
+      .logout()
+      .logoutRequestMatcher(new AntPathRequestMatcher("/app/**/logout"))
+      .logoutSuccessHandler(keycloakLogoutHandler)
+      ;
+  }
+```
 
 The handler itself (see ``org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to
 ``http://<keycloak-server>/auth/realms/camunda/protocol/openid-connect/logout?redirect_uri=http://<camunda-server>/camunda``.
@@ -292,14 +307,16 @@ The Dockerfile is using a multi-stage Docker build starting with a maven Docker 
 
 The Docker build uses the separate standalone Maven `docker-pom.xml` as build file. When using the Camunda Enterprise Version you have to adapt the file ``settings-docker.xml`` and set your credentials of the Camunda Enterprise Maven Repository accordingly:
 
-    <!-- Maven Settings for Docker Build -->
-    <servers>
-        <server>
-            <id>camunda-bpm-ee</id>
-            <username>xxxxxx</username>
-            <password>xxxxxx</password>
-        </server>
-    </servers>
+```java
+<!-- Maven Settings for Docker Build -->
+<servers>
+    <server>
+        <id>camunda-bpm-ee</id>
+        <username>xxxxxx</username>
+        <password>xxxxxx</password>
+    </server>
+</servers>
+```
 
 Just run a standard Docker image build to get your docker container.
 
@@ -313,12 +330,14 @@ Just for the records - how to find out java module dependencies and shrink your 
 
 The result goes to the jlink ``add-modules`` option in the following Dockerfile section (which has already been applied for this showcase):
 
-    # jlinked java 11 (do NOT use alpine-slim here which has important module files deleted)
-    FROM adoptopenjdk/openjdk11:jdk-11.0.3_7-alpine AS JLINKED_JAVA
-    RUN ["jlink", "--compress=2", \
-         "--module-path", "/opt/java/openjdk/jmods", \
-         "--add-modules", "java.base,java.compiler,java.desktop,java.instrument,java.management,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.httpserver,jdk.jdi,jdk.unsupported", \
-         "--output", "/jlinked"]
+```Dockerfile
+# jlinked java 11 (do NOT use alpine-slim here which has important module files deleted)
+FROM adoptopenjdk/openjdk11:jdk-11.0.3_7-alpine AS JLINKED_JAVA
+RUN ["jlink", "--compress=2", \
+      "--module-path", "/opt/java/openjdk/jmods", \
+      "--add-modules", "java.base,java.compiler,java.desktop,java.instrument,java.management,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.httpserver,jdk.jdi,jdk.unsupported", \
+      "--output", "/jlinked"]
+```
 
 The final result will be a slim custom JDK which has been reduced in image size. Feel free to skip this part, delete the corresponding Dockerfile sections and use a full JDK 11 as base image for your Spring Boot Application.
 

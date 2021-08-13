@@ -24,23 +24,27 @@ The ``com.google.code.gson`` and ``com.github.ben-manes.caffeine`` dependencies 
 
 The last step is to edit the ``default.yml`` or ``production.yml`` file inside the folder ``$CAMUNDA_BPM_RUN_ROOT/configuration`` and configure the plugin. A sample configuration looks as follows:
 
-	# Camunda Keycloak Identity Provider Plugin
-	plugin.identity.keycloak:
-	  keycloakIssuerUrl: https://localhost:9001/auth/realms/camunda
-	  keycloakAdminUrl: https://localhost:9001/auth/admin/realms/camunda
-	  clientId: camunda-identity-service
-	  clientSecret: 12345678-abcd-efgh-ijkl-123456789012
-	  useUsernameAsCamundaUserId: true
-	  useGroupPathAsCamundaGroupId: true
-	  administratorGroupName: camunda-admin
-	  disableSSLCertificateValidation: true
+```yml
+# Camunda Keycloak Identity Provider Plugin
+plugin.identity.keycloak:
+	keycloakIssuerUrl: https://localhost:9001/auth/realms/camunda
+	keycloakAdminUrl: https://localhost:9001/auth/admin/realms/camunda
+	clientId: camunda-identity-service
+	clientSecret: 12345678-abcd-efgh-ijkl-123456789012
+	useUsernameAsCamundaUserId: true
+	useGroupPathAsCamundaGroupId: true
+	administratorGroupName: camunda-admin
+	disableSSLCertificateValidation: true
+```
 
 Please be aware that you have to **delete** the following properties:
 
-	camunda.bpm:
-	  admin-user:
-	    id: demo
-	    password: demo
+```yml
+camunda.bpm:
+	admin-user:
+	id: demo
+	password: demo
+```
 
 The Keycloak Identity Provider is a ReadOnly Identity Provider and thus not allowed to create users upon startup.
 

@@ -30,31 +30,33 @@ The dependencies are shaded into the ``keycloakjar`` package namespace.
 
 The last step is to edit the ``bpm-platform.xml`` file inside the folder ``$TOMCAT_HOME/conf`` and configure the plugin. A sample configuration looks as follows:
 
-	<?xml version="1.0" encoding="UTF-8"?>
-	<bpm-platform xmlns="http://www.camunda.org/schema/1.0/BpmPlatform"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.camunda.org/schema/1.0/BpmPlatform ">
-	...
-	  <process-engine name="default"> ...
-	    <properties>...</properties>
-	    <plugins>
-	      ...
-	      <plugin>
-	        <class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
-	        <properties>
-	          <property name="keycloakIssuerUrl">https://somehost:8443/auth/realms/camunda</property>
-	          <property name="keycloakAdminUrl">https://somehost:8443/auth/admin/realms/camunda</property>
-	          <property name="clientId">camunda-identity-service</property>
-	          <property name="clientSecret">42xx42xx-42xx-42xx-42xx-42xx42xx42xx</property>
-	          <property name="useUsernameAsCamundaUserId">true</property>
-	          <property name="useGroupPathAsCamundaGroupId">true</property>
-	          <property name="administratorGroupName">camunda-admin</property>
-	          <property name="disableSSLCertificateValidation">true</property>
-	        </properties>
-	      </plugin>
-	      ...
-	    </plugins>
-	  </process-engine>
-	</bpm-platform>
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<bpm-platform xmlns="http://www.camunda.org/schema/1.0/BpmPlatform"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.camunda.org/schema/1.0/BpmPlatform ">
+...
+	<process-engine name="default"> ...
+	<properties>...</properties>
+	<plugins>
+		...
+		<plugin>
+		<class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
+		<properties>
+			<property name="keycloakIssuerUrl">https://somehost:8443/auth/realms/camunda</property>
+			<property name="keycloakAdminUrl">https://somehost:8443/auth/admin/realms/camunda</property>
+			<property name="clientId">camunda-identity-service</property>
+			<property name="clientSecret">42xx42xx-42xx-42xx-42xx-42xx42xx42xx</property>
+			<property name="useUsernameAsCamundaUserId">true</property>
+			<property name="useGroupPathAsCamundaGroupId">true</property>
+			<property name="administratorGroupName">camunda-admin</property>
+			<property name="disableSSLCertificateValidation">true</property>
+		</properties>
+		</plugin>
+		...
+	</plugins>
+	</process-engine>
+</bpm-platform>
+```
 
 For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) itself.
