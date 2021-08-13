@@ -92,15 +92,17 @@ Known limitations:
 ## Usage with Camunda Spring Boot
 
 Maven Dependencies:
-
+```xml
     <dependency>
         <groupId>org.camunda.bpm.extension</groupId>
         <artifactId>camunda-bpm-identity-keycloak</artifactId>
         <version>2.2.0</version>
     </dependency>
+```
 
 Add the following class to your Camunda Spring Boot application in order to activate the Keycloak Identity Provider Plugin:
 
+```java
     package <your-package>;
     
     import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -111,30 +113,35 @@ Add the following class to your Camunda Spring Boot application in order to acti
     @ConfigurationProperties(prefix="plugin.identity.keycloak")
     public class KeycloakIdentityProvider extends KeycloakIdentityProviderPlugin {
     }
+```
 
 Configuration in `application.yaml` will then look as follows:
 
-	camunda.bpm:
-	  ...
-	  authorization:
-	    enabled: true
-	
-	plugin.identity.keycloak:
-	  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/<realm-name>
-	  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/<realm-name>
-	  clientId: camunda-identity-service
-	  clientSecret: 42aa42bb-1234-4242-a24a-42a2b420cde0
-	  useEmailAsCamundaUserId: true
-	  administratorGroupName: camunda-admin
+```yml
+camunda.bpm:
+  ...
+  authorization:
+    enabled: true
+
+plugin.identity.keycloak:
+  keycloakIssuerUrl: https://<your-keycloak-server>/auth/realms/<realm-name>
+  keycloakAdminUrl: https://<your-keycloak-server>/auth/admin/realms/<realm-name>
+  clientId: camunda-identity-service
+  clientSecret: 42aa42bb-1234-4242-a24a-42a2b420cde0
+  useEmailAsCamundaUserId: true
+  administratorGroupName: camunda-admin
+```
 
 Hint: the engine must **not** create a user upon startup - the plugin is a *ReadOnly*IdentityProvider. Hence you must **not** configure an `admin-user` for `camunda.bpm` in your `application.yaml`. The following configuration will likely cause errors upon startup: 
 
-	camunda.bpm:
-      # DON'T DO THIS
-	  admin-user:
-	    id: demo
-	    password: demo
-	    firstName: Camunda
+```yml
+camunda.bpm:
+# DON'T DO THIS
+  admin-user:
+    id: demo
+    password: demo
+    firstName: Camunda
+```
 
 The `admin-user` part must be deleted in order to work properly. The recommended procedure for creating the admin user and admin group in Keycloak is to have the deployment pipeline do this during the environment setup phase.
     
@@ -171,6 +178,7 @@ In this part, we’ll discuss how to activate SSO – Single Sign On – for the
 
 In order to setup Spring Boot's OAuth2 security add the following Maven dependencies to your project:
 
+```xml
 	<dependency>
 	  <groupId>org.springframework.boot</groupId>
 	  <artifactId>spring-boot-starter-security</artifactId>
@@ -179,9 +187,11 @@ In order to setup Spring Boot's OAuth2 security add the following Maven dependen
 	  <groupId>org.springframework.boot</groupId>
 	  <artifactId>spring-boot-starter-oauth2-client</artifactId>
 	</dependency>
+```
 
 What we need is a bridge between Spring Security and Camunda. Hence insert a KeycloakAuthenticationProvider as follows:
 
+```java
     /**
      * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
      */
@@ -216,9 +226,11 @@ What we need is a bridge between Spring Security and Camunda. Hence insert a Key
         }
 
     }
+```
 
 Last but not least add a security configuration and enable OAuth2 SSO:
 
+```java
     /**
     * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
     */
@@ -262,9 +274,11 @@ Last but not least add a security configuration and enable OAuth2 SSO:
             return new RequestContextListener();
         }
     }
+```
 
 Finally configure Spring Security with your Keycloak Single Page Web App `client-id` and `client-secret` in `application.yaml` as follows:
 
+```yml
     # Spring Boot Security OAuth2 SSO
     spring.security.oauth2:
       client:
@@ -288,6 +302,7 @@ Finally configure Spring Security with your Keycloak Single Page Web App `client
             # - email              -> useEmailAsCamundaUserId=true
             # - preferred_username -> useUsernameAsCamundaUserId=true
             user-name-attribute: email
+```
 
 **Beware**: You have to set the parameter ``user-name-attribute`` of the ``spring.security.oauth2.client.provider.keycloak`` in a way that it matches the configuration of your KeycloakIdentityProviderPlugin: 
 
@@ -323,6 +338,7 @@ A description on how to install the plugin on a JBoss/Wildfly can be found under
 
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
 
+```docker-compose
     version: "3.3"
     
     services:
@@ -336,6 +352,7 @@ In order to run the unit tests I have used a local docker setup of Keycloak with
           KEYCLOAK_PASSWORD: keycloak1!
         ports:
           - "8443:8443"
+```
 
 For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
 
