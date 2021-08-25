@@ -447,8 +447,12 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 */
 	static String createUser(HttpHeaders headers, String realm, String userName, String firstName, String lastName, String email, String password) throws JSONException {
 		// create user
-	    String userData = "{\"id\":null,\"username\":\""+ userName + "\",\"enabled\":true,\"totp\":false,\"emailVerified\":false,\"firstName\":\"" + firstName + "\",\"lastName\":\"" + lastName + "\",\"email\":\"" + email + "\",\"disableableCredentialTypes\":[\"password\"],\"requiredActions\":[],\"federatedIdentities\":[],\"notBefore\":0,\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}";
-	    HttpEntity<String> request = new HttpEntity<>(userData, headers);
+		StringBuffer userData = new StringBuffer( "{\"id\":null,\"username\":\""+ userName + "\",\"enabled\":true,\"totp\":false,\"emailVerified\":false,");
+		if (firstName != null) userData.append("\"firstName\":\"" + firstName + "\",");
+		if (lastName != null) userData.append("\"lastName\":\"" + lastName + "\",");
+		if (email != null) userData.append("\"email\":\"" + email + "\",");
+		userData.append("\"disableableCredentialTypes\":[\"password\"],\"requiredActions\":[],\"federatedIdentities\":[],\"notBefore\":0,\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}");
+	    HttpEntity<String> request = new HttpEntity<>(userData.toString(), headers);
 	    ResponseEntity<String> response = restTemplate.postForEntity(KEYCLOAK_URL + "/admin/realms/" + realm + "/users", request, String.class);
 	    assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
 	    // get the user ID

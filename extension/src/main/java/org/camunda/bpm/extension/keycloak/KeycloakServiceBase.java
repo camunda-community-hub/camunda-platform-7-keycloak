@@ -165,7 +165,7 @@ public abstract class KeycloakServiceBase {
 	 */
 	protected boolean matches(Object[] queryParameter, Object attribute) {
 		return queryParameter == null || queryParameter.length == 0 ||
-				Arrays.asList(queryParameter).contains(attribute);
+				(attribute != null && Arrays.asList(queryParameter).contains(attribute));
 	}
 
 	/**
@@ -175,7 +175,12 @@ public abstract class KeycloakServiceBase {
 	 * @return {@code true} if the query parameter is not set at all or if the attribute is like the query parameters.
 	 */
 	protected boolean matchesLike(String queryParameter, String attribute) {
-		return queryParameter == null || attribute.matches(queryParameter.replaceAll("[%\\*]", ".*"));
+		if (queryParameter == null) {
+			return true;
+		} else if (attribute == null) {
+			return queryParameter.replaceAll("[%\\*]", "").length() == 0;
+		}
+		return attribute.matches(queryParameter.replaceAll("[%\\*]", ".*"));
 	}
 	
 	/**

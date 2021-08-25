@@ -1,5 +1,6 @@
 package org.camunda.bpm.extension.keycloak.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -7,6 +8,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.springframework.http.HttpHeaders;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -18,11 +20,19 @@ import junit.framework.TestSuite;
  */
 public class KeycloakUseUsernameAsUserIdQueryTest extends AbstractKeycloakIdentityProviderTest {
 
+	static List<String> USER_IDS = new ArrayList<String>();
+
 	public static Test suite() {
 	    return new TestSetup(new TestSuite(KeycloakUseUsernameAsUserIdQueryTest.class)) {
 
 	    	// @BeforeClass
 	        protected void setUp() throws Exception {
+	    		// setup Keycloak special test users
+	        	// -------------------------------------
+	    		HttpHeaders headers = authenticateKeycloakAdmin();
+	    		String realm = "test";
+	    		USER_IDS.add(createUser(headers, realm, "hans.wurst", null, null, null, null));
+
 	    		ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
 	    				.createProcessEngineConfigurationFromResource("camunda.useUsernameAsCamundaUserId.cfg.xml");
 	    		configureKeycloakIdentityProviderPlugin(config);
@@ -33,6 +43,11 @@ public class KeycloakUseUsernameAsUserIdQueryTest extends AbstractKeycloakIdenti
 	        protected void tearDown() throws Exception {
 	    		PluggableProcessEngineTestCase.cachedProcessEngine.close();
 	    		PluggableProcessEngineTestCase.cachedProcessEngine = null;
+
+	    		// delete special test users
+	    		HttpHeaders headers = authenticateKeycloakAdmin();
+	    		String realm = "test";
+	    		USER_IDS.forEach(u -> deleteUser(headers, realm, u));
 	        }
 	    };
 	}
@@ -87,6 +102,22 @@ public class KeycloakUseUsernameAsUserIdQueryTest extends AbstractKeycloakIdenti
 		assertEquals("camunda@accso.de", user.getEmail());
 
 		user = identityService.createUserQuery().userEmail("non-exist*").singleResult();
+		assertNull(user);
+	}
+	
+	public void testUserQueryFilterByNonExistingAttributeLike() {
+		// hans.wurst has no other attributes than his username set
+		User user = identityService.createUserQuery().userId("hans.wurst").userEmailLike("*").singleResult();
+		assertNotNull(user);
+		user = identityService.createUserQuery().userId("hans.wurst").userEmailLike("camunda*").singleResult();
+		assertNull(user);
+		user = identityService.createUserQuery().userId("hans.wurst").userFirstNameLike("*").singleResult();
+		assertNotNull(user);
+		user = identityService.createUserQuery().userId("hans.wurst").userFirstNameLike("camunda*").singleResult();
+		assertNull(user);
+		user = identityService.createUserQuery().userId("hans.wurst").userLastNameLike("*").singleResult();
+		assertNotNull(user);
+		user = identityService.createUserQuery().userId("hans.wurst").userLastNameLike("camunda*").singleResult();
 		assertNull(user);
 	}
 
