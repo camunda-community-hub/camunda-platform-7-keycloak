@@ -174,6 +174,8 @@ public class KeycloakUserService extends KeycloakServiceBase {
 
 			if (StringUtils.hasLength(query.getId())) {
 				response = requestUserById(query.getId());
+			} else if (query.getIds() != null && query.getIds().length == 1) {
+				response = requestUserById(query.getIds()[0]);
 			} else {
 				// Create user search filter
 				String userFilter = createUserSearchFilter(query);
