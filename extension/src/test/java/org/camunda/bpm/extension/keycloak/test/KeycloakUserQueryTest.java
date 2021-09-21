@@ -63,6 +63,10 @@ public class KeycloakUserQueryTest extends AbstractKeycloakIdentityProviderTest 
     users = identityService.createUserQuery().userIdIn("camunda@accso.de", "non-existing").list();
     assertNotNull(users);
     assertEquals(1, users.size());
+
+    users = identityService.createUserQuery().userIdIn("camunda@accso.de").list();
+    assertNotNull(users);
+    assertEquals(1, users.size());
   }
   
   public void testFilterByFirstname() {
