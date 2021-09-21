@@ -164,6 +164,8 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 
 			if (StringUtils.hasLength(query.getId())) {
 				response = requestGroupById(query.getId());
+			} else if (query.getIds() != null && query.getIds().length == 1) {
+				response = requestGroupById(query.getIds()[0]);
 			} else {
 				String groupFilter = createGroupSearchFilter(query); // only pre-filter of names possible
 				response = restTemplate.exchange(keycloakConfiguration.getKeycloakAdminUrl() + "/groups" + groupFilter, HttpMethod.GET, String.class);

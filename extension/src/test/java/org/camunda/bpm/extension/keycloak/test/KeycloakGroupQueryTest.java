@@ -106,6 +106,15 @@ public class KeycloakGroupQueryTest extends AbstractKeycloakIdentityProviderTest
 				fail();
 			}
 		}
+		
+		groups = identityService.createGroupQuery().groupIdIn(GROUP_ID_MANAGER,  "non-existent").list();
+		assertEquals(1, groups.size());
+		assertEquals("manager", groups.get(0).getName());
+
+		groups = identityService.createGroupQuery().groupIdIn(GROUP_ID_MANAGER).list();
+		assertEquals(1, groups.size());
+		assertEquals("manager", groups.get(0).getName());
+	
 	}
 
 	public void testFilterByGroupIdInAndType() {
