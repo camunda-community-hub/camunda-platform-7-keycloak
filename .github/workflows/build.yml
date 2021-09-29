@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     services:
       keycloak:
-        image: jboss/keycloak:14.0.0
+        image: jboss/keycloak:15.0.2
         env:
           KEYCLOAK_USER: keycloak
           KEYCLOAK_PASSWORD: keycloak1!
