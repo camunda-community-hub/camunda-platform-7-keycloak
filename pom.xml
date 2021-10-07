@@ -25,10 +25,10 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.15.0</version.camunda>
-    <!-- <version.camunda>7.15.0-ee</version.camunda> -->
-	<version.springBoot>2.4.4</version.springBoot>
-	<version.bpm.assert>10.0.0</version.bpm.assert>
+	<version.camunda>7.16.0</version.camunda>
+    <!-- <version.camunda>7.16.0-ee</version.camunda> -->
+	<version.springBoot>2.5.5</version.springBoot>
+	<version.bpm.assert>13.0.0</version.bpm.assert>
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -98,7 +98,13 @@
   </dependencyManagement>
 
   <repositories>
-    <!-- Camunda EE Repository
+    <!-- Camunda Repository -->
+    <repository>
+        <id>camunda-bpm</id>
+        <name>Camunda Enterprise Maven Repository</name>
+        <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm</url>
+    </repository>
+    <!-- Camunda EE Repository 
     <repository>
         <id>camunda-bpm-ee</id>
         <name>Camunda Enterprise Maven Repository</name>
