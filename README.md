@@ -23,6 +23,10 @@ Tested with: Keycloak >= `5.0.0`, Camunda >= `7.10.0`, `7.10.0-ee`
 
 #### Features
 
+New in Version `2.2.3`:
+
+* Optional Keycloak Login Cache - helps you to minimize password check requests to Keycloak and thus improve performance. Not applicable in SSO scenarios, but useful e.g. when using External Task Clients with Basic Auth.
+
 New in Version `2.2.2`:
 
 * Optimized user / group queries when using single items in `userIdIn(...)` / `groupIdIn(...)` selections
@@ -176,7 +180,7 @@ A complete list of configuration options can be found below:
 | `cacheEnabled` | Enable caching of queries to Keycloak to improve performance. Default: `false`.<br />*Since 2.2.0* |
 | `maxCacheSize` | Maximum size of the cache. Least used entries are evicted when this limit is reached. Default: `500`.<br />*Since 2.2.0* |
 | `cacheExpirationTimeoutMin` | Time (in minutes) after which a cached entry is evicted. Default: `15 minutes`.<br />*Since 2.2.0* |
-| `loginCacheEnabled` | Enable login caching of check password requests to Keycloak to improve performance. Not applicable in case of SSO logins, but useful e.g. in case of massive External Tasks clients using HTTP Basic Auth only. Default: `false` <br />*Since 2.2.3* |
+| `loginCacheEnabled` | Enable login caching of check password requests to Keycloak to improve performance. Not applicable in case of SSO logins, but useful e.g. in case of External Tasks clients using HTTP Basic Auth only. Default: `false` <br />*Since 2.2.3* |
 | `loginCacheSize` | Maximum size of the login cache. Least used entries are evicted when this limit is reached. Default: `50`.<br />*Since 2.2.3* |
 | `loginCacheExpirationTimeoutMin` | Time (in minutes) after which a login cache entry is evicted. Default: `15 minutes`.<br />*Since 2.2.3* |
 <!--
