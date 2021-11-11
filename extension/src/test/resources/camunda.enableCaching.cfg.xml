@@ -30,7 +30,7 @@
     
   </bean>
 
-  <bean id="keycloakIdentityProviderPlugin" class="org.camunda.bpm.extension.keycloak.test.CacheAwareKeycloakIdentityProviderPluginForTest">
+  <bean id="keycloakIdentityProviderPlugin" class="org.camunda.bpm.extension.keycloak.test.util.CacheAwareKeycloakIdentityProviderPluginForTest">
   
     <property name="keycloakIssuerUrl" value="https://localhost:9001/auth/realms/test" />
     <property name="keycloakAdminUrl" value="https://localhost:9001/auth/admin/realms/test" />
@@ -43,7 +43,7 @@
     <property name="cacheEnabled" value="true" />
     <property name="customHttpRequestInterceptors"  >
       <list>
-        <bean class="org.camunda.bpm.extension.keycloak.test.CountingHttpRequestInterceptor"/>
+        <bean class="org.camunda.bpm.extension.keycloak.test.util.CountingHttpRequestInterceptor"/>
       </list>
     </property>
     

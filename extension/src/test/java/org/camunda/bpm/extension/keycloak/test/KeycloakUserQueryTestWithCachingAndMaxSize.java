@@ -10,6 +10,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.extension.keycloak.CacheableKeycloakUserQuery;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+import org.camunda.bpm.extension.keycloak.test.util.CacheAwareKeycloakIdentityProviderPluginForTest;
+import org.camunda.bpm.extension.keycloak.test.util.CountingHttpRequestInterceptor;
+import org.camunda.bpm.extension.keycloak.test.util.PredictableTicker;
 
 import java.util.Arrays;
 import java.util.Collections;

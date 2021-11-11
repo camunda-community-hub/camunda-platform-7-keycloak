@@ -1,4 +1,4 @@
-package org.camunda.bpm.extension.keycloak.test;
+package org.camunda.bpm.extension.keycloak.test.util;
 
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;

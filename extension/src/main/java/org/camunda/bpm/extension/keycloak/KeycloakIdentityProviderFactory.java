@@ -49,6 +49,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 
 	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
 	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
+	protected QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache;
 
 	protected KeycloakRestTemplate restTemplate = new KeycloakRestTemplate();
 
@@ -63,9 +64,11 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 		this.keycloakConfiguration = keycloakConfiguration;
 
 		CacheConfiguration cacheConfiguration = CacheConfiguration.from(keycloakConfiguration);
+		CacheConfiguration loginCacheConfiguration = CacheConfiguration.fromLoginConfigOf(keycloakConfiguration);
 
 		this.setUserQueryCache(CacheFactory.create(cacheConfiguration));
 		this.setGroupQueryCache(CacheFactory.create(cacheConfiguration));
+		this.setCheckPasswordCache(CacheFactory.create(loginCacheConfiguration));
 
 		// Create REST template with pooling HTTP client
 		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -151,11 +154,19 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	}
 
 	/**
+	 * @param checkPasswordCache set the cache for check password function
+	 */
+	public void setCheckPasswordCache(QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache) {
+		this.checkPasswordCache = checkPasswordCache;
+	}
+	
+	/**
 	 * immediately clear entries from cache
 	 */
 	public void clearCache() {
 		this.userQueryCache.clear();
 		this.groupQueryCache.clear();
+		this.checkPasswordCache.clear();
 	}
 
 	/**
@@ -164,7 +175,7 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 	@Override
 	public Session openSession() {
 		return new KeycloakIdentityProviderSession(
-						keycloakConfiguration, restTemplate, keycloakContextProvider, userQueryCache, groupQueryCache);
+						keycloakConfiguration, restTemplate, keycloakContextProvider, userQueryCache, groupQueryCache, checkPasswordCache);
 	}
 
 }

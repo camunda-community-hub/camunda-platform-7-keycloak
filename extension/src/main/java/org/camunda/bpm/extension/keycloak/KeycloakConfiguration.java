@@ -86,8 +86,24 @@ public class KeycloakConfiguration {
 	 */
 	private int maxCacheSize = 500;
 
-	/** Time after which a cached entry is evicted. default: 15 minutes	 */
+	/** Time after which a cached entry is evicted. default: 15 minutes */
 	private int cacheExpirationTimeoutMin = 15;
+	
+	/** 
+	 * Determines if login password checks to Keycloak are cached. default: false.
+	 * Not applicable in case of SSO logins, but useful e.g. in case of massive 
+	 * External Tasks clients using HTTP Basic Auth only.
+	 */
+	private boolean loginCacheEnabled = false;
+
+	/**
+	 * Maximum size of the login cache. Least used entries are evicted when this limit is reached. 
+	 * Default: 50.
+	 */
+	private int loginCacheSize = 50;
+
+	/** Time after which a cached login entry is evicted. default: 15 minutes */
+	private int loginCacheExpirationTimeoutMin = 15;
 	
 	//-------------------------------------------------------------------------
 	// Getters / Setters
@@ -353,6 +369,48 @@ public class KeycloakConfiguration {
 	 */
 	public void setCacheExpirationTimeoutMin(int cacheExpirationTimeoutMin) {
 		this.cacheExpirationTimeoutMin = cacheExpirationTimeoutMin;
+	}
+
+	/**
+	 * @return the loginCacheEnabled
+	 */
+	public boolean isLoginCacheEnabled() {
+		return loginCacheEnabled;
+	}
+
+	/**
+	 * @param loginCacheEnabled the loginCacheEnabled to set
+	 */
+	public void setLoginCacheEnabled(boolean loginCacheEnabled) {
+		this.loginCacheEnabled = loginCacheEnabled;
+	}
+
+	/**
+	 * @return the loginCacheSize
+	 */
+	public int getLoginCacheSize() {
+		return loginCacheSize;
+	}
+
+	/**
+	 * @param loginCacheSize the loginCacheSize to set
+	 */
+	public void setLoginCacheSize(int loginCacheSize) {
+		this.loginCacheSize = loginCacheSize;
+	}
+
+	/**
+	 * @return the loginCacheExpirationTimeoutMin
+	 */
+	public int getLoginCacheExpirationTimeoutMin() {
+		return loginCacheExpirationTimeoutMin;
+	}
+
+	/**
+	 * @param loginCacheExpirationTimeoutMin the loginCacheExpirationTimeoutMin to set
+	 */
+	public void setLoginCacheExpirationTimeoutMin(int loginCacheExpirationTimeoutMin) {
+		this.loginCacheExpirationTimeoutMin = loginCacheExpirationTimeoutMin;
 	}
 
 	//-------------------------------------------------------------------------

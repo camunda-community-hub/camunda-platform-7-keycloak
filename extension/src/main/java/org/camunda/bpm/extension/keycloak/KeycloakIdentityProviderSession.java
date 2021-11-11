@@ -48,6 +48,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
 	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
+	protected QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache;
 
 	/**
 	 * Creates a new session.
@@ -57,7 +58,8 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 */
 	public KeycloakIdentityProviderSession(
 					KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider,
-					QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache, QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache) {
+					QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache, QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache,
+					QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
 		this.keycloakContextProvider = keycloakContextProvider;
@@ -67,6 +69,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 		this.userQueryCache = userQueryCache;
 		this.groupQueryCache = groupQueryCache;
+		this.checkPasswordCache = checkPasswordCache;
 	}
 	
 	@Override
@@ -189,6 +192,17 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 */
 	@Override
 	public boolean checkPassword(String userId, String password) {
+		return checkPasswordCache.getOrCompute(new CacheableKeycloakCheckPasswordCall(userId, password), 
+				(c) -> this.doCheckPassword(c.getUserId(), password));
+	}
+
+	/**
+	 * Checks the password of a user without using the cache.
+	 * @param userId the user ID
+	 * @param password the password
+	 * @return {@code true}, if user is allowed to login
+	 */
+	private boolean doCheckPassword(String userId, String password) {
 
 		// engine can't work without users
 		if (!StringUtils.hasLength(userId)) {

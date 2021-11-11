@@ -1,8 +1,9 @@
-package org.camunda.bpm.extension.keycloak.test;
+package org.camunda.bpm.extension.keycloak.test.util;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.extension.keycloak.CacheableKeycloakCheckPasswordCall;
 import org.camunda.bpm.extension.keycloak.CacheableKeycloakGroupQuery;
 import org.camunda.bpm.extension.keycloak.CacheableKeycloakUserQuery;
 import org.camunda.bpm.extension.keycloak.KeycloakIdentityProviderFactory;
@@ -16,6 +17,7 @@ public class CacheAwareKeycloakIdentityProviderPluginForTest extends KeycloakIde
 
 	public static CaffeineCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
 	public static CaffeineCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
+	public static CaffeineCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache;
 
 	@Override
 	public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -25,12 +27,15 @@ public class CacheAwareKeycloakIdentityProviderPluginForTest extends KeycloakIde
 
 		PredictableTicker ticker = new PredictableTicker();
 		CacheConfiguration cacheConfiguration = CacheConfiguration.from(this);
+		CacheConfiguration loginCacheConfiguration = CacheConfiguration.fromLoginConfigOf(this);
 
 		// instantiate with ticker that can be controlled in tests
 		userQueryCache = new CaffeineCache<>(cacheConfiguration, ticker);
 		groupQueryCache = new CaffeineCache<>(cacheConfiguration, ticker);
+		checkPasswordCache = new CaffeineCache<>(loginCacheConfiguration, ticker);
 
 		factory.setUserQueryCache(userQueryCache);
 		factory.setGroupQueryCache(groupQueryCache);
+		factory.setCheckPasswordCache(checkPasswordCache);
 	}
 }

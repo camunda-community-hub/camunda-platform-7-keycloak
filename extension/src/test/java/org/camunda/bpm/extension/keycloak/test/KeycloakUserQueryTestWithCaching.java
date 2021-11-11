@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
+import org.camunda.bpm.extension.keycloak.test.util.CountingHttpRequestInterceptor;
 
 import java.util.List;
 
