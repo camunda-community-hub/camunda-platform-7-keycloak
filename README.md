@@ -177,10 +177,10 @@ A complete list of configuration options can be found below:
 | `proxyUri` | Optional URI of a proxy to use. Default: `null`, example: `http://proxy:81`.<br />*Since 2.0.0* |
 | `proxyUser` | Optional username for proxy authentication. Default: `null`.<br />*Since 2.0.0* |
 | `proxyPassword` | Optional password for proxy authentication. Default: `null`.<br />*Since 2.0.0* |
-| `cacheEnabled` | Enable caching of queries to Keycloak to improve performance. Default: `false`.<br />*Since 2.2.0* |
+| `cacheEnabled` | Enable caching of user and group queries to Keycloak to improve performance. Default: `false`.<br />*Since 2.2.0* |
 | `maxCacheSize` | Maximum size of the cache. Least used entries are evicted when this limit is reached. Default: `500`.<br />*Since 2.2.0* |
 | `cacheExpirationTimeoutMin` | Time (in minutes) after which a cached entry is evicted. Default: `15 minutes`.<br />*Since 2.2.0* |
-| `loginCacheEnabled` | Enable login caching of check password requests to Keycloak to improve performance. Not applicable in case of SSO logins, but useful e.g. in case of External Tasks clients using HTTP Basic Auth only. Default: `false` <br />*Since 2.2.3* |
+| `loginCacheEnabled` | Enable caching of login / check password requests to Keycloak to improve performance. Not applicable in case of SSO scenarios, but useful e.g. in case of External Tasks clients using HTTP Basic Auth only. Default: `false` <br />*Since 2.2.3* |
 | `loginCacheSize` | Maximum size of the login cache. Least used entries are evicted when this limit is reached. Default: `50`.<br />*Since 2.2.3* |
 | `loginCacheExpirationTimeoutMin` | Time (in minutes) after which a login cache entry is evicted. Default: `15 minutes`.<br />*Since 2.2.3* |
 <!--
