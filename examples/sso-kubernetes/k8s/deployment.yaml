@@ -39,7 +39,7 @@ spec:
            - name: KEYCLOAK_CLIENT_ID
              value: camunda-identity-service
            - name: KEYCLOAK_CLIENT_SECRET
-             value: 7979d2a6-eacc-43b1-afe0-54cea181fadc
+             value: cbee1434-7e4d-4d85-bab6-5944b427a3c0
            livenessProbe:
              httpGet:
                path: /camunda/actuator/health/liveness
@@ -62,6 +62,6 @@ spec:
            image: busybox:1.28
            command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
          hostAliases:
-         - ip: 172.23.112.1
+         - ip: 172.22.48.1
            hostnames:
            - armstrong02

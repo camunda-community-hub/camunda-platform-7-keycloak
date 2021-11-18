@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-server
-           image: gunnaraccso/keycloak.server:10.0.1 # jboss.keycloak
+           image: gunnaraccso/keycloak.server:14.0.0 # jboss.keycloak
            ports:
            - containerPort: 8080
              name: http
