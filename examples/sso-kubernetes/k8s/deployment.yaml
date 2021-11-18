@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-showcase
-           image: gunnaraccso/camunda-showcase-keycloak:2.2.2
+           image: gunnaraccso/camunda-showcase-keycloak:2.2.3
            ports:
            - containerPort: 8080
            env:
@@ -62,6 +62,6 @@ spec:
            image: busybox:1.28
            command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
          hostAliases:
-         - ip: 172.29.80.1
+         - ip: 172.23.112.1
            hostnames:
            - armstrong02
