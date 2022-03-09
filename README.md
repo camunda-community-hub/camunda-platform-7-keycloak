@@ -199,7 +199,7 @@ Besides caching of user and group queries there is another scenario where cachin
 
 ### Login caching
 
-Imagine a setup with lots of External Task Clients using HTTP Basic Auth against the Camunda REST API (e.g. set `camunda.bpm.run.auth.enabled: true` when using Camunda Run). Your External Task Clients then might trigger the IdentityProvider's `checkPassword` function at high frequency. This functions requests a token from Keycloak each time, it is called. In case of a successful response the login is treated as valid. High frequency then means requesting lot's of tokens - in the worst case all for the same user and before an already delivered token has timed out. Therefore this plugin provides an optional login cache feature as well.
+Imagine a setup with lots of External Task Clients using HTTP Basic Auth against the Camunda REST API (e.g. set `camunda.bpm.run.auth.enabled: true` when using Camunda Run). Your External Task Clients then might trigger the IdentityProvider's `checkPassword` function at high frequency. This function requests a token from Keycloak each time it is called. In case of a successful response the login is treated as valid. High frequency then means requesting lots of tokens - in the worst case all for the same user and before an already delivered token has timed out. Therefore this plugin provides an optional login cache feature as well.
 
 In order to activate the login cache you have the following options available:
 
