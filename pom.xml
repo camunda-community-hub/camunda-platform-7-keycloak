@@ -53,12 +53,12 @@
     <repository>
       <id>camunda-nexus</id>
       <name>camunda bpm community extensions</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions</url>
+      <url>https://artifacts.camunda.com/artifactory/camunda-bpm-community-extensions/</url>
     </repository>
     <snapshotRepository>
       <id>camunda-nexus</id>
       <name>camunda bpm community extensions snapshots</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions-snapshots</url>
+      <url>https://artifacts.camunda.com/artifactory/camunda-bpm-community-extensions-snapshots/</url>
       <!-- for maven 2 compatibility -->
       <uniqueVersion>true</uniqueVersion>
     </snapshotRepository>
@@ -102,13 +102,13 @@
     <repository>
         <id>camunda-bpm</id>
         <name>Camunda Enterprise Maven Repository</name>
-        <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm</url>
+        <url>https://artifacts.camunda.com/artifactory/camunda-bpm/</url>
     </repository>
     <!-- Camunda EE Repository 
     <repository>
         <id>camunda-bpm-ee</id>
         <name>Camunda Enterprise Maven Repository</name>
-        <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
+        <url>https://artifacts.camunda.com/artifactory/camunda-bpm-ee/</url>
     </repository>
     -->
   </repositories>
