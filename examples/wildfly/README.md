@@ -7,13 +7,13 @@ For information on how to install Camunda on JBoss/Wildfly carefully read and fo
 
 ## Install the Keycloak Identity Provider Plugin
 
-In order to install the Keycloak Identity Provider Plugin you have to download the library ``camunda-bpm-identity-keycloak-all-x.y.z.jar`` (can be found e.g. on [Maven Central](https://search.maven.org/search?q=g:org.camunda.bpm.extension%20AND%20a:camunda-bpm-identity-keycloak-all)) and create a module containing it.
+In order to install the Keycloak Identity Provider Plugin you have to download the library ``camunda-platform-7-keycloak-all-x.y.z.jar`` (can be found e.g. on [Maven Central](https://search.maven.org/search?q=g:org.camunda.bpm.extension%20AND%20a:camunda-platform-7-keycloak-all)) and create a module containing it.
 To do so, create a directory ``modules/org/camunda/bpm/identity/camunda-identity-keycloak/main`` in your JBoss/Wildfly installation and put the library inside. In the same directory, create a descriptor file named ``module.xml`` with the following content:
 
 ```xml
 <module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.identity.camunda-identity-keycloak">
     <resources>
-        <resource-root path="camunda-bpm-identity-keycloak-all-x.y.z.jar" />
+        <resource-root path="camunda-platform-7-keycloak-all-x.y.z.jar" />
     </resources>
 
     <dependencies>
@@ -91,4 +91,4 @@ The last step is to edit the ``standalone.xml`` configuration file in ``standalo
         </process-engines>
 ```
 
-For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) itself.
+For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) itself.
