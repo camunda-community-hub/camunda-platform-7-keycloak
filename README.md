@@ -20,7 +20,7 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
 Current version: `7.17.0`<br >
-Latest tests with: Keycloak `18.0.0`, Camunda `7.17.0`, `7.17.0-ee`
+Latest tests with: Keycloak `16.1.1`, Camunda `7.17.0`, `7.17.0-ee`
 
 #### Features
 
