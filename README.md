@@ -115,7 +115,7 @@ Maven Dependencies:
 <dependency>
     <groupId>org.camunda.bpm.extension</groupId>
     <artifactId>camunda-platform-7-keycloak</artifactId>
-    <version>2.2.3</version>
+    <version>7.17.0</version>
 </dependency>
 ```
 
