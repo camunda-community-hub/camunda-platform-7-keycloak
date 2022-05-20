@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-20.04
     services:
       keycloak:
-        image: jboss/keycloak:16.1.1
+        image: quay.io/keycloak/keycloak:18.0.0
         env:
           KEYCLOAK_USER: keycloak
           KEYCLOAK_PASSWORD: keycloak1!
           DB_VENDOR: h2
         ports: [ 8443/tcp ]
-        options: --health-cmd "curl -Iks https://localhost:8443" --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd "curl -Iks https://localhost:8443" --health-interval 10s --health-timeout 5s --health-retries 10
     steps:
     - name: Checkout
       uses: actions/checkout@f1d3225b5376a0791fdee5a0e8eac5289355e43a # pin@v2
