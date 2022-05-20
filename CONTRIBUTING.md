@@ -10,15 +10,15 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Issues and PRs
 
-If you have suggestions for how this project could be improved, or want to report a bug, open an issue! We'd love all and any contributions. If you have questions, too, we'd love to hear them. You can file issues here: [File issues](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak/issues)
+If you have suggestions for how this project could be improved, or want to report a bug, open an issue! We'd love all and any contributions. If you have questions, too, we'd love to hear them. You can file issues here: [File issues](https://github.com/camunda-community-hub/camunda-platform-7-keycloak/issues)
 
 We'd also love PRs. If you're thinking of a large PR, we advise opening up an issue first to talk about it, though! Look at the links below if you're not sure how to open a PR.
 
 ### Submitting a pull request
 
 1. [Fork][fork] and clone the repository.
-1. Carefully study the [README.md](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak#readme)
-1. Setup a local Keycloak Server for your unit tests - see README.md -> [Unit testing the plugin](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak#unit-testing-the-plugin)
+1. Carefully study the [README.md](https://github.com/camunda-community-hub/camunda-platform-7-keycloak#readme)
+1. Setup a local Keycloak Server for your unit tests - see README.md -> [Unit testing the plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak#unit-testing-the-plugin)
 1. Run maven: `mvn clean install`.
 1. Make sure the unit tests have passed on your machine.
 1. Create a new branch: `git checkout -b my-branch-name`.
