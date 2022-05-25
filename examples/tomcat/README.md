@@ -59,4 +59,4 @@ xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.cam
 </bpm-platform>
 ```
 
-For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) itself.
+For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) itself.

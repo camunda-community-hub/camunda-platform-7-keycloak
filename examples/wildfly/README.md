@@ -91,4 +91,4 @@ The last step is to edit the ``standalone.xml`` configuration file in ``standalo
         </process-engines>
 ```
 
-For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) itself.
+For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) itself.

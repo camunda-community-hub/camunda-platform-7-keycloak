@@ -2,7 +2,7 @@
 
 ## What it does
 
-This is a basic showcase for a Camunda Platform 7 Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) in combination with the OAuth 2.0 Client and Resource Server implementation of Spring Security.
+This is a basic showcase for a Camunda Platform 7 Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) in combination with the OAuth 2.0 Client and Resource Server implementation of Spring Security.
 
 You will not only login using Keycloak (or if configured using your preferred social identity provider)
 
@@ -80,7 +80,7 @@ The only thing you have to adapt for local tests is the **Redirect URI** of the 
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
-For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
+For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
 
 ### Keycloak Identity Provider Plugin
 
@@ -111,7 +111,7 @@ plugin.identity.keycloak:
   disableSSLCertificateValidation: true
 ```
 
-For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) 
+For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) 
 
 ### OAuth2 SSO Configuration
 

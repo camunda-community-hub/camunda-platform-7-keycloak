@@ -48,7 +48,7 @@ camunda.bpm:
 
 The Keycloak Identity Provider is a ReadOnly Identity Provider and thus not allowed to create users upon startup.
 
-For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) itself.
+For a full documentation of all configuration properties see the documentation of the [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) itself.
 
 ## Docker Sample Setup
 
