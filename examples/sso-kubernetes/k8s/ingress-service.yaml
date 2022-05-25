@@ -30,4 +30,4 @@ spec:
               name: keycloak-server-service
               port:
                 number: 8080
-            
+  ingressClassName: nginx

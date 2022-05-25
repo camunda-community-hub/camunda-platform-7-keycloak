@@ -61,7 +61,3 @@ spec:
          - name: init-postgres
            image: busybox:1.28
            command: ['sh', '-c', "until nc -z -w 2 postgres-service:5432; do echo waiting for postgres; sleep 5; done"]
-         hostAliases:
-         - ip: 172.18.48.1
-           hostnames:
-           - armstrong02

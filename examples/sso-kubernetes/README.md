@@ -364,8 +364,8 @@ In order to make the Camunda Showcase work the following points are noteworthy:
 
 You should work through the following points:
 * Within the ``deployment.yaml`` of the showcase adapt the image name to your own needs.
-* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_AUTH`` to your own host
-* Within the ``deployment.yaml`` of the showcase adapt ``ip`` and ``hostnames`` settings of ``hostAliases`` to your own host.
+* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_AUTH`` to your own host.
+* Within the ``localhost/endpoint.yaml`` of the showcase the IP address is the one of ``host.docker.internal``. The showcase use the endpoint configuration to access the host from the inside of pod. Adapt the name including the service-name (do not forget ``localhost\service.yaml``) to your own host.
 * Within the ``ingress-service.yaml`` adapt the host name to your own environment.
 
 ### SSL
