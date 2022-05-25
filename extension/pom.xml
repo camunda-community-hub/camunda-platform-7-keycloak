@@ -3,15 +3,15 @@
 
 	<parent>
 	  <groupId>org.camunda.bpm.extension</groupId>
-	  <artifactId>camunda-bpm-identity-keycloak-root</artifactId>
-	  <version>2.2.4-SNAPSHOT</version>
+	  <artifactId>camunda-platform-7-keycloak-root</artifactId>
+	  <version>7.17.0-SNAPSHOT</version>
 	</parent>
 
-    <artifactId>camunda-bpm-identity-keycloak</artifactId>
+    <artifactId>camunda-platform-7-keycloak</artifactId>
 
 	<packaging>jar</packaging>
-    <name>camunda BPM - engine plugins - identity - keycloak - extension</name>
-	<description>A Camunda Identity Provider Plugin for Keycloak</description>
+    <name>Camunda Platform 7 - engine plugins - identity - keycloak - extension</name>
+	<description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
 
 	<properties>
 		<maven.compiler.source>${version.java}</maven.compiler.source>

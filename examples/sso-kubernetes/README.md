@@ -1,8 +1,8 @@
-# Camunda Showcase for Spring Boot & Keycloak Identity Provider
+# Camunda Platform 7 - Showcase for Spring Boot & Keycloak Identity Provider
 
 ## What it does
 
-This is a basic showcase for a Camunda Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) in combination with the OAuth 2.0 Client and Resource Server implementation of Spring Security 5.2.x.
+This is a basic showcase for a Camunda Platform 7 Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) in combination with the OAuth 2.0 Client and Resource Server implementation of Spring Security.
 
 You will not only login using Keycloak (or if configured using your preferred social identity provider)
 
@@ -80,7 +80,7 @@ The only thing you have to adapt for local tests is the **Redirect URI** of the 
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
-For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
+For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
 
 ### Keycloak Identity Provider Plugin
 
@@ -111,7 +111,7 @@ plugin.identity.keycloak:
   disableSSLCertificateValidation: true
 ```
 
-For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-bpm-identity-keycloak) 
+For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda/camunda-platform-7-keycloak) 
 
 ### OAuth2 SSO Configuration
 
@@ -364,8 +364,8 @@ In order to make the Camunda Showcase work the following points are noteworthy:
 
 You should work through the following points:
 * Within the ``deployment.yaml`` of the showcase adapt the image name to your own needs.
-* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_AUTH`` to your own host
-* Within the ``deployment.yaml`` of the showcase adapt ``ip`` and ``hostnames`` settings of ``hostAliases`` to your own host.
+* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_AUTH`` to your own host.
+* Within the ``localhost/endpoint.yaml`` of the showcase the IP address is the one of ``host.docker.internal``. The showcase use the endpoint configuration to access the host from the inside of pod. Adapt the name including the service-name (do not forget ``localhost\service.yaml``) to your own host.
 * Within the ``ingress-service.yaml`` adapt the host name to your own environment.
 
 ### SSL

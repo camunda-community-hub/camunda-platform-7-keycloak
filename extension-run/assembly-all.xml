@@ -14,8 +14,8 @@
       <unpack>true</unpack>
       <scope>compile</scope>
       <includes>
-      	  <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak</include>
-          <include>org.camunda.bpm.extension:camunda-bpm-identity-keycloak-run</include>
+      	  <include>org.camunda.bpm.extension:camunda-platform-7-keycloak</include>
+          <include>org.camunda.bpm.extension:camunda-platform-7-keycloak-run</include>
       </includes>
     </dependencySet>
   </dependencySets>

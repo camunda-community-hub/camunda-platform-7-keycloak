@@ -1,15 +1,15 @@
-# Keycloak Camunda Identity Provider Plugin
+# Camunda Platform 7 - Keycloak Identity Provider Plugin
 [![](https://img.shields.io/badge/Community%20Extension-An%20open%20source%20community%20maintained%20project-FF4700)](https://github.com/camunda-community-hub/community)
 ![](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%207-26d07c)
 [![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-identity-keycloak/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-identity-keycloak)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak)
  [![Apache License V.2](https://img.shields.io/badge/license-Apache%20V.2-blue.svg)](./LICENSE)
 
 ![Keycloak](doc/keycloak.png "https://www.keycloak.org/") 
 
 Keycloak&trade; (<https://www.keycloak.org/>) is an Open Source Identity and Access Management platform including advanced features such as User Federation, Identity Brokering and Social Login.
 
-Camunda&trade; (<https://camunda.com/>) in its current version  is perfectly suited to carry out BPM projects in the cloud. Identity management in the cloud, however, often differs from classical approaches. Camunda already provides a generic sample for Single Sign On when using Spring Boot. See <https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso>.
+Camunda&trade; (<https://camunda.com/>) Platform 7 is perfectly suited to carry out BPM projects in the cloud. Identity management in the cloud, however, often differs from classical approaches. Camunda already provides a generic sample for Single Sign On when using Spring Boot. See <https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso>.
 Specific instructions on how to use Spring Boots OAuth2 SSO in combination with this Keycloak Identity Provider Plugin can be found below.
 
 **Why this plugin?** SSO is sufficient in case you only want authentication but have no further advanced security roles. If one needs to use Camundas IdentityService APIs or wants to see actual Users and Groups show up in Cockpit, a custom IdentityProvider needs to be implemented as well.
@@ -19,10 +19,16 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Current version: `2.2.3`<br >
-Tested with: Keycloak >= `5.0.0`, Camunda >= `7.10.0`, `7.10.0-ee`
+Current version: `7.17.0`<br >
+Latest tests with: Keycloak `18.0.0`, Camunda `7.17.0`, `7.17.0-ee`
 
 #### Features
+
+Changes in Version `7.17.0`
+
+* Renamed the extension from `camunda-bpm-identity-keycloak` to `camunda-platform-7-keycloak`
+* Updated samples to Camunda Platform 7.17
+* Introduced new version which reflects the Camunda Version used in samples and tests.
 
 New in Version `2.2.3`:
 
@@ -47,7 +53,7 @@ New in Version `2.1.0`:
 
 New in Version `2.0.0`:
 
-* Support for Camunda BPM Run
+* Support for Camunda Platform 7 Run
 * New options `proxyUri`, `proxyUser`, `proxyPassword` for optional proxy support.
 * Usage of `com.google.code.gson` for JSON (de)serialization.
 * Further internal refactorings and preparations for future enhancements.
@@ -62,7 +68,7 @@ New in Version `1.4.0`:
 
 New in Version `1.3.0`:
 
-* Provided additional fat `camunda-bpm-identity-keycloak-all.jar` including transitive dependencies for easier installation e.g. on Apache Tomcat distribution with shared engine.
+* Provided additional fat `camunda-platform-7-keycloak-all.jar` including transitive dependencies for easier installation e.g. on Apache Tomcat distribution with shared engine.
 
 New in Version `1.2.0`:
 
@@ -108,8 +114,8 @@ Maven Dependencies:
 ```xml
 <dependency>
     <groupId>org.camunda.bpm.extension</groupId>
-    <artifactId>camunda-bpm-identity-keycloak</artifactId>
-    <version>2.2.3</version>
+    <artifactId>camunda-platform-7-keycloak</artifactId>
+    <version>7.17.0</version>
 </dependency>
 ```
 
@@ -354,25 +360,25 @@ Keep in mind that Keycloak's `email` attribute might not always be unique, depen
 
 ## Quickstart
 
-As a quickstart into using and configuring the plugin we recommend to have a look at the [Installation on Camunda BPM Run](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/run). You'll find a chapter "Docker Sample Setup" at the end of the README. This is a simple starting point.
+As a quickstart into using and configuring the plugin we recommend to have a look at the [Installation on Camunda Platform Run](https://github.com/camunda/camunda-platform-7-keycloak/tree/master/examples/run). You'll find a chapter "Docker Sample Setup" at the end of the README. This is a simple starting point.
 
 If your intention is a complete SSO setup on Kubernetes you'll be more happy with the next reference.
 
 ## Sample Spring Boot Project with SSO on Kubernetes
 
-A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/sso-kubernetes). See directory `examples`.
+A sample project using this plugin including a basic SSO and Kubernetes setup can be found under [Camunda Showcase for Spring Boot & Keycloak Identity Provider](https://github.com/camunda/camunda-platform-7-keycloak/tree/master/examples/sso-kubernetes). See directory `examples`.
 
 ## Installation on Apache Tomcat with Shared Process Engine
 
-Even if from an architectural point of view Spring Boot is currently the most recommended approach for cloud scenarios, it is of course possible to install the plugin in other Camunda distributions as well. A description on how to install the plugin on an Apache Tomcat full distribution can be found under [Installation on Tomcat](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/tomcat). See directory `examples`.
+Even if from an architectural point of view Spring Boot is currently the most recommended approach for cloud scenarios, it is of course possible to install the plugin in other Camunda distributions as well. A description on how to install the plugin on an Apache Tomcat full distribution can be found under [Installation on Tomcat](https://github.com/camunda/camunda-platform-7-keycloak/tree/master/examples/tomcat). See directory `examples`.
 
-## Installation on Camunda BPM Run
+## Installation on Camunda Platform Run
 
-A description on how to install the plugin on Camunda BPM Run can be found under [Installation on Camunda BPM Run](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/run). See directory `examples`.
+A description on how to install the plugin on Camunda BPM Run can be found under [Installation on Camunda BPM Run](https://github.com/camunda/camunda-platform-7-keycloak/tree/master/examples/run). See directory `examples`.
 
 ## Installation on JBoss/Wildfly
 
-A description on how to install the plugin on a JBoss/Wildfly can be found under [Installation on JBoss/Wildfly](https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/wildfly). See directory `examples`.
+A description on how to install the plugin on a JBoss/Wildfly can be found under [Installation on JBoss/Wildfly](https://github.com/camunda/camunda-platform-7-keycloak/tree/master/examples/wildfly). See directory `examples`.
 
 ## Unit testing the plugin
 
@@ -420,8 +426,8 @@ Brought to you by:
 
 ## Resources
 
-* [Issue Tracker](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak/issues)
-* [Contributing](https://github.com/camunda-community-hub/camunda-bpm-identity-keycloak/blob/master/CONTRIBUTING.md)
+* [Issue Tracker](https://github.com/camunda-community-hub/camunda-platform-7-keycloak/issues)
+* [Contributing](https://github.com/camunda-community-hub/camunda-platform-7-keycloak/blob/master/CONTRIBUTING.md)
 
 ## Maintainer
 

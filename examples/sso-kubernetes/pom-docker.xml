@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.camunda.bpm.extension.examples</groupId>
-	<artifactId>camunda-bpm-identity-keycloak-examples-sso-kubernetes</artifactId>
-	<version>2.2.3</version>
+	<artifactId>camunda-platform-7-keycloak-examples-sso-kubernetes</artifactId>
+	<version>7.17.0</version>
 
-  	<name>camunda BPM - engine plugins - identity - keycloak - examples - showcase</name>
-	<description>Showcase for using Camunda Keycloak Identity Provider </description>
+  	<name>Camunda Platform 7 - engine plugins - identity - keycloak - examples - showcase</name>
+	<description>Showcase for using Camunda Platform 7 Keycloak Identity Provider </description>
 
 	<properties>
 		<version.java>11</version.java>
@@ -21,10 +21,9 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-	    <version.camunda>7.16.0</version.camunda>
-	    <!-- <version.camunda>7.16.0-ee</version.camunda> -->
-	    <version.springBoot>2.5.5</version.springBoot>
-	    <version.bpm.assert>13.0.0</version.bpm.assert>
+	    <version.camunda>7.17.0</version.camunda>
+	    <!-- <version.camunda>7.17.0-ee</version.camunda> -->
+	    <version.springBoot>2.6.6</version.springBoot>
 	</properties>
 
     <dependencyManagement>
@@ -46,7 +45,7 @@
 	      <!-- modules -->
 	      <dependency>
 	        <groupId>org.camunda.bpm.extension</groupId>
-	        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+	        <artifactId>camunda-platform-7-keycloak</artifactId>
 	        <version>${project.version}</version>
 	        <scope>provided</scope>
 	      </dependency>
@@ -89,7 +88,7 @@
 		<!-- Keycloak Identity Prover Plugin  -->
 		<dependency>
 	        <groupId>org.camunda.bpm.extension</groupId>
-	        <artifactId>camunda-bpm-identity-keycloak</artifactId>
+	        <artifactId>camunda-platform-7-keycloak</artifactId>
 		</dependency>
 
 		<!-- Database -->
@@ -136,9 +135,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.camunda.bpm.assert</groupId>
+			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-bpm-assert</artifactId>
-			<version>${version.bpm.assert}</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
