@@ -294,7 +294,7 @@ So the logout button now redirects to the Keycloak logout URL which then redirec
 
 #### Logout URL for Keycloak version >= 18.0.0
 
-Within the ``KeycloakLogoutHandler`` there is a small snippet calculating the logout URL which - when using Keycloak version 17.0.1 or older looks as follows:
+Within the ``KeycloakLogoutHandler`` there is a small snippet calculating the logout URL which - when using Keycloak version 17.0.1 or older - looks as follows:
 
 ```java
     // Complete logout URL
