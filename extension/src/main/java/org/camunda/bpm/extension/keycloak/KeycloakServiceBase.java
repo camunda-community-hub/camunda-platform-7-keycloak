@@ -2,6 +2,10 @@ package org.camunda.bpm.extension.keycloak;
 
 import static org.camunda.bpm.extension.keycloak.json.JsonUtil.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +17,7 @@ import org.camunda.bpm.extension.keycloak.rest.KeycloakRestTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -55,16 +60,23 @@ public abstract class KeycloakServiceBase {
 	protected String getKeycloakUserID(String userId) throws KeycloakUserNotFoundException, RestClientException {
 		String userSearch;
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-			userSearch="/users?email=" + userId;
+			userSearch= "/users?email=";
 		} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-			userSearch="/users?username=" + userId;
+			userSearch="/users?username=";
 		} else {
 			return userId;
 		}
 		
 		try {
+			URI uri = UriComponentsBuilder
+					.fromUriString(keycloakConfiguration.getKeycloakAdminUrl() + userSearch + URLEncoder.encode(userId, StandardCharsets.UTF_8.name()))
+					.build(true)
+					.toUri();
 			ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + userSearch, HttpMethod.GET, String.class);
+					uri,
+					HttpMethod.GET,
+					keycloakContextProvider.createApiRequestEntity(),
+					String.class);
 			JsonArray resultList = parseAsJsonArray(response.getBody());
 			JsonObject result = findFirst(resultList,
 					keycloakConfiguration.isUseUsernameAsCamundaUserId() ? "username" : "email",
@@ -81,6 +93,9 @@ public abstract class KeycloakServiceBase {
 					(keycloakConfiguration.isUseEmailAsCamundaUserId() 
 					? " not found - email unknown" 
 					: " not found - username unknown"), je);
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new KeycloakUserNotFoundException(userId + " not encodable", e);
 		}
 	}
 	
