@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+	  <groupId>org.camunda.bpm.extension</groupId>
+	  <artifactId>camunda-platform-7-keycloak-root</artifactId>
+	  <version>7.17.0-SNAPSHOT</version>
+	</parent>
+
+    <artifactId>camunda-platform-7-keycloak-jwt</artifactId>
+
+	<packaging>jar</packaging>
+    <name>Camunda Platform 7 - engine plugins - identity - keycloak - jwt extension</name>
+	<description>A Camunda 7 Identity Provider Plugin for Keycloak - JWT addon</description>
+
+	<properties>
+		<maven.compiler.source>${version.java}</maven.compiler.source>
+		<maven.compiler.target>${version.java}</maven.compiler.target>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.camunda.bpm</groupId>
+			<artifactId>camunda-engine</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.extension</groupId>
+			<artifactId>camunda-platform-7-keycloak</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.commons</groupId>
+			<artifactId>camunda-commons-logging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+        <dependency>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+ 		
+		<dependency>
+	        <groupId>com.h2database</groupId>
+	        <artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.camunda.bpm.webapp</groupId>
+            <artifactId>camunda-webapp</artifactId>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+        </dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+    </dependencies>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<failIfNoTests>false</failIfNoTests>
+					<trimStackTrace>false</trimStackTrace>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

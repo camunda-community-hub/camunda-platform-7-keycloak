@@ -65,6 +65,7 @@
 
   <modules>
     <module>extension</module>
+    <module>extension-jwt</module>
     <module>extension-run</module>
     <module>extension-all</module>
     <module>examples</module>
@@ -90,6 +91,12 @@
       <dependency>
         <groupId>org.camunda.bpm.extension</groupId>
         <artifactId>camunda-platform-7-keycloak</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.extension</groupId>
+        <artifactId>camunda-platform-7-keycloak-jwt</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
