@@ -34,14 +34,17 @@ public class KeycloakAuthenticationFilter implements Filter {
 	
 	/** Access to the OAuth2 client service. */
 	OAuth2AuthorizedClientService clientService;
+
+	private String userNameAttribute;
 	
 	/**
 	 * Creates a new KeycloakAuthenticationFilter.
 	 * @param identityService access to Camunda's IdentityService
 	 */
-	public KeycloakAuthenticationFilter(IdentityService identityService, OAuth2AuthorizedClientService clientService) {
+	public KeycloakAuthenticationFilter(IdentityService identityService, OAuth2AuthorizedClientService clientService, String userNameAttribute) {
 		this.identityService = identityService;
 		this.clientService = clientService;
+		this.userNameAttribute = userNameAttribute;
 	}
 
 	/**
@@ -55,7 +58,9 @@ public class KeycloakAuthenticationFilter implements Filter {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String userId = null;
 		if (authentication instanceof JwtAuthenticationToken) {
-			userId = ((JwtAuthenticationToken)authentication).getName();
+			//userId = ((JwtAuthenticationToken)authentication).getName();
+			userId = ((JwtAuthenticationToken) authentication).getTokenAttributes().get(userNameAttribute).toString();
+			
 		} else if (authentication.getPrincipal() instanceof OidcUser) {
 			userId = ((OidcUser)authentication.getPrincipal()).getName();
 		} else {
