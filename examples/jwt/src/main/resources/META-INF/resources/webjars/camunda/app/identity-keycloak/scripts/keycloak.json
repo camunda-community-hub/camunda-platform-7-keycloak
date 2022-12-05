@@ -1,0 +1,5 @@
+{
+  "url": "http://localhost:9000/",
+  "realm": "camunda",
+  "clientId": "camunda-jwt"
+}

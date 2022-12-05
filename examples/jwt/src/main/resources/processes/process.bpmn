@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
+  <bpmn:process id="camunda.showcase" name="camunda.showcase" isExecutable="true">
+    <bpmn:startEvent id="START" name="Process&#10;started" camunda:formKey="embedded:app:forms/start-form.html">
+      <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="END_APPROVED" name="Process&#10;ended">
+      <bpmn:incoming>Flow_1etp9ij</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="START" targetRef="Delay_Event" />
+    <bpmn:sequenceFlow id="Flow_1etp9ij" sourceRef="Delay_Event" targetRef="END_APPROVED" />
+    <bpmn:intermediateCatchEvent id="Delay_Event">
+      <bpmn:incoming>SequenceFlow1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1etp9ij</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0mrrrcy">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT15S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="camunda.showcase">
+      <bpmndi:BPMNEdge id="SequenceFlow_08va5r8_di" bpmnElement="SequenceFlow1">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="282" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="228" y="95" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1etp9ij_di" bpmnElement="Flow_1etp9ij">
+        <di:waypoint x="318" y="120" />
+        <di:waypoint x="392" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="START">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="171" y="138" width="41" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_11rc11z_di" bpmnElement="Delay_Event">
+        <dc:Bounds x="282" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="END_APPROVED">
+        <dc:Bounds x="392" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="391" y="138" width="40" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
