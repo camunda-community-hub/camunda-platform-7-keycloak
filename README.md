@@ -20,9 +20,15 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
 Current version: `7.17.0`<br >
-Latest tests with: Keycloak `18.0.0`, Camunda `7.17.0`, `7.17.0-ee`
+Latest tests with: Keycloak `19.0.3`, Camunda `7.18.0`, `7.18.0-ee`
 
 #### Features
+
+New in version `7.18.0`
+
+* Fixed a bug for userId's containing a plus sign.
+* Updated samples to Camunda Platform 7.18 and Keycloak >= 18
+* Provided an alternative for client side JWT authentication in Camunda Cockpit
 
 Changes in Version `7.17.0`
 
@@ -95,18 +101,20 @@ Known limitations:
 
 ## Prerequisites in your Keycloak realm
 
-1.  Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
-2.  Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
-	![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
-3. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" section (available in newer Keycloak versions):
+1. Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
+2. Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
+    ![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
+   Please be aware, that beginning with Keycloak 18, you do not only have to configure a valid redirect URL, but
+   a valid post logout redirect URL as well. To keep things easy values can be the same.
+4. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" section (available in newer Keycloak versions):
 
-	![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
-4.	Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (choose `realm-management` or `master-realm`, depending on whether you are using a separate realm or master):
-	![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
-5.  Your client credentials can be found here:
-	![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
-6.  Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated Camunda admin group or Camunda admin user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
-	![KeycloakGroups](doc/keycloak-groups.png "Keycloak Realm Groups")
+    ![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
+5. Add the roles `query-groups, query-users, view-users` to the service account client roles of your realm (choose `realm-management` or `master-realm`, depending on whether you are using a separate realm or master):
+    ![IdentityServiceRoles](doc/identity-service_roles.png "Identity Service Roles")
+6. Your client credentials can be found here:
+    ![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
+7. Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated Camunda admin group or Camunda admin user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
+    ![KeycloakGroups](doc/keycloak-groups.png "Keycloak Realm Groups")
 
 ## Usage with Camunda Spring Boot
 
@@ -390,17 +398,18 @@ version: "3.3"
 services:
   jboss.keycloak:
     build: .
-    image: jboss/keycloak
+    image: quay.io/keycloak/keycloak:19.0.3-legacy
     restart: always
     environment:
       TZ: Europe/Berlin
       KEYCLOAK_USER: keycloak
       KEYCLOAK_PASSWORD: keycloak1!
+      DB_VENDOR: h2
     ports:
       - "8443:8443"
 ```
 
-For details see documentation on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
+For details see documentation on [Running Keycloak in a container](https://www.keycloak.org/server/containers "Running Keycloak in a container").
 
 ### Maven test setup
 
@@ -411,6 +420,10 @@ Running unit tests from Maven requires configuring the details of a running Keyc
 | `KEYCLOAK_URL` | Keycloak server URL.<br />Default value: `https://localhost:8443/auth` |
 | `KEYCLOAK_ADMIN_USER` | The admin user of the Keycloak server.<br />Default value: `keycloak` |
 | `KEYCLOAK_ADMIN_PASSWORD` | The admin password of the Keycloak server.<br />Default value: `keycloak1!` |
+
+In case you choose Keycloak in the new Quarkus distribution, please be aware that `/auth` has been removed from the default context path.
+Hence, it is required to change the `KEYCLOAK_URL` for the tests. Tests also run successfully against the Quarkus
+distribution, in case you start Keycloak in Development mode.
 
 ------------------------------------------------------------
 

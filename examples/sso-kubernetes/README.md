@@ -62,23 +62,29 @@ version: "3.3"
 services:
   jboss.keycloak:
     build: .
-#    image: jboss/keycloak:14.0.0
-    image: gunnaraccso/keycloak.server:14.0.0
+#    image: quay.io/keycloak/keycloak:20.0.1
+    image: gunnaraccso/keycloak.server:20.0.1
     restart: always
     environment:
       TZ: Europe/Berlin
-      KEYCLOAK_USER: keycloak
-      KEYCLOAK_PASSWORD: keycloak1!
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak1!
     ports:
       - "9001:8443"
       - "9000:8080"
+    command:
+      - start-dev
 ```
 
-The image ``gunnaraccso/keycloak.server`` has been derived from the original ``jboss/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker image](https://hub.docker.com/r/jboss/keycloak/).
+The image ``gunnaraccso/keycloak.server`` has been derived from the original ``quay.io/keycloak/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker images](https://quay.io/repository/keycloak/keycloak?tab=tags&tag=latest).
 
 The only thing you have to adapt for local tests is the **Redirect URI** of the Camuna Identity Service Client. Login at the [Keycloak Admin Console](https://localhost:9001/auth/admin/master/console/#/) using user/password as configured above and add ``http://localhost:8080/camunda/*`` as Valid Redirect URI configuration to the Camunda Identity Service client:
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
+
+Beginning with Keycloak 18, you do not only have to configure a valid redirect URL, but
+a valid post logout redirect URL as well. To keep things easy values can be the same:
+![Keycloak-PostLogoutRedirectURI](docs/Keycloak-PostLogoutRedirectURI.PNG)
 
 For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak). The optional setup for securing Camunda's REST Api is described in the chapters below.
 
@@ -92,7 +98,7 @@ The main configuration part in ``applicaton.yaml`` is as follows:
 # Externalized Keycloak configuration
 keycloak:
   # Keycloak access for the Identity Provider plugin.
-  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+  url.plugin: ${KEYCLOAK_URL_PLUGIN:http://localhost:9000}
 
   # Keycloak Camunda Identity Client
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
@@ -100,8 +106,8 @@ keycloak:
 
 # Camunda Keycloak Identity Provider Plugin
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
-  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+  keycloakIssuerUrl: ${keycloak.url.plugin}/realms/camunda
+  keycloakAdminUrl: ${keycloak.url.plugin}/admin/realms/camunda
   clientId: ${keycloak.client.id}
   clientSecret: ${keycloak.client.secret}
   useEmailAsCamundaUserId: false
@@ -110,6 +116,9 @@ plugin.identity.keycloak:
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true
 ```
+If you run Keycloak in the new Quarkus distribution, please be aware that `/auth` has been removed from the default context path.
+In case you run the derived legacy image still containing Wildfly (e.g. `gunnaraccso/keycloak.server:19.0.3-legacy`), your
+KEYCLOAK_URL_PLUGIN must have the `auth` path added to it, e.g. `http://localhost:9000/auth`.
 
 For configuration details of the plugin see documentation of [Keycloak Identity Provider Plugin](https://github.com/camunda-community-hub/camunda-platform-7-keycloak) 
 
@@ -140,17 +149,21 @@ spring.security.oauth2:
         scope: openid, profile, email
     provider:
       keycloak:
-        issuer-uri: ${keycloak.url.auth}/auth/realms/camunda
-        authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-        user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
-        token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-        jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+        issuer-uri: ${keycloak.url.auth}/realms/camunda
+        authorization-uri: ${keycloak.url.auth}/realms/camunda/protocol/openid-connect/auth
+        user-info-uri: ${keycloak.url.auth}/realms/camunda/protocol/openid-connect/userinfo
+        token-uri: ${keycloak.url.token}/realms/camunda/protocol/openid-connect/token
+        jwk-set-uri: ${keycloak.url.token}/realms/camunda/protocol/openid-connect/certs
         # set user-name-attribute one of: 
         # - sub                -> default; using keycloak ID as camunda user ID
         # - email              -> useEmailAsCamundaUserId=true
         # - preferred_username -> useUsernameAsCamundaUserId=true
         user-name-attribute: preferred_username
 ```
+
+Again: if you run Keycloak in the new Quarkus distribution, please be aware that `/auth` has been removed from the default context path.
+In case you run the derived legacy image still containing Wildfly (e.g. `gunnaraccso/keycloak.server:19.0.3-legacy`), your
+KEYCLOAK_URL_AUTH /  KEYCLOAK_URL_TOKEN must have the `auth` path added to them, e.g. `http://localhost:9000/auth`.
 
 You'll find the security configuraton setup in ``WebAppSecurityConfig``. Please be aware of the ``KeycloakAuthenticationProvider`` which is the bridge between Spring Security and Camunda.
 
@@ -198,7 +211,7 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String userId = null;
     if (authentication instanceof JwtAuthenticationToken) {
-        userId = ((JwtAuthenticationToken)authentication).getName();
+        userId = ((JwtAuthenticationToken)authentication).getTokenAttributes().get(userNameAttribute).toString();
     } else if (authentication.getPrincipal() instanceof OidcUser) {
         userId = ((OidcUser)authentication.getPrincipal()).getName();
     } else {
@@ -288,7 +301,7 @@ private KeycloakLogoutHandler keycloakLogoutHandler;
 ```
 
 The handler itself (see ``org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to
-``http://<keycloak-server>/auth/realms/camunda/protocol/openid-connect/logout?redirect_uri=http://<camunda-server>/camunda``.
+``http://<keycloak-server>/realms/camunda/protocol/openid-connect/logout?redirect_uri=http://<camunda-server>/camunda``.
 
 So the logout button now redirects to the Keycloak logout URL which then redirects back to the Camunda Cockpit. Because we're not authenticated any more, Spring Security will then start a new authentication flow.
 
@@ -307,8 +320,6 @@ When using Keycloak version 17.0.1 or older you'll have to replace this with the
     // Complete logout URL
     String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
 ```
-
-Please be aware that - since version 18.0.0 - in Keycloak you now have to additionally configure "Valid post logout redirect URIs". Set this to the same value as "Valid redirect URIs". 
 
 For more detailed information on what has changed in Keycloak 18 see [Keycloak 18.0.0 released](https://www.keycloak.org/2022/04/keycloak-1800-released) chapter "OpenID Connect Logout".
 
