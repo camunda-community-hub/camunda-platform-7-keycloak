@@ -292,23 +292,23 @@ The handler itself (see ``org.camunda.bpm.extension.keycloak.showcase.sso.Keyclo
 
 So the logout button now redirects to the Keycloak logout URL which then redirects back to the Camunda Cockpit. Because we're not authenticated any more, Spring Security will then start a new authentication flow.
 
-#### Logout URL for Keycloak version >= 18.0.0
+#### Logout URL for Keycloak versions < 18.0.0
 
-Within the ``KeycloakLogoutHandler`` there is a small snippet calculating the logout URL which - when using Keycloak version 17.0.1 or older - looks as follows:
-
-```java
-    // Complete logout URL
-    String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
-```
-
-Starting from Keycloak version 18.0.0 you'll have to replace this with the following:
+Within the ``KeycloakLogoutHandler`` there is a small snippet calculating the logout URL which - starting from Keycloak version 18.0.0 looks as follows:
 
 ```java
     // Complete logout URL
     String logoutUrl = oauth2UserLogoutUri + "?post_logout_redirect_uri=" + redirectUri + "&id_token_hint=" + ((OidcUser)authentication.getPrincipal()).getIdToken().getTokenValue();
 ```
 
-Please be aware that in Keycloak you now have to additionally configure "Valid post logout redirect URIs". Set this to the same value as "Valid redirect URIs". 
+When using Keycloak version 17.0.1 or older you'll have to replace this with the following:
+
+```java
+    // Complete logout URL
+    String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
+```
+
+Please be aware that - since version 18.0.0 - in Keycloak you now have to additionally configure "Valid post logout redirect URIs". Set this to the same value as "Valid redirect URIs". 
 
 For more detailed information on what has changed in Keycloak 18 see [Keycloak 18.0.0 released](https://www.keycloak.org/2022/04/keycloak-1800-released) chapter "OpenID Connect Logout".
 

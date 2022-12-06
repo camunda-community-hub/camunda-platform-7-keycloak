@@ -21,9 +21,9 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-	    <version.camunda>7.17.0</version.camunda>
-	    <!-- <version.camunda>7.17.0-ee</version.camunda> -->
-	    <version.springBoot>2.6.6</version.springBoot>
+	    <version.camunda>7.18.0</version.camunda>
+	    <!-- <version.camunda>7.18.0-ee</version.camunda> -->
+	    <version.springBoot>2.6.14</version.springBoot>
 	</properties>
 
     <dependencyManagement>

@@ -13,7 +13,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-platform-7-keycloak-root</artifactId>
-  <version>7.17.0-SNAPSHOT</version>
+  <version>7.18.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform 7 - engine plugins - identity - keycloak - root</name>
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
@@ -25,9 +25,9 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.17.0</version.camunda>
-    <!-- <version.camunda>7.17.0-ee</version.camunda> -->
-	<version.springBoot>2.6.6</version.springBoot>
+	<version.camunda>7.18.0</version.camunda>
+    <!-- <version.camunda>7.18.0-ee</version.camunda> -->
+	<version.springBoot>2.6.14</version.springBoot>
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>

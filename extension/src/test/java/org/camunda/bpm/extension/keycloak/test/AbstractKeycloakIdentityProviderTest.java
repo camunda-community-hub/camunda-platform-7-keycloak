@@ -165,8 +165,8 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		for (ProcessEnginePlugin p : config.getProcessEnginePlugins()) {
 			if (p instanceof KeycloakIdentityProviderPlugin) {
 				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
-				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
-				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("https://localhost:9001/auth", KEYCLOAK_URL));
+				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("http://localhost:9000", KEYCLOAK_URL));
+				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("http://localhost:9000", KEYCLOAK_URL));
 				kcp.setClientSecret(CLIENT_SECRET);
 				return kcp;
 			}

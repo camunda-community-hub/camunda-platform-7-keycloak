@@ -32,8 +32,8 @@
 
   <bean id="keycloakIdentityProviderPlugin" class="org.camunda.bpm.extension.keycloak.test.util.CacheAwareKeycloakIdentityProviderPluginForTest">
   
-    <property name="keycloakIssuerUrl" value="https://localhost:9001/auth/realms/test" />
-    <property name="keycloakAdminUrl" value="https://localhost:9001/auth/admin/realms/test" />
+    <property name="keycloakIssuerUrl" value="http://localhost:9000/realms/test" />
+    <property name="keycloakAdminUrl" value="http://localhost:9000/admin/realms/test" />
     <property name="clientId" value="camunda-identity-service" />
     <property name="clientSecret" value="%clientSecret%" />
 

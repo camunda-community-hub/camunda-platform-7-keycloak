@@ -1,5 +1,6 @@
 package org.camunda.bpm.extension.keycloak.test;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ import org.camunda.bpm.extension.keycloak.test.util.PredictableTicker;
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import static org.awaitility.Awaitility.await;
 
 /**
  * Keycloak login test with login cache enabled.
@@ -173,7 +176,9 @@ public class KeycloakLoginTestWithCaching extends AbstractKeycloakIdentityProvid
 		assertEquals(countBefore + 3, CountingHttpRequestInterceptor.getHttpRequestCount());
 		// check cache entries: one has been evicted, new one is part of the cache
 		assertTrue(getCacheEntries().contains("hans.mustermann@tradermail.info"));
-		assertEquals(2, getCacheEntries().size());
+		// cache may temporarily exceed the max entry limit while evicting, hence we need to wait
+		await().atMost(Duration.ofSeconds(2)).pollInterval(Duration.ofMillis(500))
+						.untilAsserted(() -> assertEquals(2, getCacheEntries().size()));
 
 		// call cache entry
 		assertTrue(identityService.checkPassword("hans.mustermann@tradermail.info", "äöüÄÖÜ"));

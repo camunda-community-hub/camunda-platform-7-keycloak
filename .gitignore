@@ -2,6 +2,7 @@
 /.settings/
 /.classpath
 /.project
+**/target/
 
 ### IntelliJ IDEA ###
 .idea
@@ -10,3 +11,4 @@
 *.ipr
 /extension-all/dependency-reduced-pom.xml
 /extension-run/dependency-reduced-pom.xml
+/examples/sso-kubernetes/camunda-db.mv.db

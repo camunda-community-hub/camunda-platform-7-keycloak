@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -53,7 +54,7 @@ public class KeycloakLogoutHandler implements LogoutSuccessHandler {
 			String requestUrl = request.getRequestURL().toString();
 			String redirectUri = requestUrl.substring(0, requestUrl.indexOf("/app"));
 			// Complete logout URL
-			String logoutUrl = oauth2UserLogoutUri + "?redirect_uri=" + redirectUri;
+			String logoutUrl = oauth2UserLogoutUri + "?post_logout_redirect_uri=" + redirectUri + "&id_token_hint=" + ((OidcUser)authentication.getPrincipal()).getIdToken().getTokenValue();
 	
 			// Do logout by redirecting to Keycloak logout
 			LOG.debug("Redirecting to logout URL {}", logoutUrl);
