@@ -2,8 +2,8 @@ var camundaIdentityKeycloak = undefined;
 
 const portalName = document.querySelector('base').attributes['app-root'].value;
 
-await import('./keycloak.min.js')
-    .then(() => window.fetch(portalName+"/app/identity-keycloak/scripts/keycloak.json"))
+await import(portalName + '/app/keycloak/keycloak.min.js')
+    .then(() => window.fetch(portalName+"/app/keycloak/keycloak-options.json"))
     .then(response => response.ok ? response.json() : Promise.resolve())
     .then(options => {
         if (options) {

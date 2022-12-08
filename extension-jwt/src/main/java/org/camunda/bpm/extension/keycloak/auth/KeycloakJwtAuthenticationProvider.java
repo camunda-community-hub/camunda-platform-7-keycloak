@@ -1,27 +1,24 @@
-package org.camunda.bpm.extension.keycloak.showcase.sso;
+package org.camunda.bpm.extension.keycloak.auth;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin. 
+ * OAuth2 Authentication Provider for usage with Keycloak JWT.
  */
-public class KeycloakAuthenticationProvider extends ContainerBasedAuthenticationProvider {
+public class KeycloakJwtAuthenticationProvider extends ContainerBasedAuthenticationProvider {
 
     @Override
     public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
-
         // Extract user-name-attribute of the OAuth2 token
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (!(authentication instanceof AbstractOAuth2TokenAuthenticationToken) || !(authentication.getPrincipal() instanceof Jwt)) {
@@ -34,17 +31,10 @@ public class KeycloakAuthenticationProvider extends ContainerBasedAuthentication
 
         // Authentication successful
         AuthenticationResult authenticationResult = new AuthenticationResult(userId, true);
-        authenticationResult.setGroups(getUserGroups(userId, engine));
+        authenticationResult.setGroups(((Jwt)authentication.getPrincipal()).getClaimAsStringList("groups")
+                .stream().map(g -> g.startsWith("/") ? g.substring(1) : g).collect(Collectors.toList()));
 
         return authenticationResult;
-    }
-
-    private List<String> getUserGroups(String userId, ProcessEngine engine){
-        List<String> groupIds = new ArrayList<>();
-        // query groups using KeycloakIdentityProvider plugin
-        engine.getIdentityService().createGroupQuery().groupMember(userId).list()
-        	.forEach( g -> groupIds.add(g.getId()));
-        return groupIds;
     }
 
 }

@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationProvider;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
+import org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationFilter;
 import org.camunda.bpm.webapp.impl.security.auth.AuthenticationService;
 
 import javax.servlet.FilterChain;
@@ -23,7 +24,7 @@ public class StatelessAuthenticationFilterTest extends PluggableProcessEngineTes
 
     private final AuthenticationProvider authenticationProvider = mock(AuthenticationProvider.class);
 
-    private final StatelessAuthenticationFilter statelessAuthenticationFilter = new StatelessAuthenticationFilter() {
+    private final KeycloakJwtAuthenticationFilter statelessAuthenticationFilter = new KeycloakJwtAuthenticationFilter() {
         {
             userAuthentications = new AuthenticationService();
             authenticationProvider = StatelessAuthenticationFilterTest.this.authenticationProvider;

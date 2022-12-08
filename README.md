@@ -28,7 +28,7 @@ New in version `7.18.0`
 
 * Fixed a bug for userId's containing a plus sign.
 * Updated samples to Camunda Platform 7.18 and Keycloak >= 18
-* Provided an alternative for client side JWT authentication in Camunda Cockpit
+* Alternative for client side JWT authentication in Camunda Cockpit (incubation status)
 
 Changes in Version `7.17.0`
 

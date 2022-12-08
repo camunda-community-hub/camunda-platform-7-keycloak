@@ -5,6 +5,7 @@
 
   <process-archive>
     <process-engine>default</process-engine>
+    <resource>forms/do-something.form</resource>
     <properties>
       <property name="isDeleteUponUndeploy">false</property>
       <property name="isScanForProcessDefinitions">true</property>

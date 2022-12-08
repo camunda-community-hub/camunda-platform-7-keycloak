@@ -17,8 +17,6 @@
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
-    
-    <property name="createDiagramOnDeploy" value="true" />
 
   </bean>
 

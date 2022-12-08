@@ -1,4 +1,4 @@
-package org.camunda.bpm.extension.keycloak.filter;
+package org.camunda.bpm.extension.keycloak.auth;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
  * @see org.camunda.bpm.webapp.impl.security.auth.AuthenticationFilter
  * @see org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter
  */
-public class StatelessAuthenticationFilter extends ContainerBasedAuthenticationFilter {
+public class KeycloakJwtAuthenticationFilter extends ContainerBasedAuthenticationFilter {
 
     private static final int HTTP_STATUS_NOT_AUTHENTICATED = 401;
     private static final int HTTP_STATUS_NOT_FOUND = 404;

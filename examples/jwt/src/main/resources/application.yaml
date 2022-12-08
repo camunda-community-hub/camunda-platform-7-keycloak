@@ -7,27 +7,25 @@ camunda.bpm:
   history-level: audit
   authorization:
     enabled: true
-
-#CSP header configuration (Camunda 7.18+)
-#  webapp:
-#    header-security:
-#      content-security-policy-value=: "base-uri 'self';
-#                                        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
-#                                        style-src 'unsafe-inline' 'self';
-#                                        connect-src ${keycloak.url.plugin} 'self';
-#                                        default-src 'self';
-#                                        img-src 'self' data:;
-#                                        block-all-mixed-content;form-action 'self';
-#                                        frame-ancestors 'none';object-src 'none';
-#                                        sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
-
+  # CSP header configuration (Camunda 7.18+)
+  webapp:
+    header-security:
+      content-security-policy-value=: "base-uri 'self';
+                                        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
+                                        style-src 'unsafe-inline' 'self';
+                                        connect-src ${keycloak.url} 'self';
+                                        default-src 'self';
+                                        img-src 'self' data:;
+                                        block-all-mixed-content;form-action 'self';
+                                        frame-ancestors 'none';object-src 'none';
+                                        sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
 
 server:
   port: 8080
 
 # Metrics & Health
 management:
-  health.probes.enabled: true
+  endpoint.health.probes.enabled: true
   endpoints:
     web.exposure.include: env,health,info,metrics
 
@@ -35,11 +33,17 @@ management:
 # Externalized Keycloak configuration
 keycloak:
   # Keycloak access for the Identity Provider plugin.
-  url.plugin: http://localhost:9000
+  url: http://localhost:9000
 
-  # Keycloak Camunda Identity Client
-  client.id: camunda-identity-service
-  client.secret: ObiDo0rGuRtGNtcY4BnZ0FjLz7QDkpHG
+  # Keycloak JWT Client configuration
+  jwt:
+    realm: camunda
+    client.id: camunda-jwt
+
+  # Keycloak Camunda Identity Service
+  plugin:
+    client.id: camunda-identity-service
+    client.secret: FOZQuxYwfuvb9R708askvn9XkZMfwlKp
 
 # Spring Boot Security OAuth2 SSO
 spring.security:
@@ -48,20 +52,22 @@ spring.security:
       jwt:
         issuer-uri: http://localhost:9000/realms/camunda
 
-
-logging.level.org.springframework.security: DEBUG
-
-
+# Camunda Cockpit JWT Plugin
+plugin.cockpit.keycloak:
+  keycloakUrl: ${keycloak.url}
+  realm: ${keycloak.jwt.realm}
+  clientId: ${keycloak.jwt.client.id}
 
 # Camunda Keycloak Identity Provider Plugin
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${keycloak.url.plugin}/realms/camunda
-  keycloakAdminUrl: ${keycloak.url.plugin}/admin/realms/camunda
-  clientId: ${keycloak.client.id}
-  clientSecret: ${keycloak.client.secret}
+  keycloakIssuerUrl: ${keycloak.url}/realms/camunda
+  keycloakAdminUrl: ${keycloak.url}/admin/realms/camunda
+  clientId: ${keycloak.plugin.client.id}
+  clientSecret: ${keycloak.plugin.client.secret}
   useEmailAsCamundaUserId: false
   useUsernameAsCamundaUserId: true
   useGroupPathAsCamundaGroupId: true
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true
 
+logging.level.org.springframework.security: DEBUG
