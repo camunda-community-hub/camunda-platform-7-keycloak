@@ -48,7 +48,6 @@ First of all we need an additional dependency which does most of the magic:
     <dependency>
         <groupId>org.camunda.bpm.extension</groupId>
         <artifactId>camunda-platform-7-keycloak-jwt</artifactId>
-        <version>7.18.0-preview</version>
     </dependency>
 ```
 

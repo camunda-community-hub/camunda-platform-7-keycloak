@@ -8,7 +8,6 @@
 	</parent>
 
     <artifactId>camunda-platform-7-keycloak-jwt</artifactId>
-	<version>7.18.0-preview</version>
 
 	<packaging>jar</packaging>
     <name>Camunda Platform 7 - engine plugins - identity - keycloak - jwt extension</name>
