@@ -2,12 +2,12 @@ package org.camunda.bpm.extension.keycloak.filter;
 
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationProvider;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationFilter;
-import org.camunda.bpm.webapp.impl.security.auth.AuthenticationService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,7 +26,6 @@ public class StatelessAuthenticationFilterTest extends PluggableProcessEngineTes
 
     private final KeycloakJwtAuthenticationFilter statelessAuthenticationFilter = new KeycloakJwtAuthenticationFilter() {
         {
-            userAuthentications = new AuthenticationService();
             authenticationProvider = StatelessAuthenticationFilterTest.this.authenticationProvider;
         }
     };
@@ -34,6 +33,13 @@ public class StatelessAuthenticationFilterTest extends PluggableProcessEngineTes
     @Override
     protected void setUp() {
         Cockpit.setCockpitRuntimeDelegate(new DefaultCockpitRuntimeDelegate());
+        IdentityService identityService = getProcessEngine().getIdentityService();
+        identityService.saveUser(identityService.newUser("user"));
+    }
+    
+    @Override
+    protected void tearDown() {
+    	getProcessEngine().getIdentityService().deleteUser("user");
     }
 
     public void testDoFilterForProtectedResource() throws ServletException, IOException {
@@ -50,6 +56,7 @@ public class StatelessAuthenticationFilterTest extends PluggableProcessEngineTes
             @Override
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) {
                 Authentication currentAuthentication = processEngine.getIdentityService().getCurrentAuthentication();
+                assertNotNull(currentAuthentication);
                 assertEquals("user", currentAuthentication.getUserId());
             }
         });

@@ -4,9 +4,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
-import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
+import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -56,8 +56,8 @@ public class KeycloakJwtAuthenticationFilter extends ContainerBasedAuthenticatio
             if (!this.existisAuthentication(authentications, engineName, authenticatedUser)) {
                 List<String> groups = authenticationResult.getGroups();
                 List<String> tenants = authenticationResult.getTenants();
-                Authentication authentication = this.createAuthentication(engine, authenticatedUser, groups, tenants);
-                authentications.addAuthentication(authentication);
+                UserAuthentication authentication = this.createAuthentication(engine, authenticatedUser, groups, tenants);
+                if (authentication != null) authentications.addOrReplace(authentication);
             }
 
             Authentications.setCurrent(authentications);

@@ -6,7 +6,7 @@
 
 	<groupId>org.camunda.bpm.extension.examples</groupId>
 	<artifactId>camunda-platform-7-keycloak-examples-sso-kubernetes</artifactId>
-	<version>7.18.0</version>
+	<version>7.19.0-SNAPSHOT</version>
 
   	<name>Camunda Platform 7 - engine plugins - identity - keycloak - examples - showcase</name>
 	<description>Showcase for using Camunda Platform 7 Keycloak Identity Provider </description>
@@ -21,9 +21,9 @@
 		<failOnMissingWebXml>false</failOnMissingWebXml>
     
 	    <!-- versions -->
-	    <version.camunda>7.18.0</version.camunda>
-	    <!-- <version.camunda>7.18.0-ee</version.camunda> -->
-	    <version.springBoot>2.6.14</version.springBoot>
+	    <version.camunda>7.19.0</version.camunda>
+	    <!-- <version.camunda>7.19.0-ee</version.camunda> -->
+	    <version.springBoot>2.7.12</version.springBoot>
 	</properties>
 
     <dependencyManagement>
