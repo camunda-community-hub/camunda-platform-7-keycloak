@@ -57,23 +57,24 @@ The following description is a quick start. A more detailed description will fol
 Use a ``docker-compose.yml`` file as follows:
 
 ```docker-compose
-version: "3.3"
+version: "3.9"
 
 services:
   jboss.keycloak:
-    build: .
-#    image: quay.io/keycloak/keycloak:20.0.1
-    image: gunnaraccso/keycloak.server:20.0.1
+    image: gunnaraccso/keycloak.server:21.1.1
     restart: always
     environment:
       TZ: Europe/Berlin
+      DB_VENDOR: h2
       KEYCLOAK_ADMIN: keycloak
       KEYCLOAK_ADMIN_PASSWORD: keycloak1!
+      KC_HTTP_RELATIVE_PATH: /auth
     ports:
       - "9001:8443"
       - "9000:8080"
     command:
       - start-dev
+      - --features admin-fine-grained-authz
 ```
 
 The image ``gunnaraccso/keycloak.server`` has been derived from the original ``quay.io/keycloak/keycloak`` docker image. It additionally includes a basic test setup matching the test configuration of this project. The image exists only for demonstration purposes. Do not use in production. For original Keycloak docker images see [Keycloak Docker images](https://quay.io/repository/keycloak/keycloak?tab=tags&tag=latest).

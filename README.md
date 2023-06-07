@@ -393,20 +393,24 @@ A description on how to install the plugin on a JBoss/Wildfly can be found under
 In order to run the unit tests I have used a local docker setup of Keycloak with `docker-compose.yml` as follows:
 
 ```docker-compose
-version: "3.3"
+version: "3.9"
 
 services:
   jboss.keycloak:
-    build: .
-    image: quay.io/keycloak/keycloak:19.0.3-legacy
+    image: quay.io/keycloak/keycloak:21.1.1
     restart: always
     environment:
       TZ: Europe/Berlin
-      KEYCLOAK_USER: keycloak
-      KEYCLOAK_PASSWORD: keycloak1!
       DB_VENDOR: h2
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak1!
+      KC_HTTP_RELATIVE_PATH: /auth
     ports:
       - "8443:8443"
+      - "8080:8080"
+    command:
+      - start-dev
+      - --features admin-fine-grained-authz
 ```
 
 For details see documentation on [Running Keycloak in a container](https://www.keycloak.org/server/containers "Running Keycloak in a container").
@@ -417,7 +421,7 @@ Running unit tests from Maven requires configuring the details of a running Keyc
 
 | *Environment Variable* | *Description* |
 | --- | --- |
-| `KEYCLOAK_URL` | Keycloak server URL.<br />Default value: `https://localhost:8443/auth` |
+| `KEYCLOAK_URL` | Keycloak server URL.<br />Default value: `http://localhost:8080/auth` |
 | `KEYCLOAK_ADMIN_USER` | The admin user of the Keycloak server.<br />Default value: `keycloak` |
 | `KEYCLOAK_ADMIN_PASSWORD` | The admin password of the Keycloak server.<br />Default value: `keycloak1!` |
 
