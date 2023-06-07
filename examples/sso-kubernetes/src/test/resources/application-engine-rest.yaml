@@ -18,15 +18,15 @@ camunda.bpm:
 # Externalized Keycloak configuration
 keycloak:
   # SSO Authentication requests. Send by application as redirect to the browser
-  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
+  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000/auth}
   # SSO Token requests. Send from the application to Keycloak
-  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
+  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000/auth}
   # Keycloak access for the Identity Provider plugin.
-  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+  url.plugin: ${KEYCLOAK_URL_PLUGIN:http://localhost:9000/auth}
 
   # Keycloak Camunda Identity Client
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
-  client.secret: ${KEYCLOAK_CLIENT_SECRET:7979d2a6-eacc-43b1-afe0-54cea181fadc}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:GBLb9KSRxmmo81SIGH2BWu3GEtrofvWo}
 
 # Spring Boot Security OAuth2 SSO
 spring.security:
@@ -42,11 +42,11 @@ spring.security:
           scope: openid, profile, email
       provider:
         keycloak:
-          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
-          authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
-          user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
-          jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
-          issuer-uri: ${keycloak.url.token}/auth/realms/camunda
+          token-uri: ${keycloak.url.token}/realms/camunda/protocol/openid-connect/token
+          authorization-uri: ${keycloak.url.auth}/realms/camunda/protocol/openid-connect/auth
+          user-info-uri: ${keycloak.url.auth}/realms/camunda/protocol/openid-connect/userinfo
+          jwk-set-uri: ${keycloak.url.token}/realms/camunda/protocol/openid-connect/certs
+          issuer-uri: ${keycloak.url.token}/realms/camunda
           # set user-name-attribute one of: 
           # - sub                -> default; using keycloak ID as camunda user ID
           # - email              -> useEmailAsCamundaUserId=true
@@ -63,8 +63,8 @@ rest.security:
 
 # Camunda Keycloak Identity Provider Plugin
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
-  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+  keycloakIssuerUrl: ${keycloak.url.plugin}/realms/camunda
+  keycloakAdminUrl: ${keycloak.url.plugin}/admin/realms/camunda
   clientId: ${keycloak.client.id}
   clientSecret: ${keycloak.client.secret}
   useEmailAsCamundaUserId: true

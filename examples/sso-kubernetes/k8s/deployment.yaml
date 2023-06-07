@@ -35,11 +35,11 @@ spec:
            - name: KEYCLOAK_URL_TOKEN
              value: http://keycloak-server-service:8080/auth
            - name: KEYCLOAK_URL_PLUGIN
-             value: https://keycloak-server-service:8443/auth
+             value: http://keycloak-server-service:8080/auth
            - name: KEYCLOAK_CLIENT_ID
              value: camunda-identity-service
            - name: KEYCLOAK_CLIENT_SECRET
-             value: GtyyKMyl1aQKM9xhQv98cdLlhkh4qMsB
+             value: GBLb9KSRxmmo81SIGH2BWu3GEtrofvWo
            livenessProbe:
              httpGet:
                path: /camunda/actuator/health/liveness

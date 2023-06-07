@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-server
-           image: gunnaraccso/keycloak.server:19.0.3-legacy # jboss.keycloak
+           image: gunnaraccso/keycloak.server:21.1.1 # quay.io/keycloak/keycloak
            ports:
            - containerPort: 8080
              name: http
@@ -31,10 +31,14 @@ spec:
              value: "true"
            - name: TZ
              value: Europe/Berlin
-           - name: KEYCLOAK_USER
+           - name: KEYCLOAK_ADMIN
              value: keycloak
-           - name: KEYCLOAK_PASSWORD
+           - name: KEYCLOAK_ADMIN_PASSWORD
              value: keycloak1!
+           - name: DB_VENDOR
+             value: h2
+           - name: KC_HTTP_RELATIVE_PATH
+             value: /auth
            readinessProbe:
              tcpSocket:
                port: 8080
