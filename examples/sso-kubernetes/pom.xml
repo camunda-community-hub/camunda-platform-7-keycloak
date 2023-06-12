@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.camunda.bpm.extension.examples</groupId>
 		<artifactId>camunda-platform-7-keycloak-examples</artifactId>
-		<version>7.19.0-SNAPSHOT</version>
+		<version>7.19.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>camunda-platform-7-keycloak-examples-sso-kubernetes</artifactId>
