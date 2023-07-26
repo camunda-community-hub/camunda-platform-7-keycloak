@@ -59,6 +59,7 @@ jobs:
         maven-usr: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_USR }}
         maven-psw: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_PSW }}
         maven-gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
+        maven-auto-release-after-close: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
       id: release
     - if: github.event.release

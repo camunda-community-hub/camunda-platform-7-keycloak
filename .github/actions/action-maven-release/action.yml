@@ -38,6 +38,10 @@ inputs:
   maven-gpg-passphrase:
     description: GPG passphrase used to unlock the signing key
     required: true
+  maven-auto-release-after-close:
+    description: Flag indicating triggering of automatic release in OSS Maven Central if the repository closure was successful.
+    required: true
+    default: false
   github-token:
     description: GitHub token
     required: true
@@ -83,6 +87,7 @@ runs:
         mvn -B ${{ inputs.maven-additional-options }} versions:set org.codehaus.mojo:versions-maven-plugin:2.8.1:update-child-modules -DnewVersion=${{ inputs.release-version }}
         # 2. perform release
         mvn -B ${{ inputs.maven-additional-options }} ${RELEASE_PROFILE} ${{ inputs.maven-release-options }} -DskipTests -DnexusUrl=https://oss.sonatype.org/ -DserverId=central -Drelease-version=${{ inputs.release-version }} -Dgpg.sign initialize \
+        -DautoReleaseAfterClose=${{ inputs.maven-auto-release-after-close }} \
           clean source:jar javadoc:jar \
           deploy org.apache.maven.plugins:maven-gpg-plugin:sign \
           nexus-staging:deploy

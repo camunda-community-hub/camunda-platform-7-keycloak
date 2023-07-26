@@ -31,6 +31,8 @@
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
+    <!-- Nexus Staging -->
+    <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
   </properties>
 
   <licenses>
