@@ -1,6 +1,6 @@
 package org.camunda.bpm.extension.keycloak.showcase.rest;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
