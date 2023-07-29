@@ -45,7 +45,7 @@
 		</dependency>
         <dependency>
             <groupId>org.camunda.bpm.webapp</groupId>
-            <artifactId>camunda-webapp</artifactId>
+            <artifactId>camunda-webapp-jakarta</artifactId>
 			<classifier>classes</classifier>
 			<scope>provided</scope>
         </dependency>
