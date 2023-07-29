@@ -1,9 +1,9 @@
 package org.camunda.bpm.extension.keycloak.showcase.sso;
 
-import java.util.Collections;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 import jakarta.inject.Inject;
-
+import java.util.Collections;
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
@@ -24,33 +24,28 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
 @Configuration
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
-public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebAppSecurityConfig {
 
 	@Inject
 	private KeycloakLogoutHandler keycloakLogoutHandler;
-	
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    	
-    	http
-    	.csrf().ignoringAntMatchers("/api/**", "/engine-rest/**")
-    	.and()
-    	.requestMatchers().antMatchers("/**").and()
-        .authorizeRequests(
-       		authorizeRequests ->
-       		authorizeRequests
-       		.antMatchers("/app/**", "/api/**", "/lib/**")
-       		.authenticated()
-       		.anyRequest()
-       		.permitAll()
-       		)
-	    .oauth2Login()
-	    .and()
-	      .logout()
-	      .logoutRequestMatcher(new AntPathRequestMatcher("/app/**/logout"))
-	      .logoutSuccessHandler(keycloakLogoutHandler)
-        ;
-    }
+
+  @Bean
+  public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
+    return http
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers(antMatcher("/app/**"), antMatcher("/api/**"), antMatcher("/lib/**"))
+            .authenticated()
+            .anyRequest()
+            .permitAll())
+        .oauth2Login(Customizer.withDefaults())
+        .logout(logout -> logout
+            .logoutRequestMatcher(antMatcher("/app/**/logout"))
+            .logoutSuccessHandler(keycloakLogoutHandler)
+        )
+        .build();
+  }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Bean
