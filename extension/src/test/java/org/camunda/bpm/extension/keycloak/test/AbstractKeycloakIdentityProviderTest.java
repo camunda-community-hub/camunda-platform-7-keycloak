@@ -9,7 +9,13 @@ import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -277,22 +283,17 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @throws Exception in case of errors
 	 */
 	private static void setupRestTemplate() throws Exception {
-		HttpClientBuilder httpClient = HttpClientBuilder.create();
-		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-		factory.setHttpClient(httpClient.build());
-		restTemplate.setRequestFactory(factory);
 
-//		final TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-//	    final SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-//                .loadTrustMaterial(null, acceptingTrustStrategy)
-//                .build();
-//		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-//		final HttpClient httpClient = HttpClientBuilder.create()
-//	    		.setRedirectStrategy(new LaxRedirectStrategy())
-//	    		.setSSLSocketFactory(new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE))
-//	    		.build();
-//		factory.setHttpClient(httpClient);
-//		restTemplate.setRequestFactory(factory);
+		PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = PoolingHttpClientConnectionManagerBuilder.create();
+		SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustAllStrategy()).build();
+		SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
+				NoopHostnameVerifier.INSTANCE);
+		connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
+		final HttpClient httpClient = HttpClientBuilder.create()
+				.setConnectionManager(connectionManagerBuilder.build())
+				.build();
+		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+		restTemplate.setRequestFactory(factory);
 
 		for (int i = 0; i < restTemplate.getMessageConverters().size(); i++) {
 			if (restTemplate.getMessageConverters().get(i) instanceof StringHttpMessageConverter) {

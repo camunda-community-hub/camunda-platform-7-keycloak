@@ -1,8 +1,19 @@
 package org.camunda.bpm.extension.keycloak;
 
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
@@ -15,12 +26,10 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
@@ -55,51 +64,43 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 		this.setCheckPasswordCache(CacheFactory.create(loginCacheConfiguration));
 
 		// Create REST template with pooling HTTP client
-		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-		HttpClientBuilder httpClient = HttpClientBuilder.create();
-//		HttpClientBuilder httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy());
-//		if (keycloakConfiguration.isDisableSSLCertificateValidation()) {
-//			try {
-//				TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-//				SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-//				        .loadTrustMaterial(null, acceptingTrustStrategy)
-//				        .build();
-//				HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
-//				Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-//				        .<ConnectionSocketFactory> create()
-//						.register("https", new SSLConnectionSocketFactory(sslContext, allowAllHosts))
-//						.register("http", new PlainConnectionSocketFactory()) // needed if http proxy is in place
-//				        .build();
-//				final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-//				connectionManager.setMaxTotal(keycloakConfiguration.getMaxHttpConnections());
-//				httpClient.setConnectionManager(connectionManager);
-//			} catch (GeneralSecurityException e) {
-//				throw new IdentityProviderException("Disabling SSL certificate validation failed", e);
-//			}
-//		} else {
-//			final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-//			connectionManager.setMaxTotal(keycloakConfiguration.getMaxHttpConnections());
-//			httpClient.setConnectionManager(connectionManager);
-//		}
-//
-//		// configure proxy if set
-//		if (StringUtils.hasLength(keycloakConfiguration.getProxyUri())) {
-//			final URI proxyUri = URI.create(keycloakConfiguration.getProxyUri());
-//			final HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
-//			httpClient.setProxy(proxy);
-//			// configure proxy auth if set
-//			if (StringUtils.hasLength(keycloakConfiguration.getProxyUser()) && keycloakConfiguration.getProxyPassword() != null) {
-//				final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//				credentialsProvider.setCredentials(
-//						new AuthScope(proxyUri.getHost(), proxyUri.getPort()),
-//						new UsernamePasswordCredentials(keycloakConfiguration.getProxyUser(), keycloakConfiguration.getProxyPassword())
-//				);
-//				httpClient.setDefaultCredentialsProvider(credentialsProvider)
-//						.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
-//			}
-//		}
+		PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = PoolingHttpClientConnectionManagerBuilder
+				.create()
+				.setMaxConnTotal(keycloakConfiguration.getMaxHttpConnections());
 
-		factory.setHttpClient(httpClient.build());
+		if (keycloakConfiguration.isDisableSSLCertificateValidation()) {
+			try {
+			SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustAllStrategy()).build();
+			SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
+					NoopHostnameVerifier.INSTANCE);
+			connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
+			} catch (GeneralSecurityException e) {
+				throw new IdentityProviderException("Disabling SSL certificate validation failed", e);
+			}
+		}
+
+		final CredentialsStore credentialsProvider = new BasicCredentialsProvider();
+		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
+				//.setRedirectStrategy(new LaxRedirectStrategy())
+				.setConnectionManager(connectionManagerBuilder.build())
+				.setDefaultCredentialsProvider(credentialsProvider);
+
+		// configure proxy if set
+		if (StringUtils.hasLength(keycloakConfiguration.getProxyUri())) {
+			final URI proxyUri = URI.create(keycloakConfiguration.getProxyUri());
+			final HttpHost proxy = new HttpHost(proxyUri.getScheme(), proxyUri.getHost(), proxyUri.getPort());
+			httpClientBuilder.setProxy(proxy);
+			// configure proxy auth if set
+			if (StringUtils.hasLength(keycloakConfiguration.getProxyUser()) && keycloakConfiguration.getProxyPassword() != null) {
+				credentialsProvider.setCredentials(
+						new AuthScope(proxyUri.getHost(), proxyUri.getPort()),
+						new UsernamePasswordCredentials(keycloakConfiguration.getProxyUser(),
+								keycloakConfiguration.getProxyPassword().toCharArray())
+				);
+			}
+		}
+
+		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClientBuilder.build());
 		restTemplate.setRequestFactory(factory);
 
 		// replace ISO-8859-1 encoding with configured charset (default: UTF-8)
