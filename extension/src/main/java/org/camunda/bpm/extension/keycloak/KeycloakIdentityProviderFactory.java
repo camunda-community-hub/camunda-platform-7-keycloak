@@ -81,7 +81,6 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 
 		final CredentialsStore credentialsProvider = new BasicCredentialsProvider();
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
-				//.setRedirectStrategy(new LaxRedirectStrategy())
 				.setConnectionManager(connectionManagerBuilder.build())
 				.setDefaultCredentialsProvider(credentialsProvider);
 
