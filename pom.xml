@@ -19,7 +19,7 @@
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
   
   <properties>
-    <version.java>1.8</version.java>
+    <version.java>17</version.java>
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
