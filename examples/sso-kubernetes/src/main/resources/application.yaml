@@ -22,7 +22,7 @@ server:
 
 # Metrics & Health
 management:
-  health.probes.enabled: true
+  endpoint.health.probes.enabled: true
   endpoints:
     web.exposure.include: env,health,info,metrics
 

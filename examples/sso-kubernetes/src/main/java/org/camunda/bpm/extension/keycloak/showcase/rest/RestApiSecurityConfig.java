@@ -1,34 +1,26 @@
 package org.camunda.bpm.extension.keycloak.showcase.rest;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import jakarta.inject.Inject;
 import org.camunda.bpm.engine.IdentityService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtValidators;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 /**
  * Optional Security Configuration for Camunda REST Api.
  */
 @Configuration
-@EnableWebSecurity
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 20)
 @ConditionalOnProperty(name = "rest.security.enabled", havingValue = "true", matchIfMissing = true)
 public class RestApiSecurityConfig {
 
@@ -51,7 +43,8 @@ public class RestApiSecurityConfig {
 	 * {@inheritDoc}
 	 */
 	@Bean
-	public SecurityFilterChain httpSecurity(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+	@Order(2)
+	public SecurityFilterChain httpSecurityRest(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
 		String jwkSetUri = applicationContext.getEnvironment().getRequiredProperty(
 				"spring.security.oauth2.client.provider." + configProps.getProvider() + ".jwk-set-uri");
 

@@ -1,45 +1,51 @@
 package org.camunda.bpm.extension.keycloak.showcase.sso;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import jakarta.inject.Inject;
-import java.util.Collections;
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+
+import java.util.Collections;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 /**
  * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
  */
 @ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
+@EnableWebSecurity
 @Configuration
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
 public class WebAppSecurityConfig {
 
 	@Inject
 	private KeycloakLogoutHandler keycloakLogoutHandler;
 
   @Bean
+  @Order(1)
   public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
     return http
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(antMatcher("/app/**"), antMatcher("/api/**"), antMatcher("/lib/**"))
+            .requestMatchers(
+                    antMatcher("/assets/**"),
+                    antMatcher("/app/**"),
+                    antMatcher("/api/**"),
+                    antMatcher("/lib/**"))
             .authenticated()
             .anyRequest()
             .permitAll())
-        .oauth2Login(Customizer.withDefaults())
+        .oauth2Login(withDefaults())
         .logout(logout -> logout
             .logoutRequestMatcher(antMatcher("/app/**/logout"))
             .logoutSuccessHandler(keycloakLogoutHandler)
