@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.request.RequestContextListener;
 
@@ -25,7 +26,7 @@ import java.util.Collections;
  */
 @ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
 @Configuration
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
+@EnableWebSecurity
 public class WebAppSecurityConfig {
 
 	private static final int AFTER_SPRING_SECURITY_FILTER_CHAIN_ORDER = 201;
@@ -47,6 +48,7 @@ public class WebAppSecurityConfig {
 				.authorizeHttpRequests(authz -> authz
 						.requestMatchers(antMatcher("/")).permitAll()
 						.requestMatchers(antMatcher(path + "/app/**")).permitAll()
+						.requestMatchers(antMatcher(path + "/assets/**")).permitAll()
 						.requestMatchers(antMatcher(path + "/lib/**")).permitAll()
 						.requestMatchers(antMatcher(path + "/api/engine/engine/**")).permitAll()
 						.requestMatchers(antMatcher(path + "/api/*/plugin/*/static/app/plugin.css")).permitAll()

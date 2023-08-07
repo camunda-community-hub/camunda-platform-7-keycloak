@@ -17,18 +17,6 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- temporarily fix deserialisation bug when parsing nested objects
-                 of Keycloak answer inside Spring Security init -->
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>oauth2-oidc-sdk</artifactId>
-                <version>9.12</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.camunda.bpm.springboot</groupId>
