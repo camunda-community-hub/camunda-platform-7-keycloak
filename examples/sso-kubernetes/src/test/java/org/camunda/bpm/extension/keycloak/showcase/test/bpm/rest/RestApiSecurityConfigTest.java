@@ -7,11 +7,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.extension.keycloak.showcase.test.KeycloakTestcontainer;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,19 +25,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * Tests the security of the engine's REST interface.
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = "engine-rest")
-@Disabled("Runs only with Keycloak backend")
-public class RestApiSecurityConfigTest {
+@ContextConfiguration(initializers = KeycloakTestcontainer.Initializer.class)
+class RestApiSecurityConfigTest {
 
 	private static final String REST_API_USER = "camunda";
 	private static final String REST_API_PWD = "camunda1!";
@@ -85,7 +83,7 @@ public class RestApiSecurityConfigTest {
 	// ---------------------------------------------------------------------------
 
 	@Test
-	public void testSecuredRestApi_Accepted() throws Exception {
+	void testSecuredRestApi_Accepted() throws Exception {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
 		ResponseEntity<String> response = restTemplate.exchange(getEngineRestUrl("engine"), 
@@ -94,7 +92,7 @@ public class RestApiSecurityConfigTest {
 	}
 	
 	@Test
-	public void testUnSecuredRestApi_Denied() throws Exception {
+	void testUnSecuredRestApi_Denied() throws Exception {
 		HttpHeaders headers = new HttpHeaders();
 		try {
 			restTemplate.exchange(getEngineRestUrl("engine"), 
