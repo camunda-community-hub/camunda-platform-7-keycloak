@@ -1,5 +1,7 @@
 package org.camunda.bpm.extension.keycloak.showcase.sso;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationFilter;
 import org.camunda.bpm.extension.keycloak.config.KeycloakCockpitConfiguration;
 import org.camunda.bpm.extension.keycloak.config.KeycloakConfigurationFilterRegistrationBean;
@@ -10,11 +12,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.request.RequestContextListener;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collections;
 
 /**
@@ -22,8 +26,8 @@ import java.util.Collections;
  */
 @ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
 @Configuration
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
-public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class WebAppSecurityConfig {
 
 	private static final int AFTER_SPRING_SECURITY_FILTER_CHAIN_ORDER = 201;
 	private static final String API_FILTER_PATTERN = "/api/*";
@@ -35,22 +39,23 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Inject
 	private KeycloakCockpitConfiguration keycloakCockpitConfiguration;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
 		String path = camundaBpmProperties.getWebapp().getApplicationPath();
-		http
-				.csrf().ignoringAntMatchers("/api/**", "/engine-rest/**")
-				.and()
-				.requestMatchers().antMatchers("/**").and()
-				.authorizeRequests(authz -> authz
-						.antMatchers( "/").permitAll()
-						.antMatchers(path + "/app/**").permitAll()
-						.antMatchers(path + "/lib/**").permitAll()
-						.antMatchers(path + "/api/engine/engine/**").permitAll()
-						.antMatchers(path + "/api/*/plugin/*/static/app/plugin.css").permitAll()
-						.antMatchers(path + "/api/*/plugin/*/static/app/plugin.js").permitAll()
+		return http
+				.csrf(csrf -> csrf
+						.ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
+				.authorizeHttpRequests(authz -> authz
+						.requestMatchers(antMatcher("/")).permitAll()
+						.requestMatchers(antMatcher(path + "/app/**")).permitAll()
+						.requestMatchers(antMatcher(path + "/assets/**")).permitAll()
+						.requestMatchers(antMatcher(path + "/lib/**")).permitAll()
+						.requestMatchers(antMatcher(path + "/api/engine/engine/**")).permitAll()
+						.requestMatchers(antMatcher(path + "/api/*/plugin/*/static/app/plugin.css")).permitAll()
+						.requestMatchers(antMatcher(path + "/api/*/plugin/*/static/app/plugin.js")).permitAll()
 						.anyRequest().authenticated())
-				.oauth2ResourceServer(oauth2 -> oauth2.jwt());
+				.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+				.build();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

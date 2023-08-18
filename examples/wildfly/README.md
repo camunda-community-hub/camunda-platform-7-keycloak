@@ -23,7 +23,8 @@ To do so, create a directory ``modules/org/camunda/bpm/identity/camunda-identity
         <module name="javax.api" />
         <module name="org.camunda.bpm.camunda-engine" />
         <module name="org.camunda.commons.camunda-commons-logging" />
-
+        <module name="org.slf4j"/>
+        
     </dependencies>
 </module>
 ```
