@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-			<!-- 			<artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
+			<!-- <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
 		</dependency>
 
 		<dependency>
@@ -80,6 +80,7 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+		<!-- Required in order to run with Java > 8 -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
@@ -99,7 +100,7 @@
         <dependency>
           <groupId>org.camunda.bpm.extension</groupId>
           <artifactId>camunda-bpm-junit5</artifactId>
-          <version>1.0.0</version>
+          <version>1.1.0</version>
           <scope>test</scope>
         </dependency>
 
