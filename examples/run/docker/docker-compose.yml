@@ -3,13 +3,18 @@ version: '3.9'
 services:
 
   keycloak:
-    image: gunnaraccso/keycloak.server:14.0.0
+    image: gunnaraccso/keycloak.server:21.1.1
     restart: always
     env_file:
       - ./env/keycloak.env
+    # Add 127.0.0.1 keycloak in /etc/hosts
     ports:
-      - "9001:8443"
-      - "9000:8080"
+      - "9001:9001"
+      - "9000:9000"
+    command:
+      - start-dev
+      - --http-port=9000
+      - --https-port=9001
 
   camunda:
     build: .
