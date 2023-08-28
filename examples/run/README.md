@@ -59,9 +59,9 @@ Within the subdirectory `docker` you'll find a basic sample consisting of:
 
 Usage:
 
-1. ``docker-compose build``
-2. ``docker-compose up -d``
+1. ``docker compose build``
+2. ``docker compose up -d``
 3. Login at ``http://localhost:8080`` using ``camunda`` / ``camunda1!`` and use Cockpit / Tasklist / Admin.
-4. Keycloak is available under ``https://localhost:9001``. Login with ``keycloak`` / ``keycloak1!``.
+4. Keycloak is available under ``https://localhost:9001/auth``. Login with ``keycloak`` / ``keycloak1!``.
 
 **Beware**: This is not production ready, still using a H2 database for each of the instances, but might help you to understand the configuration basics.

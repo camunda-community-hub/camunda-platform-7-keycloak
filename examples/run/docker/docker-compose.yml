@@ -3,13 +3,21 @@ version: '3.9'
 services:
 
   keycloak:
-    image: gunnaraccso/keycloak.server:14.0.0
+    image: gunnaraccso/keycloak.server:21.1.1
     restart: always
     env_file:
       - ./env/keycloak.env
     ports:
       - "9001:8443"
       - "9000:8080"
+    command:
+      - start-dev
+      - --features admin-fine-grained-authz
+      - --https-certificate-file=/keycloak/config/ssl/cert.pem
+      - --https-certificate-key-file=/keycloak/config/ssl/key.pem
+    volumes:
+      - ./ssl/cert.pem:/keycloak/config/ssl/cert.pem
+      - ./ssl/key.pem:/keycloak/config/ssl/key.pem
 
   camunda:
     build: .
