@@ -339,6 +339,16 @@ Finally - a quick introduction on how to setup Keycloak and this showcase on Kub
 
 Before we turn to Kubernetes it is necessary to build the Docker image. As we included the ``spring-boot-maven-plugin`` everything is quite simple, just run ``mvn spring-boot:build-image``.
 
+The Docker Image Build is using the `gcr.io/paketo-buildpacks/adoptium` Buildpack having JDK's jlink tool at build time enabled to generate a custom slim JRE.
+
+#### Java module dependencies & jlinked Java 17
+
+Just for the records - how to find out java module dependencies and shrink your JRE:
+* Extract ``target/camunda-platform-7-keycloak-examples-sso-kubernetes.jar/BOOT-INF/lib`` to `target/lib``
+* Open a shell in ``target`` and run ``jdeps -cp lib/* -R --multi-release 17 --print-module-deps --ignore-missing-deps camunda-platform-7-keycloak-examples-sso-kubernetes.jar``
+
+The result goes to the jlink `add-modules` option in the `BP_JVM_JLINK_ARGS` environment parameter of the `spring-boot-maven-plugin` image configuration.
+
 ### Kubernetes
 
 The Kubernetes setup can be found in directory ``k8s``. It contains a subfolder ``keycloak`` setting up the Keycloak test server.

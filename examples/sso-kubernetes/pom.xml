@@ -16,7 +16,6 @@
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 
-		<docker.buildPack>paketobuildpacks/builder-jammy-tiny</docker.buildPack>
 		<docker.imageName>gunnaraccso/camunda-showcase-keycloak:${version}</docker.imageName>
 	</properties>
 
@@ -158,7 +157,17 @@
 						<enabled>true</enabled>
 					</layers>
 					<image>
-						<builder>${docker.buildPack}</builder>
+						<builder>paketobuildpacks/builder:tiny</builder>
+						<buildpacks>
+							<buildpack>gcr.io/paketo-buildpacks/adoptium</buildpack>
+							<buildpack>paketo-buildpacks/java</buildpack>
+						</buildpacks>
+						<env>
+							<BP_JVM_VERSION>${version.java}</BP_JVM_VERSION>
+							<BP_JVM_TYPE>JRE</BP_JVM_TYPE>
+							<BP_JVM_JLINK_ENABLED>true</BP_JVM_JLINK_ENABLED>
+							<BP_JVM_JLINK_ARGS>--no-man-pages --no-header-files --strip-debug --compress=2 --add-modules java.base,java.compiler,java.desktop,java.instrument,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.attach,jdk.jdi,jdk.jfr,jdk.management,jdk.net,jdk.unsupported</BP_JVM_JLINK_ARGS>
+						</env>
 					</image>
 					<imageName>${docker.imageName}</imageName>
 				</configuration>
