@@ -15,6 +15,9 @@
 
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+		<docker.buildPack>paketobuildpacks/builder-jammy-tiny</docker.buildPack>
+		<docker.imageName>gunnaraccso/camunda-showcase-keycloak:${version}</docker.imageName>
 	</properties>
 
 	<dependencies>
@@ -151,6 +154,13 @@
 				<version>${version.springBoot}</version>
 				<configuration>
 					<layout>ZIP</layout>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
+					<image>
+						<builder>${docker.buildPack}</builder>
+					</image>
+					<imageName>${docker.imageName}</imageName>
 				</configuration>
 				<executions>
 					<execution>
@@ -198,6 +208,5 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
 </project>
