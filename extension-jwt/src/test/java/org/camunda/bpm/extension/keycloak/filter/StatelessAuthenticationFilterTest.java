@@ -24,7 +24,7 @@ public class StatelessAuthenticationFilterTest extends PluggableProcessEngineTes
 
     private final AuthenticationProvider authenticationProvider = mock(AuthenticationProvider.class);
 
-    private final KeycloakJwtAuthenticationFilter statelessAuthenticationFilter = new KeycloakJwtAuthenticationFilter() {
+    private final KeycloakJwtAuthenticationFilter statelessAuthenticationFilter = new KeycloakJwtAuthenticationFilter("") {
         {
             authenticationProvider = StatelessAuthenticationFilterTest.this.authenticationProvider;
         }

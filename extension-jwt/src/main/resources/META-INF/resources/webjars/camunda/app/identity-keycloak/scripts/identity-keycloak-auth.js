@@ -1,10 +1,16 @@
-var camundaIdentityKeycloak = undefined;
+import { default as Keycloak } from "./keycloak-mjs.js";
+
+let camundaIdentityKeycloak = undefined;
 
 const portalName = document.querySelector('base').attributes['app-root'].value;
 
-await import(portalName + '/app/keycloak/keycloak.min.js')
-    .then(() => window.fetch(portalName+"/app/keycloak/keycloak-options.json"))
-    .then(response => response.ok ? response.json() : Promise.resolve())
+async function fetchKeycloakOptions(optionsUrl) {
+    const response = await fetch(optionsUrl);
+    const options = await response.json();
+    return options;
+}
+
+await fetchKeycloakOptions(portalName+"/app/keycloak/keycloak-options.json")
     .then(options => {
         if (options) {
             camundaIdentityKeycloak = new Keycloak(options);

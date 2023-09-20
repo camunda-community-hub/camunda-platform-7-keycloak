@@ -1,5 +1,11 @@
 package org.camunda.bpm.extension.keycloak.auth;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
@@ -7,13 +13,8 @@ import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
+import org.springframework.util.StringUtils;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,6 +31,14 @@ public class KeycloakJwtAuthenticationFilter extends ContainerBasedAuthenticatio
     private static final int HTTP_STATUS_NOT_FOUND = 404;
     private static final String GET_METHOD = "GET";
     private String processEngineName = ProcessEngines.NAME_DEFAULT;
+
+    private String camundaApplicationPath = "";
+
+    public KeycloakJwtAuthenticationFilter(String camundaApplicationPath) {
+        if (StringUtils.hasLength(camundaApplicationPath)) {
+            this.camundaApplicationPath = camundaApplicationPath;
+        }
+    }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest req = (HttpServletRequest) request;
@@ -81,7 +90,8 @@ public class KeycloakJwtAuthenticationFilter extends ContainerBasedAuthenticatio
 
     @Override
     protected String extractEngineName(HttpServletRequest request) {
-        Matcher apiStaticPluginPattern = API_STATIC_PLUGIN_PATTERN.matcher(request.getRequestURI());
+        String requestUri = request.getRequestURI().substring(camundaApplicationPath.length());
+        Matcher apiStaticPluginPattern = API_STATIC_PLUGIN_PATTERN.matcher(requestUri);
         if (request.getMethod().equals(GET_METHOD) && apiStaticPluginPattern.matches()) {
             return null;
         } else {

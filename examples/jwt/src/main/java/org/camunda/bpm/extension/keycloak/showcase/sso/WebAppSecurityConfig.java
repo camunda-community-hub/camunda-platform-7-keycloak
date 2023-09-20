@@ -1,13 +1,11 @@
 package org.camunda.bpm.extension.keycloak.showcase.sso;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
+import jakarta.inject.Inject;
 import org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationFilter;
 import org.camunda.bpm.extension.keycloak.config.KeycloakCockpitConfiguration;
 import org.camunda.bpm.extension.keycloak.config.KeycloakConfigurationFilterRegistrationBean;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +16,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.request.RequestContextListener;
 
-import jakarta.inject.Inject;
 import java.util.Collections;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 /**
  * Camunda Web application SSO configuration for usage with KeycloakIdentityProviderPlugin.
@@ -44,7 +43,8 @@ public class WebAppSecurityConfig {
 		String path = camundaBpmProperties.getWebapp().getApplicationPath();
 		return http
 				.csrf(csrf -> csrf
-						.ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
+						.ignoringRequestMatchers(antMatcher(path + "/api/**"), antMatcher("/engine-rest/**")))
+				.securityMatcher("/**")
 				.authorizeHttpRequests(authz -> authz
 						.requestMatchers(antMatcher("/")).permitAll()
 						.requestMatchers(antMatcher(path + "/app/**")).permitAll()
@@ -64,7 +64,7 @@ public class WebAppSecurityConfig {
 		String camundaWebappPath = camundaBpmProperties.getWebapp().getApplicationPath();
 
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-        filterRegistration.setFilter(new KeycloakJwtAuthenticationFilter());
+        filterRegistration.setFilter(new KeycloakJwtAuthenticationFilter(camundaWebappPath));
         filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationProvider"));
 		filterRegistration.setName(AUTHENTICATION_FILTER_NAME);
 		filterRegistration.setOrder(AFTER_SPRING_SECURITY_FILTER_CHAIN_ORDER);

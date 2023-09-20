@@ -9,6 +9,5 @@ public class KeycloakConfigurationFilterRegistrationBean extends FilterRegistrat
         setFilter(new KeycloakCockpitConfigurationFilter(keycloakCockpitConfiguration));
         setOrder(Ordered.HIGHEST_PRECEDENCE);
         addUrlPatterns(camundaWebappApplicationPath + KeycloakCockpitConfigurationFilter.KEYCLOAK_OPTIONS_PATH);
-        addUrlPatterns(camundaWebappApplicationPath + KeycloakCockpitConfigurationFilter.KEYCLOAK_JS_PATH);
     }
 }
