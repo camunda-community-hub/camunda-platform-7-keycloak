@@ -67,9 +67,10 @@ In order to setup Spring Boot's OAuth2 security add the following Maven dependen
 With all that stuff in place we then need a Web Security Configuration as follows:
 
 ```java
+@ConditionalOnMissingClass("org.springframework.test.context.junit.jupiter.SpringExtension")
 @Configuration
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
-public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class WebAppSecurityConfig {
 
     private static final int AFTER_SPRING_SECURITY_FILTER_CHAIN_ORDER = 201;
     private static final String API_FILTER_PATTERN = "/api/*";
@@ -81,22 +82,24 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Inject
     private KeycloakCockpitConfiguration keycloakCockpitConfiguration;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
         String path = camundaBpmProperties.getWebapp().getApplicationPath();
-        http
-                .csrf().ignoringAntMatchers("/api/**", "/engine-rest/**")
-                .and()
-                .requestMatchers().antMatchers("/**").and()
-                .authorizeRequests(authz -> authz
-                        .antMatchers( "/").permitAll()
-                        .antMatchers(path + "/app/**").permitAll()
-                        .antMatchers(path + "/lib/**").permitAll()
-                        .antMatchers(path + "/api/engine/engine/**").permitAll()
-                        .antMatchers(path + "/api/*/plugin/*/static/app/plugin.css").permitAll()
-                        .antMatchers(path + "/api/*/plugin/*/static/app/plugin.js").permitAll()
+        return http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(antMatcher(path + "/api/**"), antMatcher("/engine-rest/**")))
+                .securityMatcher("/**")
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(antMatcher("/")).permitAll()
+                        .requestMatchers(antMatcher(path + "/app/**")).permitAll()
+                        .requestMatchers(antMatcher(path + "/assets/**")).permitAll()
+                        .requestMatchers(antMatcher(path + "/lib/**")).permitAll()
+                        .requestMatchers(antMatcher(path + "/api/engine/engine/**")).permitAll()
+                        .requestMatchers(antMatcher(path + "/api/*/plugin/*/static/app/plugin.css")).permitAll()
+                        .requestMatchers(antMatcher(path + "/api/*/plugin/*/static/app/plugin.js")).permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt());
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .build();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -105,7 +108,7 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
         String camundaWebappPath = camundaBpmProperties.getWebapp().getApplicationPath();
 
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-        filterRegistration.setFilter(new KeycloakJwtAuthenticationFilter());
+        filterRegistration.setFilter(new KeycloakJwtAuthenticationFilter(camundaWebappPath));
         filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "org.camunda.bpm.extension.keycloak.auth.KeycloakJwtAuthenticationProvider"));
         filterRegistration.setName(AUTHENTICATION_FILTER_NAME);
         filterRegistration.setOrder(AFTER_SPRING_SECURITY_FILTER_CHAIN_ORDER);
@@ -156,16 +159,15 @@ Also for camunda 7.18+ you need to configure CSP header:
 camunda.bpm:
   webapp:
     header-security:
-      content-security-policy-value=: "base-uri 'self';
-                                        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
-                                        style-src 'unsafe-inline' 'self';
-                                        connect-src ${plugin.cockpit.keycloak.keycloakUrl} 'self';
-                                        default-src 'self';
-                                        img-src 'self' data:;
-                                        block-all-mixed-content;form-action 'self';
-                                        frame-ancestors 'none';object-src 'none';
-                                        sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
-
+      content-security-policy-value: "base-uri 'self';
+                                      script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
+                                      style-src 'unsafe-inline' 'self';
+                                      connect-src ${keycloak.url} 'self';
+                                      default-src 'self';
+                                      img-src 'self' data:;
+                                      block-all-mixed-content;form-action 'self';
+                                      frame-ancestors 'none';object-src 'none';
+                                      sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
 ```
 
 Now you are ready for the last step: activate Keycloak on the client side.
@@ -184,5 +186,5 @@ export default {
 };
 ```
 
-The referenced script takes care of loading `<keycloakserver>/js/keycloak.min.js` from your Keycloak server and integrates the Authorization into the Cockpit app
+The referenced script takes care of loading the [Keycloak Javascript adapter](https://www.keycloak.org/docs/latest/securing_apps/#_javascript_adapter) and integrates the Authorization into the Cockpit app
 using parameters as configured in the Spring Boot config file.

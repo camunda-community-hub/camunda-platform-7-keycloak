@@ -30,9 +30,9 @@ public class WebAppSecurityConfig {
 	@Inject
 	private KeycloakLogoutHandler keycloakLogoutHandler;
 
-  @Bean
-  @Order(1)
-  public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
+    @Bean
+    @Order(1)
+    public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
     return http
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
@@ -51,7 +51,7 @@ public class WebAppSecurityConfig {
             .logoutSuccessHandler(keycloakLogoutHandler)
         )
         .build();
-  }
+    }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Bean

@@ -17,9 +17,8 @@ For the records - included dependencies are:
 * org.springframework:spring-beans
 * org.springframework:spring-core
 * org.springframework:spring-jcl
-* org.apache.httpcomponents:httpclient
-	* org.apache.httpcomponents:httpcore
-	* commons-codec:commons-codec
+* org.apache.httpcomponents:client5
+	* org.apache.httpcomponents:core5
 * com.github.ben-manes.caffeine:caffeine
 	* org.checkerframework:checker-qual
 	* com.google.errorprone:error_prone_annotations
