@@ -38,6 +38,11 @@ The build process uses Maven.
         <td>&nbsp;</td>
         <td><code>spring-boot:run</code></td>
     </tr>
+    <tr>
+        <td>Build Docker Image</td>
+        <td>&nbsp;</td>
+        <td><code>spring-boot:build-image</code></td>
+    </tr>
 </table>
 
 ## Show me the important parts
@@ -330,48 +335,19 @@ Finally - a quick introduction on how to setup Keycloak and this showcase on Kub
 
 ![KubernetesSetup](docs/KubernetesSetup.PNG)
 
+### Docker Image Build
 
-Before we turn to Kubernetes it is necessary to shortly introduce the Docker Build process.
+Before we turn to Kubernetes it is necessary to build the Docker image. As we included the ``spring-boot-maven-plugin`` everything is quite simple, just run ``mvn spring-boot:build-image``.
 
-### Multi-Stage Docker Build
+The Docker Image Build is using the `gcr.io/paketo-buildpacks/adoptium` Buildpack having JDK's jlink tool at build time enabled to generate a custom slim JRE.
 
-The Dockerfile is using a multi-stage Docker build starting with a maven Docker image. Why do we do that? Because we do not want to deal with maven and java versions etc. within our pipeline. In our case the pipeline will have to deal with Docker, that's all.
+#### Java module dependencies & jlinked Java 17
 
-The Docker build uses the separate standalone Maven `docker-pom.xml` as build file. When using the Camunda Enterprise Version you have to adapt the file ``settings-docker.xml`` and set your credentials of the Camunda Enterprise Maven Repository accordingly:
+Just for the records - how to find out java module dependencies and shrink your JRE:
+* Extract ``target/camunda-platform-7-keycloak-examples-sso-kubernetes.jar/BOOT-INF/lib`` to `target/lib``
+* Open a shell in ``target`` and run ``jdeps -cp lib/* -R --multi-release 17 --print-module-deps --ignore-missing-deps camunda-platform-7-keycloak-examples-sso-kubernetes.jar``
 
-```xml
-<!-- Maven Settings for Docker Build -->
-<servers>
-    <server>
-        <id>camunda-bpm-ee</id>
-        <username>xxxxxx</username>
-        <password>xxxxxx</password>
-    </server>
-</servers>
-```
-
-Just run a standard Docker image build to get your docker container.
-
-### Java module dependencies & jlinked Java 11
-
-The Dockerfile includes stages for building a shrinked JDK 11 using Java's ``jlink``. Keep in mind that this is optional.
-
-Just for the records - how to find out java module dependencies and shrink your JDK:
-* Extract ``target/camunda-showcase-keycloak.jar/BOOT-INF/lib`` to `target/lib``
-* Open a shell in ``target`` and run ``jdeps -cp lib/* -R --multi-release 11 --print-module-deps --ignore-missing-deps camunda-showcase-keycloak.jar``
-
-The result goes to the jlink ``add-modules`` option in the following Dockerfile section (which has already been applied for this showcase):
-
-```Dockerfile
-# jlinked java 11 (do NOT use alpine-slim here which has important module files deleted)
-FROM adoptopenjdk/openjdk11:jdk-11.0.3_7-alpine AS JLINKED_JAVA
-RUN ["jlink", "--compress=2", \
-      "--module-path", "/opt/java/openjdk/jmods", \
-      "--add-modules", "java.base,java.compiler,java.desktop,java.instrument,java.management,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.httpserver,jdk.jdi,jdk.unsupported", \
-      "--output", "/jlinked"]
-```
-
-The final result will be a slim custom JDK which has been reduced in image size. Feel free to skip this part, delete the corresponding Dockerfile sections and use a full JDK 11 as base image for your Spring Boot Application.
+The result goes to the jlink `add-modules` option in the `BP_JVM_JLINK_ARGS` environment parameter of the `spring-boot-maven-plugin` image configuration.
 
 ### Kubernetes
 

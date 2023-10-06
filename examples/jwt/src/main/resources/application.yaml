@@ -10,15 +10,15 @@ camunda.bpm:
   # CSP header configuration (Camunda 7.18+)
   webapp:
     header-security:
-      content-security-policy-value=: "base-uri 'self';
-                                        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
-                                        style-src 'unsafe-inline' 'self';
-                                        connect-src ${keycloak.url} 'self';
-                                        default-src 'self';
-                                        img-src 'self' data:;
-                                        block-all-mixed-content;form-action 'self';
-                                        frame-ancestors 'none';object-src 'none';
-                                        sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
+      content-security-policy-value: "base-uri 'self';
+                                      script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
+                                      style-src 'unsafe-inline' 'self';
+                                      connect-src ${keycloak.url} 'self';
+                                      default-src 'self';
+                                      img-src 'self' data:;
+                                      block-all-mixed-content;form-action 'self';
+                                      frame-ancestors 'none';object-src 'none';
+                                      sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"
 
 server:
   port: 8080
@@ -48,9 +48,9 @@ keycloak:
 # Spring Boot Security OAuth2 SSO
 spring.security:
   oauth2:
-    resourceserver:
+    resource-server:
       jwt:
-        issuer-uri: http://localhost:9000/realms/camunda
+        issuer-uri: ${keycloak.url}/realms/camunda
 
 # Camunda Cockpit JWT Plugin
 plugin.cockpit.keycloak:
@@ -70,4 +70,4 @@ plugin.identity.keycloak:
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true
 
-logging.level.org.springframework.security: DEBUG
+logging.level.org.springframework.security: TRACE

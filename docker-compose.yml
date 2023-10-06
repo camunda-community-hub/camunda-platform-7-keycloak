@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  jboss.keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    restart: always
+    environment:
+      TZ: Europe/Berlin
+      DB_VENDOR: h2
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak1!
+      KC_HTTP_RELATIVE_PATH: /auth
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+    command:
+      - start-dev
+      - --features admin-fine-grained-authz

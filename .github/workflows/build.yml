@@ -23,7 +23,7 @@ jobs:
     - name: Java setup
       uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
       with:
-        java-version: 1.8
+        java-version: 17
     - name: Cache
       uses: actions/cache@0781355a23dac32fd3bac414512f4b903437991a # pin@v2
       with:

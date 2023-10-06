@@ -9,14 +9,12 @@ Please be aware that you must use the provided ``*-run-x.y.z.jar`` (fat jar, pac
 
 For the records - included dependencies are:
 
-* org.apache.httpcomponents:httpclient
-	* org.apache.httpcomponents:httpcore
-	* commons-codec:commons-codec
+* org.apache.httpcomponents:client5
+	* org.apache.httpcomponents:core5
 * com.google.code.gson:gson
 * com.github.ben-manes.caffeine:caffeine
 	* org.checkerframework:checker-qual
 	* com.google.errorprone:error_prone_annotations
-
 
 The ``com.google.code.gson`` and ``com.github.ben-manes.caffeine`` dependencies are shaded into the ``keycloakjar`` package namespace. Please be aware ``httpclient`` dependencies (including transitive ones) are not(!) shaded.
 

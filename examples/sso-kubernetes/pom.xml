@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.camunda.bpm.extension.examples</groupId>
 		<artifactId>camunda-platform-7-keycloak-examples</artifactId>
-		<version>7.19.1-SNAPSHOT</version>
+		<version>7.20.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>camunda-platform-7-keycloak-examples-sso-kubernetes</artifactId>
@@ -15,25 +15,15 @@
 
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
-	</properties>
 
-	<dependencyManagement>
-        <dependencies>
-            <!-- temporarily fix deserialisation bug when parsing nested objects 
-                 of Keycloak answer inside Spring Security init -->
-	        <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>oauth2-oidc-sdk</artifactId>
-                <version>9.12</version>
-	        </dependency>
-        </dependencies>
-	</dependencyManagement>
+		<docker.imageName>gunnaraccso/camunda-showcase-keycloak:${version}</docker.imageName>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.camunda.bpm.springboot</groupId>
 			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-<!-- 			<artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
+			<!-- <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId> -->
 		</dependency>
 
 		<dependency>
@@ -46,29 +36,29 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-	    <dependency>
-	      <groupId>org.springframework.boot</groupId>
-	      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.springframework.boot</groupId>
-	      <artifactId>spring-boot-starter-oauth2-client</artifactId>
-	    </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
 
 		<!-- Keycloak Identity Prover Plugin  -->
 		<dependency>
-	        <groupId>org.camunda.bpm.extension</groupId>
-	        <artifactId>camunda-platform-7-keycloak</artifactId>
+			<groupId>org.camunda.bpm.extension</groupId>
+			<artifactId>camunda-platform-7-keycloak</artifactId>
 		</dependency>
 
 		<!-- Database -->
 		<dependency>
-		  <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-starter-jdbc</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.postgresql</groupId>
-		    <artifactId>postgresql</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 		</dependency>
 
 		<dependency>
@@ -92,10 +82,10 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-		<!-- Required to run with Java 11 -->
+		<!-- Required in order to run with Java > 8 -->
 		<dependency>
-		    <groupId>javax.xml.bind</groupId>
-		    <artifactId>jaxb-api</artifactId>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
 
 		<!-- Test dependencies -->
@@ -112,7 +102,7 @@
         <dependency>
           <groupId>org.camunda.bpm.extension</groupId>
           <artifactId>camunda-bpm-junit5</artifactId>
-          <version>1.0.0</version>
+          <version>1.1.0</version>
           <scope>test</scope>
         </dependency>
 
@@ -125,6 +115,17 @@
 
 		<!-- Add your own dependencies here, if in compile scope, they are added 
 			to the jar -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.dasniko</groupId>
+			<artifactId>testcontainers-keycloak</artifactId>
+			<version>3.0.0</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -152,6 +153,23 @@
 				<version>${version.springBoot}</version>
 				<configuration>
 					<layout>ZIP</layout>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
+					<image>
+						<builder>paketobuildpacks/builder:tiny</builder>
+						<buildpacks>
+							<buildpack>gcr.io/paketo-buildpacks/adoptium</buildpack>
+							<buildpack>paketo-buildpacks/java</buildpack>
+						</buildpacks>
+						<env>
+							<BP_JVM_VERSION>${version.java}</BP_JVM_VERSION>
+							<BP_JVM_TYPE>JRE</BP_JVM_TYPE>
+							<BP_JVM_JLINK_ENABLED>true</BP_JVM_JLINK_ENABLED>
+							<BP_JVM_JLINK_ARGS>--no-man-pages --no-header-files --strip-debug --compress=2 --add-modules java.base,java.compiler,java.desktop,java.instrument,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.attach,jdk.jdi,jdk.jfr,jdk.management,jdk.net,jdk.unsupported</BP_JVM_JLINK_ARGS>
+						</env>
+					</image>
+					<imageName>${docker.imageName}</imageName>
 				</configuration>
 				<executions>
 					<execution>
@@ -199,6 +217,5 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
 </project>

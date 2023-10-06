@@ -7,27 +7,28 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>3.7</version>
+    <version>3.9.1</version>
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-platform-7-keycloak-root</artifactId>
-  <version>7.19.1-SNAPSHOT</version>
+  <version>7.20.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform 7 - engine plugins - identity - keycloak - root</name>
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
   
   <properties>
-    <version.java>1.8</version.java>
+    <version.java>17</version.java>
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.19.0</version.camunda>
-    <!-- <version.camunda>7.19.0-ee</version.camunda> -->
-	<version.springBoot>2.7.12</version.springBoot>
+	<version.camunda>7.20.0</version.camunda>
+    <!-- <version.camunda>7.20.0-ee</version.camunda> -->
+	<version.springBoot>3.1.4</version.springBoot>
+    <version.commons-codec>1.16.0</version.commons-codec>
 
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -120,6 +121,20 @@
     </repository>
     -->
   </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>${version.java}</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>community-action-maven-release</id>

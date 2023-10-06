@@ -9,13 +9,13 @@ import java.util.ResourceBundle;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.apache.http.ssl.TrustStrategy;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -32,6 +32,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -282,17 +283,17 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * @throws Exception in case of errors
 	 */
 	private static void setupRestTemplate() throws Exception {
-		final TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-	    final SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
-		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+
+		PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = PoolingHttpClientConnectionManagerBuilder.create();
+		SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustAllStrategy()).build();
+		SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
+				NoopHostnameVerifier.INSTANCE);
+		connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
 		final HttpClient httpClient = HttpClientBuilder.create()
-	    		.setRedirectStrategy(new LaxRedirectStrategy())
-	    		.setSSLSocketFactory(new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE))
-	    		.build();
-		factory.setHttpClient(httpClient);
-		restTemplate.setRequestFactory(factory);		
+				.setConnectionManager(connectionManagerBuilder.build())
+				.build();
+		final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+		restTemplate.setRequestFactory(factory);
 
 		for (int i = 0; i < restTemplate.getMessageConverters().size(); i++) {
 			if (restTemplate.getMessageConverters().get(i) instanceof StringHttpMessageConverter) {
@@ -310,7 +311,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	protected static HttpHeaders authenticateKeycloakAdmin() throws JSONException {
 		// Authenticate Admin
 		HttpHeaders headers = new HttpHeaders();
-	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString());
+	    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 	    HttpEntity<String> request = new HttpEntity<>(
 	    		"client_id=admin-cli"
 	    		+ "&username=" + KEYCLOAK_ADMIN_USER + "&password=" + KEYCLOAK_ADMIN_PASSWORD
@@ -324,7 +325,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 
 		// Create REST request header
 		headers = new HttpHeaders();
-	    headers.add(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString() + ";charset="+StandardCharsets.UTF_8.name());
+	    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset="+StandardCharsets.UTF_8.name());
 		headers.add(HttpHeaders.AUTHORIZATION, tokenType + " " + accessToken);
 
 		return headers;
