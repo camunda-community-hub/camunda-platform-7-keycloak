@@ -137,6 +137,14 @@
         <configuration>
           <!-- disable javadoc linter to not fail on incomplete javadoc -->
           <additionalJOption>-Xdoclint:none</additionalJOption>
+          <legacyMode>true</legacyMode>
+          <additionalDependencies>
+            <dependency>
+              <groupId>org.camunda.bpm</groupId>
+              <artifactId>camunda-engine</artifactId>
+              <version>${version.camunda}</version>
+            </dependency>
+          </additionalDependencies>
         </configuration>
       </plugin>
     </plugins>
