@@ -30,8 +30,6 @@
 	<version.springBoot>3.1.4</version.springBoot>
     <version.commons-codec>1.16.0</version.commons-codec>
 
-    <!-- disable javadoc linter to not fail on incomplete javadoc -->
-    <additionalJOption>-Xdoclint:none</additionalJOption>
     <!-- Nexus Staging -->
     <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
   </properties>
@@ -130,6 +128,15 @@
         <version>3.11.0</version>
         <configuration>
           <release>${version.java}</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <!-- disable javadoc linter to not fail on incomplete javadoc -->
+          <additionalJOption>-Xdoclint:none</additionalJOption>
         </configuration>
       </plugin>
     </plugins>
