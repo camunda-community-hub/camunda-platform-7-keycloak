@@ -98,6 +98,10 @@
 							</artifactSet>
  							<relocations>
 								<relocation>
+									<pattern>org.apache.commons.codec</pattern>
+									<shadedPattern>keycloakjar.org.apache.commons.codec</shadedPattern>
+								</relocation>
+								<relocation>
 								    <pattern>com.google.gson</pattern>
 								    <shadedPattern>keycloakjar.com.google.gson</shadedPattern>
 								</relocation>
