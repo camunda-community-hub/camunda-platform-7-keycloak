@@ -34,7 +34,7 @@ jobs:
           echo "::set-output name=type::RELEASE"
         fi
       id: release-detection
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Cache
       uses: actions/cache@v3
       with:
