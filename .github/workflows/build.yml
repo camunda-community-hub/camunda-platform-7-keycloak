@@ -21,7 +21,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@f1d3225b5376a0791fdee5a0e8eac5289355e43a # pin@v2
     - name: Java setup
-      uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
+      uses: actions/setup-java@9eda6b51cc4f6ee99be3dd5537b85e389e47bda9 # pin@v1
       with:
         java-version: 17
     - name: Cache
