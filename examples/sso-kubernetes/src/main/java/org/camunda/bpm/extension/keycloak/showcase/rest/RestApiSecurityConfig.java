@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -43,21 +45,20 @@ public class RestApiSecurityConfig {
 	 * {@inheritDoc}
 	 */
 	@Bean
-	@Order(2)
+	@Order(1)
 	public SecurityFilterChain httpSecurityRest(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
 		String jwkSetUri = applicationContext.getEnvironment().getRequiredProperty(
 				"spring.security.oauth2.client.provider." + configProps.getProvider() + ".jwk-set-uri");
 
 		return http
-				.csrf(csrf -> csrf
-						.ignoringRequestMatchers(antMatcher("/api/**"), antMatcher("/engine-rest/**")))
-				.authorizeHttpRequests(authorize -> authorize.
-						requestMatchers(antMatcher("/engine-rest/**")).authenticated()
-						.anyRequest().authenticated())
+				.securityMatcher(antMatcher("/engine-rest/**"))
+				.csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/engine-rest/**")))
+				.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
 						.jwt(jwt -> jwt
 								.decoder(jwtDecoder)
 								.jwkSetUri(jwkSetUri)))
+				.addFilterBefore(keycloakAuthenticationFilter(), AuthorizationFilter.class)
 				.build();
 	}
 
@@ -81,24 +82,17 @@ public class RestApiSecurityConfig {
 
 		return jwtDecoder;
 	}
-	   
+
     /**
-     * Registers the REST Api Keycloak Authentication Filter.
-     * @return filter registration
+     * Creates the REST Api Keycloak Authentication Filter.
+     * @return the filter
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Bean
-    public FilterRegistrationBean keycloakAuthenticationFilter(){
-        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-		
+    public KeycloakAuthenticationFilter keycloakAuthenticationFilter(){
 		String userNameAttribute = this.applicationContext.getEnvironment().getRequiredProperty(
 			"spring.security.oauth2.client.provider." + this.configProps.getProvider() + ".user-name-attribute");
-    
-    	filterRegistration.setFilter(new KeycloakAuthenticationFilter(this.identityService, this.clientService, userNameAttribute));
-        
-        filterRegistration.setOrder(102); // make sure the filter is registered after the Spring Security Filter Chain
-        filterRegistration.addUrlPatterns("/engine-rest/*");
-        return filterRegistration;
+
+    	return new KeycloakAuthenticationFilter(this.identityService, this.clientService, userNameAttribute);
     }
-   
+
 }

@@ -221,10 +221,10 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
     } else if (authentication.getPrincipal() instanceof OidcUser) {
         userId = ((OidcUser)authentication.getPrincipal()).getName();
     } else {
-        throw new ServletException("Invalid authentication request token");
+        throw new AccessDeniedException("Invalid authentication request token");
     }
     if (StringUtils.isEmpty(userId)) {
-        throw new ServletException("Unable to extract user-name-attribute from token");
+        throw new AccessDeniedException("Unable to extract user-name-attribute from token");
     }
 
     LOG.debug("Extracted userId from bearer token: {}", userId);
@@ -293,17 +293,18 @@ In order to provide a Keycloak specific logout handler, we first have to add the
 @Inject
 private KeycloakLogoutHandler keycloakLogoutHandler;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-      http
-      ...
-    .oauth2Login()
-    .and()
-      .logout()
-      .logoutRequestMatcher(new AntPathRequestMatcher("/app/**/logout"))
+@Bean
+@Order(2)
+public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
+  return http
+    ...
+    .oauth2Login(withDefaults())
+    .logout(logout -> logout
+      .logoutRequestMatcher(antMatcher("/app/**/logout"))
       .logoutSuccessHandler(keycloakLogoutHandler)
-      ;
-  }
+    )
+    .build();
+}
 ```
 
 The handler itself (see ``org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to

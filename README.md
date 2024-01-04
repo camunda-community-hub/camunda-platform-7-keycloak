@@ -306,7 +306,7 @@ Last but not least add a security configuration and enable OAuth2 SSO:
 public class WebAppSecurityConfig {
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf
@@ -331,7 +331,7 @@ public class WebAppSecurityConfig {
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
         filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
         filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider", "org.camunda.bpm.extension.keycloak.showcase.sso.KeycloakAuthenticationProvider"));
-        filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
+        filterRegistration.setOrder(201); // make sure the filter is registered after the Spring Security Filter Chain
         filterRegistration.addUrlPatterns("/app/*");
         return filterRegistration;
     }

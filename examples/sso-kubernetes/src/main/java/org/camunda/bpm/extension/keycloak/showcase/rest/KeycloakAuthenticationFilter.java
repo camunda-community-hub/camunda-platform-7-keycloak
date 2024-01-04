@@ -13,6 +13,7 @@ import jakarta.servlet.ServletResponse;
 import org.camunda.bpm.engine.IdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -61,10 +62,10 @@ public class KeycloakAuthenticationFilter implements Filter {
 		} else if (authentication.getPrincipal() instanceof OidcUser) {
 			userId = ((OidcUser)authentication.getPrincipal()).getName();
 		} else {
-			throw new ServletException("Invalid authentication request token");
+			throw new AccessDeniedException("Invalid authentication request token");
 		}
-        if (StringUtils.isEmpty(userId)) {
-        	throw new ServletException("Unable to extract user-name-attribute from token");
+        if (!StringUtils.hasLength(userId)) {
+        	throw new AccessDeniedException("Unable to extract user-name-attribute from token");
         }
 
         LOG.debug("Extracted userId from bearer token: {}", userId);
