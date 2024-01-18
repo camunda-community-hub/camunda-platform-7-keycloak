@@ -67,7 +67,7 @@ version: "3.9"
 services:
   jboss.keycloak:
     image: gunnaraccso/keycloak.server:21.1.1
-    restart: always
+    restart: unless-stopped
     environment:
       TZ: Europe/Berlin
       DB_VENDOR: h2
@@ -238,7 +238,7 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 }
 ```
 
-A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore it is ignored as standard.
+A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore, it is ignored as standard.
 
 ### Logging out from Cockpit
 
