@@ -238,6 +238,8 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 }
 ```
 
+The REST API URL for this example is `http://localhost:8080/camunda/engine-rest`. Every request requires a JWT token from Keycloak.
+
 A unit test checking the REST Api security is provided in class ``RestApiSecurityConfigTest``. Please be aware that the unit test requires a running Keycloak Server including the setup described above. Therefore it is ignored as standard.
 
 ### Logging out from Cockpit
