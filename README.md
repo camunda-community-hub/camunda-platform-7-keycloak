@@ -422,7 +422,7 @@ version: "3.9"
 services:
   jboss.keycloak:
     image: quay.io/keycloak/keycloak:21.1.1
-    restart: always
+    restart: unless-stopped
     environment:
       TZ: Europe/Berlin
       DB_VENDOR: h2
