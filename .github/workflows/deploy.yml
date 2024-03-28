@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Wait for build to succeed
-      uses: fountainhead/action-wait-for-check@297be350cf8393728ea4d4b39435c7d7ae167c93 # pin@v1.0.0
+      uses: fountainhead/action-wait-for-check@5a908a24814494009c4bb27c242ea38c93c593be # pin@v1.0.0
       id: wait-for-build
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
