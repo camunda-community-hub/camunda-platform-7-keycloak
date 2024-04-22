@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-showcase
-           image: gunnaraccso/camunda-showcase-keycloak:7.20.0
+           image: gunnaraccso/camunda-showcase-keycloak:7.21.0
            ports:
            - containerPort: 8080
            env:
