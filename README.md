@@ -19,10 +19,14 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Current version: `7.20.1`<br >
+Current version: `7.21.0`<br >
 Latest tests with: Keycloak `21.1.1`, `19.0.3-legacy`, Camunda `7.20.0`, `7.20.0-ee`
 
 #### Features
+Changes in version `7.21.0`
+
+*  Upgrade to Camunda Platform 7.21.0
+
 Changes in version `7.20.1`
 
 With version 7.20.0 Camunda Platform 7 switched to Spring Boot 3.1, JakartaEE 10 and a JDK 17 baseline. The Keycloak Identity Provider Plugin has been updated to support the new baseline versions of it's major dependencies.
@@ -135,7 +139,7 @@ Maven Dependencies:
 <dependency>
     <groupId>org.camunda.bpm.extension</groupId>
     <artifactId>camunda-platform-7-keycloak</artifactId>
-    <version>7.20.1</version>
+    <version>7.21.0</version>
 </dependency>
 ```
 
