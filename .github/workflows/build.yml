@@ -12,8 +12,8 @@ jobs:
       keycloak:
         image: bitnami/keycloak:24.0.3
         env:
-          KEYCLOAK_USER: keycloak
-          KEYCLOAK_PASSWORD: keycloak1!
+          KEYCLOAK_ADMIN: keycloak
+          KEYCLOAK_ADMIN_PASSWORD: keycloak1!
           KEYCLOAK_DATABASE_VENDOR: dev-mem
           KEYCLOAK_HTTP_RELATIVE_PATH: /auth
         ports: [ 8080/tcp ]
