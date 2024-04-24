@@ -37,6 +37,16 @@ public class KeycloakConfiguration {
 	 */
 	protected boolean useGroupPathAsCamundaGroupId = false;
 
+	/**
+	 * Starting with Keycloak version 23.x the group query without any other search parameters does not automatically
+	 * return subgroups within the result. Generally this has positive effects on performance and in case you do not
+	 * have subgroups you must not take care. On the other hand, if you do use subgroups you'll miss information and get
+	 * inconsistent results.
+	 * <p/>
+	 * Set this flag to 'true' in case you use subgroups together with Keycloak 23 or higher.
+	 */
+	protected boolean enforceSubgroupsInGroupQuery = false;
+
 	/** The name of the administrator group.
 	 *
 	 * If this name is set to a non-null and non-empty value,
@@ -205,6 +215,20 @@ public class KeycloakConfiguration {
 	 */
 	public void setUseGroupPathAsCamundaGroupId(boolean useGroupPathAsCamundaGroupId) {
 		this.useGroupPathAsCamundaGroupId = useGroupPathAsCamundaGroupId;
+	}
+
+	/**
+	 * @return the enforceSubgroupsInGroupQuery
+	 */
+	public boolean isEnforceSubgroupsInGroupQuery() {
+		return enforceSubgroupsInGroupQuery;
+	}
+
+	/**
+	 * @param enforceSubgroupsInGroupQuery the enforceSubgroupsInGroupQuery to set
+	 */
+	public void setEnforceSubgroupsInGroupQuery(boolean enforceSubgroupsInGroupQuery) {
+		this.enforceSubgroupsInGroupQuery = enforceSubgroupsInGroupQuery;
 	}
 
 	/**

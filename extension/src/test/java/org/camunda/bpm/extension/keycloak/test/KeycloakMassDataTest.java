@@ -35,18 +35,23 @@ public class KeycloakMassDataTest extends AbstractKeycloakIdentityProviderTest {
 	    		for (int i = 0; i < 60; i++) {
 	    			USER_IDS.add(createUser(headers, realm, "test.user" + i, "Test" + i, "User Test" + i, "test.user" + i + "@test.info", "test"));
 	    		}
+				headers = authenticateKeycloakAdmin();
 	    		for (int i = 0; i < 100; i++) {
 	    			USER_IDS.add(createUser(headers, realm, "user.test" + i, "UTest" + i, "User Test" + i, "utest.user" + i + "@test.info", "test"));
 	    		}
-	    		USER_IDS.forEach(u -> assignUserGroup(headers, realm, u, GROUP_ID_MANAGER));
-	    		
+				HttpHeaders finalHeaders = headers;
+				USER_IDS.forEach(u -> assignUserGroup(finalHeaders, realm, u, GROUP_ID_MANAGER));
+
+				headers = authenticateKeycloakAdmin();
 	    		for (int i = 0; i < 60; i++) {
 	    			GROUP_IDS.add(createGroup(headers, realm, "test.group" + i, false));
 	    		}
+				headers = authenticateKeycloakAdmin();
 	    		for (int i = 0; i < 100; i++) {
 	    			GROUP_IDS.add(createGroup(headers, realm, "group.test" + i, false));
 	    		}
-	    		GROUP_IDS.forEach(g -> assignUserGroup(headers, realm, USER_ID_TEAMLEAD, g));
+				HttpHeaders finalHeaders1 = headers;
+				GROUP_IDS.forEach(g -> assignUserGroup(finalHeaders1, realm, USER_ID_TEAMLEAD, g));
 	    		
 	    		// setup process engine
 	    		// -------------------------------------

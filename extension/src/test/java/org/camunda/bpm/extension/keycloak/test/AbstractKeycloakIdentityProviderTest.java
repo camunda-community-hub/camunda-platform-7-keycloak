@@ -50,6 +50,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	private static final String KEYCLOAK_URL; // expected format "https://<myhost:myport>/auth
 	private static final String KEYCLOAK_ADMIN_USER;
 	private static final String KEYCLOAK_ADMIN_PASSWORD;
+	private static final Boolean KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY;
 
 	// ------------------------------------------------------------------------
 	
@@ -86,6 +87,8 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 		KEYCLOAK_URL = getConfigValue(defaults, "keycloak.url").replaceAll("/+$", "");
 		KEYCLOAK_ADMIN_USER = getConfigValue(defaults, "keycloak.admin.user");
 		KEYCLOAK_ADMIN_PASSWORD = getConfigValue(defaults, "keycloak.admin.password");
+		KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY =
+				Boolean.valueOf(getConfigValue(defaults, "keycloak.enforce.subgroups.in.group.query"));
 		
 		// setup 
 		try {
@@ -168,6 +171,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 				KeycloakIdentityProviderPlugin kcp = (KeycloakIdentityProviderPlugin) p;
 				kcp.setKeycloakAdminUrl(kcp.getKeycloakAdminUrl().replace("http://localhost:9000", KEYCLOAK_URL));
 				kcp.setKeycloakIssuerUrl(kcp.getKeycloakIssuerUrl().replace("http://localhost:9000", KEYCLOAK_URL));
+				kcp.setEnforceSubgroupsInGroupQuery(KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY);
 				kcp.setClientSecret(CLIENT_SECRET);
 				return kcp;
 			}
@@ -529,7 +533,7 @@ public abstract class AbstractKeycloakIdentityProviderTest extends PluggableProc
 	 * Deletes a group.
 	 * @param headers HttpHeaders including the Authorization header / acces token
 	 * @param realm the realm name
-	 * @param userId the user ID
+	 * @param groupId the group ID
 	 */
 	static void deleteGroup(HttpHeaders headers, String realm, String groupId) {
 		ResponseEntity<String> response = restTemplate.exchange(KEYCLOAK_URL + "/admin/realms/" + realm + "/groups/" + groupId, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);

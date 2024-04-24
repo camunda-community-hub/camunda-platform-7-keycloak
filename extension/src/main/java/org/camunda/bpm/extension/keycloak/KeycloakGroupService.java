@@ -255,13 +255,20 @@ public class KeycloakGroupService extends KeycloakServiceBase {
 	 */
 	private String createGroupSearchFilter(CacheableKeycloakGroupQuery query) {
 		StringBuilder filter = new StringBuilder();
+		boolean hasSearch = false;
 		if (StringUtils.hasLength(query.getName())) {
+			hasSearch = true;
 			addArgument(filter, "search", query.getName());
 		}
 		if (StringUtils.hasLength(query.getNameLike())) {
+			hasSearch = true;
 			addArgument(filter, "search", query.getNameLike().replaceAll("[%,\\*]", ""));
 		}
 		addArgument(filter, "max", getMaxQueryResultSize());
+		if (!hasSearch && keycloakConfiguration.isEnforceSubgroupsInGroupQuery()) {
+			// fix: include subgroups in query result for Keycloak >= 23
+			addArgument(filter, "q", ":");
+		}
 		if (filter.length() > 0) {
 			filter.insert(0, "?");
 			String result = filter.toString();
