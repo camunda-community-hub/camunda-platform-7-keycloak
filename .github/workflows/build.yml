@@ -35,5 +35,5 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Run Maven
       env:
-        KEYCLOAK_URL: https://localhost:${{ job.services.keycloak.ports[8443] }}/auth
+        KEYCLOAK_URL: http://localhost:${{ job.services.keycloak.ports[8080] }}/auth
       run: mvn -B clean install com.mycila:license-maven-plugin:check
