@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-showcase
-           image: gunnaraccso/camunda-showcase-keycloak:7.21.0
+           image: gunnaraccso/camunda-showcase-keycloak:7.21.1
            ports:
            - containerPort: 8080
            env:
@@ -39,7 +39,7 @@ spec:
            - name: KEYCLOAK_CLIENT_ID
              value: camunda-identity-service
            - name: KEYCLOAK_CLIENT_SECRET
-             value: GBLb9KSRxmmo81SIGH2BWu3GEtrofvWo
+             value: 0F0yFyCvv2T901fvMSbKlAd7f8QkyxNg
            livenessProbe:
              httpGet:
                path: /camunda/actuator/health/liveness

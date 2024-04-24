@@ -451,9 +451,9 @@ Running unit tests from Maven requires configuring the details of a running Keyc
 | `KEYCLOAK_URL` | Keycloak server URL.<br />Default value: `http://localhost:8080/auth`                                                 |
 | `KEYCLOAK_ADMIN_USER` | The admin user of the Keycloak server.<br />Default value: `keycloak`                                                 |
 | `KEYCLOAK_ADMIN_PASSWORD` | The admin password of the Keycloak server.<br />Default value: `keycloak1!`                                           |
- | `KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY` | Wether to enforce subgroup results in group queries when testing with Keycloak >= `23.0.0`<br />Default value: `true` |
+| `KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY` | Wether to enforce subgroup results in group queries when testing with Keycloak >= `23.0.0`<br />Default value: `true` |
 In case you choose Keycloak in the new Quarkus distribution, please be aware that `/auth` has been removed from the default context path.
-Hence, it is required to change the `KEYCLOAK_URL` for the tests. Tests also run successfully against the Quarkus
+Hence, it is required to change the `KEYCLOAK_URL` for the tests. Tests run successfully against the Quarkus
 distribution, in case you start Keycloak in Development mode.
 
 ------------------------------------------------------------

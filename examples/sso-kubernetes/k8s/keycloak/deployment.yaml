@@ -20,7 +20,7 @@ spec:
       spec:
          containers:
          - name: keycloak-server
-           image: gunnaraccso/keycloak.server:21.1.1 # quay.io/keycloak/keycloak
+           image: gunnaraccso/keycloak.server:24.0.3 # quay.io/keycloak/keycloak
            ports:
            - containerPort: 8080
              name: http

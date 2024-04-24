@@ -38,7 +38,7 @@ keycloak:
 
   # Keycloak Camunda Identity Client
   client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
-  client.secret: ${KEYCLOAK_CLIENT_SECRET:GBLb9KSRxmmo81SIGH2BWu3GEtrofvWo}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:0F0yFyCvv2T901fvMSbKlAd7f8QkyxNg}
 
 # Spring Boot Security OAuth2 SSO
 spring.security:
@@ -82,5 +82,6 @@ plugin.identity.keycloak:
   useEmailAsCamundaUserId: false
   useUsernameAsCamundaUserId: true
   useGroupPathAsCamundaGroupId: true
+  enforceSubgroupsInGroupQuery: true
   administratorGroupName: camunda-admin
   disableSSLCertificateValidation: true

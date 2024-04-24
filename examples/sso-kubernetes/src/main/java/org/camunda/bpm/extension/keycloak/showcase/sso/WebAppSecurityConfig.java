@@ -11,6 +11,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
@@ -80,5 +82,13 @@ public class WebAppSecurityConfig {
 	public RequestContextListener requestContextListener() {
 	    return new RequestContextListener();
 	}
-	
+
+    // Modify firewall in order to allow request details for child groups
+    @Bean
+    public HttpFirewall getHttpFirewall() {
+        StrictHttpFirewall strictHttpFirewall = new StrictHttpFirewall();
+        strictHttpFirewall.setAllowUrlEncodedPercent(true);
+        strictHttpFirewall.setAllowUrlEncodedSlash(true);
+        return strictHttpFirewall;
+    }
 }
