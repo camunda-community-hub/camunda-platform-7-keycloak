@@ -427,17 +427,19 @@ version: "3.9"
 
 services:
   jboss.keycloak:
-    image: bitnami/keycloak:24.0.3
+    image: quay.io/keycloak/keycloak:24.0.3
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
-      KEYCLOAK_DATABASE_VENDOR: dev-mem
+      DB_VENDOR: h2
       KEYCLOAK_ADMIN: keycloak
       KEYCLOAK_ADMIN_PASSWORD: keycloak1!
-      KEYCLOAK_HTTP_RELATIVE_PATH: /auth
+      KC_HTTP_RELATIVE_PATH: /auth
     ports:
       - "8443:8443"
       - "8080:8080"
+    command:
+      - start-dev
 ```
 
 For details see documentation on [Running Keycloak in a container](https://www.keycloak.org/server/containers "Running Keycloak in a container").

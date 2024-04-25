@@ -10,14 +10,13 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       keycloak:
-        image: bitnami/keycloak:24.0.3
+        image: quay.io/keycloak/keycloak:19.0.3-legacy
         env:
-          KEYCLOAK_ADMIN: keycloak
-          KEYCLOAK_ADMIN_PASSWORD: keycloak1!
-          KEYCLOAK_DATABASE_VENDOR: dev-mem
-          KEYCLOAK_HTTP_RELATIVE_PATH: /auth
-        ports: [ 8080/tcp ]
-        options: --health-cmd "curl -Iks http://localhost:8080" --health-interval 10s --health-timeout 5s --health-retries 5
+          KEYCLOAK_USER: keycloak
+          KEYCLOAK_PASSWORD: keycloak1!
+          DB_VENDOR: h2
+        ports: [ 8443/tcp ]
+        options: --health-cmd "curl -Iks https://localhost:8443" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -35,5 +34,6 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Run Maven
       env:
-        KEYCLOAK_URL: http://localhost:${{ job.services.keycloak.ports[8080] }}/auth
+        KEYCLOAK_URL: https://localhost:${{ job.services.keycloak.ports[8443] }}/auth
+        KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY: false
       run: mvn -B clean install com.mycila:license-maven-plugin:check
