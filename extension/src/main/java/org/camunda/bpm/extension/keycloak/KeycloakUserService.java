@@ -309,9 +309,9 @@ public class KeycloakUserService extends KeycloakServiceBase {
 		try {
 			String userSearch;
 			if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-				userSearch="/users?email=" + userId;
+				userSearch="/users?exact=true&email=" + userId;
 			} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-				userSearch="/users?username=" + userId;
+				userSearch="/users?exact=true&username=" + userId;
 			} else {
 				userSearch= "/users/" + userId;
 			}

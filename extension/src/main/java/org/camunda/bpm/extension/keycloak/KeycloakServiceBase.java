@@ -60,9 +60,9 @@ public abstract class KeycloakServiceBase {
 	protected String getKeycloakUserID(String userId) throws KeycloakUserNotFoundException, RestClientException {
 		String userSearch;
 		if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
-			userSearch= "/users?email=";
+			userSearch= "/users?exact=true&email=";
 		} else if (keycloakConfiguration.isUseUsernameAsCamundaUserId()) {
-			userSearch="/users?username=";
+			userSearch="/users?exact=true&username=";
 		} else {
 			return userId;
 		}
