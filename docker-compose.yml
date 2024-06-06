@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   jboss.keycloak:
-    image: quay.io/keycloak/keycloak:24.0.4
+    image: quay.io/keycloak/keycloak:24.0.5
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
