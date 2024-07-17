@@ -28,7 +28,7 @@
 	<version.camunda>7.21.0</version.camunda>
     <!-- <version.camunda>7.20.0-ee</version.camunda> -->
 	<version.springBoot>3.2.6</version.springBoot>
-    <version.commons-codec>1.17.0</version.commons-codec>
+    <version.commons-codec>1.17.1</version.commons-codec>
 
     <!-- Nexus Staging -->
     <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
