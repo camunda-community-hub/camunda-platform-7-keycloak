@@ -262,7 +262,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		try {
 			if (keycloakConfiguration.isUseEmailAsCamundaUserId()) {
 				ResponseEntity<String> response = restTemplate.exchange(
-					keycloakConfiguration.getKeycloakAdminUrl() + "/users?email=" + userId, HttpMethod.GET, String.class);
+					keycloakConfiguration.getKeycloakAdminUrl() + "/users?exact=true&email=" + userId, HttpMethod.GET, String.class);
 				JsonObject result = findFirst(parseAsJsonArray(response.getBody()), "email", userId);
 				if (result != null) {
 					return getJsonString(result, "username");
