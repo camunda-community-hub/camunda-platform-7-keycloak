@@ -27,6 +27,9 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
+
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
@@ -70,14 +73,25 @@ public class KeycloakIdentityProviderFactory implements SessionFactory {
 
 		if (keycloakConfiguration.isDisableSSLCertificateValidation()) {
 			try {
-			SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustAllStrategy()).build();
-			SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
-					NoopHostnameVerifier.INSTANCE);
-			connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
+				SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(TrustAllStrategy.INSTANCE).build();
+				SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+				connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
 			} catch (GeneralSecurityException e) {
 				throw new IdentityProviderException("Disabling SSL certificate validation failed", e);
 			}
-		}
+		} else if (keycloakConfiguration.getTruststore() != null && !keycloakConfiguration.getTruststore().isBlank()) {
+			// configure truststore if set
+			File file = new File(keycloakConfiguration.getTruststore());
+			String truststorePassword = keycloakConfiguration.getTruststorePassword();
+			char[] truststorePasswordCharArray = truststorePassword == null ? null: truststorePassword.toCharArray();
+            try {
+                SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(file, truststorePasswordCharArray).build();
+				SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+				connectionManagerBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
+			} catch (GeneralSecurityException | IOException e) {
+                throw new IdentityProviderException("Configuring truststore failed", e);
+            }
+        }
 
 		final CredentialsStore credentialsProvider = new BasicCredentialsProvider();
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
