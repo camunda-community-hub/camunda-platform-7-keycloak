@@ -65,7 +65,6 @@ jobs:
         maven-auto-release-after-close: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
         maven-build-options: clean
-        maven-release-options: clean
       id: release
     - if: github.event.release
       name: Attach artifacts to GitHub Release (Release only)
