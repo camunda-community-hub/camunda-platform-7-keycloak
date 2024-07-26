@@ -67,6 +67,12 @@ public class KeycloakConfiguration {
 	/** Disables SSL certificate validation. Useful for testing. */
 	protected boolean disableSSLCertificateValidation = false;
 
+	/** The file path to a truststore file. */
+	protected String truststore;
+
+	/** The password for the truststore. */
+	protected String truststorePassword;
+
 	/** Maximum number of HTTP connections of the Keycloak specific connection pool. */
 	protected int maxHttpConnections = 50;
 
@@ -285,6 +291,34 @@ public class KeycloakConfiguration {
 	 */
 	public void setDisableSSLCertificateValidation(boolean disableSSLCertificateValidation) {
 		this.disableSSLCertificateValidation = disableSSLCertificateValidation;
+	}
+
+	/**
+	 * @return the truststore
+	 */
+	public String getTruststore() {
+		return truststore;
+	}
+
+	/**
+	 * @param truststore the truststore to set
+	 */
+	public void setTruststore(String truststore) {
+		this.truststore = truststore;
+	}
+
+	/**
+	 * @return the truststorePassword
+	 */
+	public String getTruststorePassword() {
+		return truststorePassword;
+	}
+
+	/**
+	 * @param truststorePassword the truststorePassword to set
+	 */
+	public void setTruststorePassword(String truststorePassword) {
+		this.truststorePassword = truststorePassword;
 	}
 
 	/**
