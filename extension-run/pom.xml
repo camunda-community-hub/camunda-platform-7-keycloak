@@ -131,12 +131,9 @@
 				<!-- exclude source generation through maven plugin (already done by maven-shade) -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-					  <id>prevent-source-plugin</id>
-					  <phase>none</phase>
-					</execution>
-				</executions>
+				<configuration>
+					<skipSource>true</skipSource>
+				</configuration>
 			</plugin>
 			<plugin>
 				<!-- make sure javadocs are generated for camunda-platform-7-keycloak-run -->

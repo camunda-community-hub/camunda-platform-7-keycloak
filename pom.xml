@@ -3,12 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Attention: to properly separate dependencies of extension and examples, do not define any dependencies/management here! -->
-  
+
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-release-parent</artifactId>
-    <version>3.9.1</version>
-    <relativePath />
+    <groupId>org.camunda.community</groupId>
+    <artifactId>community-hub-release-parent</artifactId>
+    <version>1.4.4</version>
   </parent>
 
   <groupId>org.camunda.bpm.extension</groupId>
@@ -150,34 +149,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>community-action-maven-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.4</version>
-            <executions>
-                <execution>
-                    <id>sign-artifacts</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>sign</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <!-- Prevent gpg from using pinentry programs -->
-                <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                </gpgArguments>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
