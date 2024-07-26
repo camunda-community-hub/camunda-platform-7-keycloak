@@ -51,8 +51,8 @@ jobs:
         gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
     - name: Deploy SNAPSHOT / Release
       # uses: camunda-community-hub/community-action-maven-release@v1.0.4
-      uses: ./.github/actions/action-maven-release
-      # uses: camunda-community-hub/community-action-maven-release@v1.2.1
+      # uses: ./.github/actions/action-maven-release
+      uses: camunda-community-hub/community-action-maven-release@v1.2.1
       with:
         release-version: ${{ github.event.release.tag_name }}
         release-profile: community-action-maven-release
@@ -64,8 +64,8 @@ jobs:
         maven-gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
         maven-auto-release-after-close: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
-#        maven-build-options: clean
-#        maven-release-options: clean
+        maven-build-options: clean
+        maven-release-options: clean
       id: release
     - if: github.event.release
       name: Attach artifacts to GitHub Release (Release only)
