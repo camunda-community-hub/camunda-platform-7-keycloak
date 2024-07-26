@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.camunda.bpm.extension.examples</groupId>
         <artifactId>camunda-platform-7-keycloak-examples</artifactId>
-        <version>7.21.3-SNAPSHOT</version>
+        <version>7.21.3</version>
     </parent>
 
     <artifactId>camunda-platform-7-keycloak-examples-jwt</artifactId>
