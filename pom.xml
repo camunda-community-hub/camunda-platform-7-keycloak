@@ -12,7 +12,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-platform-7-keycloak-root</artifactId>
-  <version>7.21.6-SNAPSHOT</version>
+  <version>7.21.6</version>
   <packaging>pom</packaging>
   <name>Camunda Platform 7 - engine plugins - identity - keycloak - root</name>
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
