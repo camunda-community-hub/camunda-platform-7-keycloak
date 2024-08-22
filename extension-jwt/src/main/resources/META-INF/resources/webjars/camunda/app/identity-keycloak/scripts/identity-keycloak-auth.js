@@ -1,4 +1,4 @@
-import { default as Keycloak } from "./keycloak-mjs.js";
+import "./keycloak.js";
 
 let camundaIdentityKeycloak = undefined;
 
