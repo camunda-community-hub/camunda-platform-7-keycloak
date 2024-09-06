@@ -125,6 +125,8 @@ Known limitations:
     ![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
    Please be aware, that beginning with Keycloak 18, you do not only have to configure a valid redirect URL, but
    a valid post logout redirect URL as well. To keep things easy values can be the same.
+3. Since Keycloak 20, user queries require an 'openid' scope for OIDC clients. To enable this, create an 'openid' scope under client scopes and add add this the `camunda-identity-service` client.
+![openid-client-scope.png](doc/openid-clientscope.png "Client scopes") 
 4. In order to use refresh tokens set the "Use Refresh Tokens For Client Credentials Grant" option within the "OpenID Connect Compatibility Modes" section (available in newer Keycloak versions):
 
     ![IdentityServiceOptions](doc/identity-service_options.png "Identity Service Options")
