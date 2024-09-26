@@ -13,7 +13,7 @@ on:
     types: [published]
 jobs:
   publish:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Wait for build to succeed
       uses: fountainhead/action-wait-for-check@5a908a24814494009c4bb27c242ea38c93c593be # pin@v1.0.0
