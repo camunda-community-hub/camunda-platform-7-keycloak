@@ -24,7 +24,7 @@
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     
     <!-- versions -->
-	<version.camunda>7.21.0</version.camunda>
+	<version.camunda>7.22.0</version.camunda>
     <!-- <version.camunda>7.20.0-ee</version.camunda> -->
 	<version.springBoot>3.3.4</version.springBoot>
     <version.commons-codec>1.17.1</version.commons-codec>
