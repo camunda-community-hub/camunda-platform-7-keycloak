@@ -26,7 +26,7 @@ jobs:
         java-version: 17
         distribution: temurin
     - name: Cache
-      uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # pin@v2
+      uses: actions/cache@8469c94c6a180dfb41a1bd7e1b46ac557ea124f1 # pin@v2
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
