@@ -66,7 +66,7 @@ version: "3.9"
 
 services:
   jboss.keycloak:
-    image: gunnaraccso/keycloak.server:21.1.1
+    image: gunnaraccso/keycloak.server:24.0.3
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
