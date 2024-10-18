@@ -1,8 +1,8 @@
 # Get Camunda-run as base image
-FROM camunda/camunda-bpm-platform:run-7.21.0
+FROM camunda/camunda-bpm-platform:run-7.22.0
 
 # The Version of the Keycloak Identity Provider to use
-ENV IDENTITY_PROVIDER_VERSION=7.21.0
+ENV IDENTITY_PROVIDER_VERSION=7.22.0
 
 # Add Keycloak Identity Provider
 USER camunda
