@@ -5,11 +5,11 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak)
  [![Apache License V.2](https://img.shields.io/badge/license-Apache%20V.2-blue.svg)](./LICENSE)
 
-*Important Notice**
+**Important Notice**
 
 > [!CAUTION]
 > Camunda announced that the Camunda 7 Community Edition will EOL (end of life) in October 2025 with a final release 7.24. This community-maintained project is based on Camunda 7 CE and will therefore also have its final release 7.24 in fall 2025. After that, it will no longer be maintained.
-> I would like to thank the entire Camunda community for their great collaboration on this project. Without all of you, this plugin would not have become what it is! Thanks :trophy: :clinking_beer_mugs:
+> I would like to thank the entire Camunda community for their great collaboration on this project. Without all of you, this plugin would not have become what it is! Thanks :trophy:
 
 ![Keycloak](doc/keycloak.png "https://www.keycloak.org/") 
 
