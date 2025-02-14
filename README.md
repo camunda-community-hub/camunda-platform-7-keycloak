@@ -5,6 +5,12 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak)
  [![Apache License V.2](https://img.shields.io/badge/license-Apache%20V.2-blue.svg)](./LICENSE)
 
+*Important Notice**
+
+> [!CAUTION]
+> Camunda announced that the Camunda 7 Community Edition will EOL (end of life) in October 2025 with a final release 7.24. This community-maintained project is based on Camunda 7 CE and will therefore also have its final release 7.24 in fall 2025. After that, it will no longer be maintained.
+> I would like to thank the entire Camunda community for their great collaboration on this project. Without all of you, this plugin would not have become what it is! Thanks :trophy: :clinking_beer_mugs:
+
 ![Keycloak](doc/keycloak.png "https://www.keycloak.org/") 
 
 Keycloak&trade; (<https://www.keycloak.org/>) is an Open Source Identity and Access Management platform including advanced features such as User Federation, Identity Brokering and Social Login.
@@ -42,78 +48,6 @@ With version 7.20.0 Camunda Platform 7 switched to Spring Boot 3.1, JakartaEE 10
 * Upgrade to Apache HttpComponents HttpClient 5
 * Upgrade to Spring Boot 3.1.x
 * Updated samples to Spring Security 6.1
-
-Changes in version `7.19.0`
-
-*  Updated samples to Camunda Platform 7.19 and Keycloak 21.1
-
-New in version `7.18.0`
-
-* Fixed a bug for userId's containing a plus sign.
-* Updated samples to Camunda Platform 7.18 and Keycloak >= 18
-* Alternative for client side JWT authentication in Camunda Cockpit (incubation status)
-
-Changes in Version `7.17.0`
-
-* Renamed the extension from `camunda-bpm-identity-keycloak` to `camunda-platform-7-keycloak`
-* Updated samples to Camunda Platform 7.17
-* Introduced new version which reflects the Camunda Version used in samples and tests.
-
-New in Version `2.2.3`:
-
-* Optional Keycloak Login Cache - helps you to minimize password check requests to Keycloak and thus improve performance. Not applicable in SSO scenarios, but useful e.g. when using External Task Clients with Basic Auth.
-
-New in Version `2.2.2`:
-
-* Optimized user / group queries when using single items in `userIdIn(...)` / `groupIdIn(...)` selections
-
-New in Version `2.2.1`:
-
-* Fixed a bug where "like" filters in combination with missing Keycloak attributes (e.g. users without email) may cause a NullPointerException
-
-New in Version `2.2.0`:
-
-* Optional Keycloak Query Cache - helps you to minimize requests to Keycloak and thus improve performance.
-* Minor optimization of refresh token handling in case it is missing at all.
-
-New in Version `2.1.0`:
-
-* Auto retry with refreshed new token in case of Keycloak HTTP 401 responses (more stability in case of misconfigurations).
-
-New in Version `2.0.0`:
-
-* Support for Camunda Platform 7 Run
-* New options `proxyUri`, `proxyUser`, `proxyPassword` for optional proxy support.
-* Usage of `com.google.code.gson` for JSON (de)serialization.
-* Further internal refactorings and preparations for future enhancements.
-
-New in Version `1.5.0`:
-
-* New option `maxResultSize` for configuring the maximum result size of queries against the Keycloak REST API.
-
-New in Version `1.4.0`:
-
-* Corrected rare problems with group queries of a single user in case the Keycloak Client name is similar to this username and config property ``useUsernameAsCamundaUserId=true``
-
-New in Version `1.3.0`:
-
-* Provided additional fat `camunda-platform-7-keycloak-all.jar` including transitive dependencies for easier installation e.g. on Apache Tomcat distribution with shared engine.
-
-New in Version `1.2.0`:
-
-*   Optimized and correct searches in Keycloak mass data
-*   Add missing paging functionality to queries
-
-New in Version `1.1.0`:
-
-* Ability to read group hierarchies.
-* New option `useGroupPathAsCamundaGroupId` for readable group IDs. Helps when configuring authorizations.
-
-Version `1.0.0`:
-
-*   ReadOnlyIdentityProvider
-*   Broad support for user and group queries
-*   Compatible with Spring Boot OAuth2 SSO
 
 Known limitations:
 
