@@ -124,7 +124,7 @@ Known limitations:
 
 ## Prerequisites in your Keycloak realm
 
-1. Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/jboss/keycloak/ "Keycloak Docker Images").
+1. Keycloak docker images can be found on [Keycloak Docker Hub](https://hub.docker.com/r/keycloak/keycloak "Keycloak Docker Images").
 2. Create a new client named `camunda-identity-service` with access type confidential and service accounts enabled:
     ![IdentityServiceSettings](doc/identity-service_settings.png "Identity Service Settings")
    Please be aware, that beginning with Keycloak 18, you do not only have to configure a valid redirect URL, but
