@@ -23,7 +23,7 @@
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
     <!-- versions -->
-	<version.camunda>7.23.0-alpha5</version.camunda>
+	<version.camunda>7.23.0</version.camunda>
 	<version.springBoot>3.4.4</version.springBoot>
     <version.commons-codec>1.18.0</version.commons-codec>
 
