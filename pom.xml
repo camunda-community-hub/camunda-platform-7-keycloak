@@ -12,7 +12,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-platform-7-keycloak-root</artifactId>
-  <version>7.22.1-SNAPSHOT</version>
+  <version>7.23.0</version>
   <packaging>pom</packaging>
   <name>Camunda Platform 7 - engine plugins - identity - keycloak - root</name>
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
@@ -22,15 +22,13 @@
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
-    
     <!-- versions -->
-	<version.camunda>7.22.0</version.camunda>
-    <!-- <version.camunda>7.20.0-ee</version.camunda> -->
-	<version.springBoot>3.3.5</version.springBoot>
+	<version.camunda>7.23.0-alpha5</version.camunda>
+	<version.springBoot>3.4.4</version.springBoot>
     <version.commons-codec>1.18.0</version.commons-codec>
 
     <!-- Nexus Staging -->
-    <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
+    <plugin.version.nexus-staging>1.7.0</plugin.version.nexus-staging>
   </properties>
 
   <licenses>
@@ -153,7 +151,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.7.0</version>
+          <version>${plugin.version.nexus-staging}</version>
         </plugin>
       </plugins>
     </pluginManagement>
