@@ -12,7 +12,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-platform-7-keycloak-root</artifactId>
-  <version>7.23.0</version>
+  <version>7.23.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform 7 - engine plugins - identity - keycloak - root</name>
   <description>A Camunda 7 Identity Provider Plugin for Keycloak</description>
@@ -22,6 +22,7 @@
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.build.resourceEncoding>${encoding}</project.build.resourceEncoding>
+
     <!-- versions -->
 	<version.camunda>7.23.0</version.camunda>
 	<version.springBoot>3.4.4</version.springBoot>
@@ -122,7 +123,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <version>3.14.0</version>
         <configuration>
           <release>${version.java}</release>
         </configuration>
