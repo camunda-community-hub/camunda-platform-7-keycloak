@@ -274,5 +274,9 @@ public abstract class ProcessTestAssertions {
 		public String getBusinessKey() {
 			return hpi.getBusinessKey();
 		}
+
+		public String getProcessDefinitionKey() {
+			return hpi.getProcessDefinitionKey();
+		}
 	}
 }
