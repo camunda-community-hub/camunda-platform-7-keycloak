@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.camunda.bpm.extension.examples</groupId>
 		<artifactId>camunda-platform-7-keycloak-examples</artifactId>
-		<version>7.23.0</version>
+		<version>7.23.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>camunda-platform-7-keycloak-examples-sso-kubernetes</artifactId>
@@ -16,7 +16,7 @@
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 
-		<docker.imageName>gunnaraccso/camunda-showcase-keycloak:${version}</docker.imageName>
+		<docker.imageName>gunnaraccso/camunda-showcase-keycloak:${project.version}</docker.imageName>
 	</properties>
 
 	<dependencies>
