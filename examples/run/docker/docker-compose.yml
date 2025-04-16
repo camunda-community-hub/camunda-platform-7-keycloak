@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   keycloak:
@@ -22,7 +20,7 @@ services:
   camunda:
     build: .
     ports: 
-      - 8080:8080
+      - "8080:8080"
     env_file:
       - ./env/camunda.env
     depends_on:

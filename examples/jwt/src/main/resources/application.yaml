@@ -43,7 +43,7 @@ keycloak:
   # Keycloak Camunda Identity Service
   plugin:
     client.id: camunda-identity-service
-    client.secret: FOZQuxYwfuvb9R708askvn9XkZMfwlKp
+    client.secret: yVWaJTFGjHCiqIvvbDTVSdDqLnTugMfd
 
 # Spring Boot Security OAuth2 SSO
 spring.security:

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   jboss.keycloak:
     image: quay.io/keycloak/keycloak:26.1.4
