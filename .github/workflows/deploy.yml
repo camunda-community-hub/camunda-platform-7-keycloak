@@ -50,12 +50,16 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
         gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
     - name: Deploy SNAPSHOT / Release
-      uses: camunda-community-hub/community-action-maven-release@v1.2.3
+      uses: camunda-community-hub/community-action-maven-release@v2
       with:
         release-version: ${{ github.event.release.tag_name }}
         release-profile: community-action-maven-release
         nexus-usr: ${{ secrets.NEXUS_USR }}
         nexus-psw: ${{ secrets.NEXUS_PSW }}
+        sonatype-central-portal-usr: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_CP_USR }}
+        sonatype-central-portal-psw: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_CP_PSW }}
+        # maven-usr, maven-psw and maven-url are deprecated; they are required only for publishing to the legacy OSS Sonatype repository.
+        # Once the io.zeebe namespace is migrated to the Sonatype Central Portal, these can be safely removed.
         maven-usr: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_OSS_USR }}
         maven-psw: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_OSS_PSW }}
         maven-url: oss.sonatype.org
