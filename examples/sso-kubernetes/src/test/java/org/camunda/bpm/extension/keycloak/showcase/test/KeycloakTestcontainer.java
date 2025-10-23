@@ -13,7 +13,7 @@ public class KeycloakTestcontainer {
 
   private static final Logger log = LoggerFactory.getLogger(KeycloakTestcontainer.class);
 
-  static KeycloakContainer keycloakContainer = new KeycloakContainer("quay.io/keycloak/keycloak:24.0.3")
+  static KeycloakContainer keycloakContainer = new KeycloakContainer("quay.io/keycloak/keycloak:26.4.2")
       .withRealmImportFile("/camunda-realm.json")
       .withAdminUsername("keycloak")
       .withAdminPassword("keycloak1!");
