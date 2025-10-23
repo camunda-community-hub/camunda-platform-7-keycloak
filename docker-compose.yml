@@ -1,6 +1,6 @@
 services:
   jboss.keycloak:
-    image: quay.io/keycloak/keycloak:26.4.1
+    image: quay.io/keycloak/keycloak:26.4.2
     restart: unless-stopped
     environment:
       TZ: Europe/Berlin
