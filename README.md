@@ -1,14 +1,14 @@
 # Camunda Platform 7 - Keycloak Identity Provider Plugin
 [![](https://img.shields.io/badge/Community%20Extension-An%20open%20source%20community%20maintained%20project-FF4700)](https://github.com/camunda-community-hub/community)
 ![](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%207-26d07c)
-[![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
+![](https://img.shields.io/badge/Lifecycle-Deprecated-yellowgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#deprecated-)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-platform-7-keycloak)
  [![Apache License V.2](https://img.shields.io/badge/license-Apache%20V.2-blue.svg)](./LICENSE)
 
 **Important Notice**
 
 > [!CAUTION]
-> Camunda announced that the Camunda 7 Community Edition will EOL (end of life) in October 2025 with a final release 7.24. This community-maintained project is based on Camunda 7 CE and will therefore also have its final release 7.24 in fall 2025. After that, it will no longer be maintained.
+> Camunda has ended the life (EOL) of the Camunda 7 Community Edition in October 2025 with a final release 7.24. This community-maintained project is based on Camunda 7 CE and therefore also had its final release 7.24 in fall 2025. After that, it is no longer maintained.
 > I would like to thank the entire Camunda community for their great collaboration on this project. Without all of you, this plugin would not have become what it is! Thanks :trophy:
 
 ![Keycloak](doc/keycloak.png "https://www.keycloak.org/") 
@@ -25,10 +25,14 @@ This plugin provides the basis for using Keycloak as Identity Management solutio
 **Beware: in case you want to use Keycloak's advanced login capabilities for social connections you must configure SSO as well.**
 Password grant exchanges are only supported for Keycloak's internally managed users and users of an LDAP / Keberos User federation. Hence without SSO you will only be able to login with users managed by such connections.
 
-Current version: `7.23.0`<br >
-Latest tests with: Keycloak `26.1.2`, `19.0.3-legacy`, Camunda `7.23.0`, `7.23.0-ee`
+Current version: `7.24.0`<br >
+Latest tests with: Keycloak `26.4.2`, `19.0.3-legacy`, Camunda `7.24.0`, `7.24.0-ee`
 
 #### Features
+Changes in version `7.24.0`
+
+* Upgrade to Camunda Platform 7.24.0
+
 Changes in version `7.23.0`
 
 * Upgrade to Camunda Platform 7.23.0
@@ -86,7 +90,7 @@ Maven Dependencies:
 <dependency>
     <groupId>org.camunda.bpm.extension</groupId>
     <artifactId>camunda-platform-7-keycloak</artifactId>
-    <version>7.23.0</version>
+    <version>7.24.0</version>
 </dependency>
 ```
 
