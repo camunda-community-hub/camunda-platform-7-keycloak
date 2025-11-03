@@ -25,7 +25,7 @@ jobs:
     - name: Cancel workflow when build fails
       if: steps.wait-for-build.outputs.conclusion == 'failure'
       run: echo "Build failed, skipping deploy" && exit 1
-    - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # pin@v2
+    - uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # pin@v2
     - name: Detect release type
       run: |-
         if [[ "${{github.ref}}" == "refs/heads/master" ]]; then
