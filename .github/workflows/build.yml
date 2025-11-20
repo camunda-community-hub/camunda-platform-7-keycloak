@@ -19,7 +19,7 @@ jobs:
         options: --health-cmd "curl -Iks https://localhost:8443" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Java setup
       uses: actions/setup-java@v5
       with:
