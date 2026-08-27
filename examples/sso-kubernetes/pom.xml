@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.cibseven.community.keycloak.examples</groupId>
 		<artifactId>cibseven-keycloak-examples</artifactId>
-		<version>2.2.0-SNAPSHOT</version>
+		<version>2.2.0</version>
 	</parent>
 
 	<artifactId>cibseven-keycloak-examples-sso-kubernetes</artifactId>
@@ -165,7 +165,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>3.1.1</version>
 				<configuration>
-					<mainClass>org.cibseven.bpm.extension.keycloak.showcase.CibsevenApplication</mainClass>
+					<mainClass>org.cibseven.community.keycloak.showcase.CibsevenApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

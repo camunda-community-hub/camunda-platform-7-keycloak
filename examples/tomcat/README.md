@@ -40,7 +40,7 @@ xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.cam
     <plugins>
         ...
         <plugin>
-        <class>org.cibseven.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
+        <class>org.cibseven.community.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
         <properties>
             <property name="keycloakIssuerUrl">https://somehost:8443/auth/realms/camunda</property>
             <property name="keycloakAdminUrl">https://somehost:8443/auth/admin/realms/camunda</property>

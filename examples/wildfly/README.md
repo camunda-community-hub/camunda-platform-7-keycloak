@@ -59,7 +59,7 @@ The last step is to edit the ``standalone.xml`` configuration file in ``standalo
                 </properties>
                 <plugins>
                     <plugin>
-                        <class>org.cibseven.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
+                        <class>org.cibseven.community.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
                         <properties>
                             <property name="keycloakIssuerUrl">
                                 http://localhost:8082/auth/realms/ndb

@@ -30,7 +30,7 @@
     
   </bean>
   
-  <bean id="keycloakIdentityProviderPlugin" class="org.cibseven.bpm.extension.keycloak.test.util.CacheAwareKeycloakIdentityProviderPluginForTest">
+  <bean id="keycloakIdentityProviderPlugin" class="org.cibseven.community.keycloak.test.util.CacheAwareKeycloakIdentityProviderPluginForTest">
   
     <property name="keycloakIssuerUrl" value="http://localhost:9000/realms/test" />
     <property name="keycloakAdminUrl" value="http://localhost:9000/admin/realms/test" />
@@ -44,7 +44,7 @@
     <property name="cacheExpirationTimeoutMin" value="5" />
     <property name="customHttpRequestInterceptors"  >
       <list>
-        <bean class="org.cibseven.bpm.extension.keycloak.test.util.CountingHttpRequestInterceptor"/>
+        <bean class="org.cibseven.community.keycloak.test.util.CountingHttpRequestInterceptor"/>
       </list>
     </property>
     

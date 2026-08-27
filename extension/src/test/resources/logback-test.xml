@@ -20,7 +20,7 @@
   <logger name="org.cibseven.bpm.engine.impl.jobexecutor" level="debug" />
   <logger name="org.cibseven.bpm.engine.impl.pvm" level="debug" />
 
-  <logger name="org.cibseven.bpm.extension.keycloak" level="debug" />
+  <logger name="org.cibseven.community.keycloak" level="debug" />
   
   <root level="info">
     <appender-ref ref="STDOUT" />

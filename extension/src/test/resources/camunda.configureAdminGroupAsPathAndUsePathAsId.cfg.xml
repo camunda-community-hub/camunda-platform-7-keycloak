@@ -31,7 +31,7 @@
     
   </bean>
   
-  <bean id="keycloakIdentityProviderPlugin" class="org.cibseven.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin">
+  <bean id="keycloakIdentityProviderPlugin" class="org.cibseven.community.keycloak.plugin.KeycloakIdentityProviderPlugin">
   
     <property name="keycloakIssuerUrl" value="http://localhost:9000/realms/test" />
     <property name="keycloakAdminUrl" value="http://localhost:9000/admin/realms/test" />

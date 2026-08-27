@@ -94,7 +94,7 @@ For further details on how to setup a Keycloak Camunda Identity Service Client s
 
 ### Keycloak Identity Provider Plugin
 
-The class ``KeycloakIdentityProvider.java`` in package ``org.cibseven.bpm.extension.keycloak.showcase.plugin`` will activate the plugin.
+The class ``KeycloakIdentityProvider.java`` in package ``org.cibseven.community.keycloak.showcase.plugin`` will activate the plugin.
 
 The main configuration part in ``application.yaml`` is as follows:
 
@@ -182,7 +182,7 @@ cibseven:
 
 #### SSO for legacy Camunda webapp
 
-For OAuth2 SSO configuration see package ``org.cibseven.bpm.extension.keycloak.showcase.sso``.
+For OAuth2 SSO configuration see package ``org.cibseven.community.keycloak.showcase.sso``.
 
 The additional configuration parts in ``application.yaml`` are as follows:
 
@@ -264,7 +264,7 @@ Finally we assign the created Client Scope to our existing Camunda-Identity-Serv
 
 This ensures, that only users authenticated at the Camunda-Identity-Service are allowed to access REST API of CIB seven. Fine grained configuration of the authorization rights can be achieved by adding rules to Authorization configuration.
 
-The security implementation snippets for the REST Api part can be found in package ``org.cibseven.bpm.extension.keycloak.showcase.rest``. 
+The security implementation snippets for the REST Api part can be found in package ``org.cibseven.community.keycloak.showcase.rest``. 
 
 Besides a typical Web security configuration ``RestApiSecurityConfig`` including OAuth 2.0 Resource Server support we need a ``KeycloakAuthenticationFilter`` registered at the end of the Spring Security Filter Chain. Its job is to pass the authenticated user id and groupIds to IdentityService:
 
@@ -369,7 +369,7 @@ public SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
 }
 ```
 
-The handler itself (see ``org.cibseven.bpm.extension.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to
+The handler itself (see ``org.cibseven.community.keycloak.showcase.sso.KeycloakLogoutHandler``) takes care of sending an appropriate redirect to Keycloak. The redirect URI will look similar to
 ``http://<keycloak-server>/realms/camunda/protocol/openid-connect/logout?redirect_uri=http://<camunda-server>/camunda``.
 
 So the logout button now redirects to the Keycloak logout URL which then redirects back to the CIB seven Cockpit. Because we're not authenticated any more, Spring Security will then start a new authentication flow.

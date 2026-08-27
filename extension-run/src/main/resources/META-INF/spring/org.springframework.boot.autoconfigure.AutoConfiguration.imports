@@ -1,1 +1,1 @@
-org.cibseven.bpm.extension.keycloak.run.plugin.KeycloakIdentityProvider
+org.cibseven.community.keycloak.run.plugin.KeycloakIdentityProvider
