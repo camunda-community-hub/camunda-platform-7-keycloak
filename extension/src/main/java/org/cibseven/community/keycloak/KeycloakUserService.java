@@ -161,6 +161,51 @@ public class KeycloakUserService extends KeycloakServiceBase {
 	}
 
 	/**
+	 * Requests users of a specific tenant (Keycloak organization).
+	 * @param query the user query - including a tenantId criteria
+	 * @return list of matching users
+	 */
+	public List<User> requestUsersByTenantId(CacheableKeycloakUserQuery query) {
+		if (!keycloakConfiguration.isOrganizationsEnabled()) {
+			return Collections.emptyList();
+		}
+		String tenantId = query.getTenantId();
+		List<User> userList = new ArrayList<>();
+
+		try {
+			// tenant ID is the Keycloak organization ID - no ID lookup required
+			ResponseEntity<String> response = restTemplate.exchange(
+					keycloakConfiguration.getKeycloakAdminUrl() + "/organizations/" + tenantId
+							+ "/members?first=0&max=" + getMaxQueryResultSize(),
+					HttpMethod.GET, String.class);
+
+			JsonArray searchResult = parseAsJsonArray(response.getBody());
+			for (int i = 0; i < searchResult.size(); i++) {
+				JsonObject keycloakUser = getJsonObjectAtIndex(searchResult, i);
+				if (keycloakConfiguration.isUseEmailAsCamundaUserId() &&
+						!StringUtils.hasLength(getJsonString(keycloakUser, "email"))) {
+					continue;
+				}
+				if (keycloakConfiguration.isUseUsernameAsCamundaUserId() &&
+						!StringUtils.hasLength(getJsonString(keycloakUser, "username"))) {
+					continue;
+				}
+				userList.add(transformUser(keycloakUser));
+			}
+
+		} catch (HttpClientErrorException hcee) {
+			if (hcee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+				return Collections.emptyList();
+			}
+			throw new IdentityProviderException("Unable to query members of organization " + tenantId, hcee);
+		} catch (RestClientException | JsonException rce) {
+			throw new IdentityProviderException("Unable to query members of organization " + tenantId, rce);
+		}
+
+		return userList;
+	}
+
+	/**
 	 * Requests users.
 	 * @param query the user query - not including a groupId criteria
 	 * @return list of matching users
@@ -330,7 +375,7 @@ public class KeycloakUserService extends KeycloakServiceBase {
 			throw hcee;
 		}
 	}
-	
+
 	/**
 	 * Maps a Keycloak JSON result to a User object
 	 * @param result the Keycloak JSON result

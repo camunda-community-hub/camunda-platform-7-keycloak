@@ -45,11 +45,6 @@ public class KeycloakUserQuery extends UserQueryImpl {
 	// unimplemented features //////////////////////////////////
 
 	@Override
-	public UserQuery memberOfTenant(String tenantId) {
-		throw new UnsupportedOperationException("The Keycloak identity provider does currently not support tenant queries.");
-	}
-
-	@Override
 	public UserQuery potentialStarter(String procDefId) {
 		throw new UnsupportedOperationException("The Keycloak identity provider does currently not support potential starter queries.");
 	}

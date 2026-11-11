@@ -1,6 +1,5 @@
 package org.cibseven.community.keycloak;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.cibseven.bpm.engine.identity.Tenant;
@@ -10,8 +9,7 @@ import org.cibseven.bpm.engine.impl.interceptor.CommandContext;
 import org.cibseven.bpm.engine.impl.interceptor.CommandExecutor;
 
 /**
- * Since multi-tenancy is currently not yet supported for the Keycloak plugin, the query always
- * returns <code>0</code> or an empty list.
+ * Tenant query for the Keycloak plugin. Tenants are mapped to Keycloak organizations.
  */
 public class KeycloakTenantQuery extends TenantQueryImpl {
 
@@ -27,12 +25,16 @@ public class KeycloakTenantQuery extends TenantQueryImpl {
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    return 0;
+    return getIdentityProvider(commandContext).findTenants(this).size();
   }
 
   @Override
   public List<Tenant> executeList(CommandContext commandContext, Page page) {
-    return Collections.emptyList();
+    return getIdentityProvider(commandContext).findTenants(this);
+  }
+
+  protected KeycloakIdentityProviderSession getIdentityProvider(CommandContext commandContext) {
+    return (KeycloakIdentityProviderSession) commandContext.getReadOnlyIdentityProvider();
   }
 
 }

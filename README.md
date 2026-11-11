@@ -37,7 +37,7 @@ Known limitations:
 *   A strategy to distinguish SYSTEM and WORKFLOW groups is missing. Currently only the administrator group is mapped to type SYSTEM.
 *   Some query filters are applied on the client side - the Keycloak REST API does not allow full criteria search in all required cases.
 *   Sort criteria for queries are implemented on the client side - the Keycloak REST API does not allow result ordering.
-*   Tenants are currently not supported.
+*   Tenants are mapped to Keycloak organizations (requires Keycloak 26 or later). Tenant queries and user queries filtered by tenant (`memberOfTenant`) are supported; group queries filtered by tenant (`GroupQuery.memberOfTenant`) are not.
 
 ## Prerequisites in your Keycloak realm
 
@@ -57,6 +57,7 @@ Known limitations:
     ![IdentityServiceCredentials](doc/identity-service_credentials.png "Identity Service Credentials")
 7. Once you're done with the basic setup you're now ready to manage your users and groups with Keycloak. Please keep in mind, that in order to make the Keycloak Identity Provider work, you will need at least one dedicated CIB seven admin group or CIB seven user in your realm. Whether you create this group/user manually or import it using the LDAP user federation or any other Identity Provider is up to you.
     ![KeycloakGroups](doc/keycloak-groups.png "Keycloak Realm Groups")
+8. Optional - multi-tenancy: to use tenants, enable "Organizations" in your realm settings and create one organization per tenant. The CIB seven tenant ID is the Keycloak organization ID, the tenant name is the organization name. Users become members of a tenant by being added as members of the organization.
 
 ## Usage with CIB seven Spring Boot
 
@@ -405,8 +406,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: keycloak1!
       KC_HTTP_RELATIVE_PATH: /auth
     ports:
-      - "8443:8443"
-      - "8080:8080"
+      - "9001:8443"
+      - "9000:8080"
     command:
       - start-dev
 ```
@@ -419,7 +420,7 @@ Running unit tests from Maven requires configuring the details of a running Keyc
 
 | *Environment Variable*                      | *Description*                                                                                                        |
 |---------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| `KEYCLOAK_URL`                              | Keycloak server URL.<br />Default value: `http://localhost:8080/auth`                                                |
+| `KEYCLOAK_URL`                              | Keycloak server URL.<br />E.g. `http://localhost:9000/auth` for the setup above                                      |
 | `KEYCLOAK_ADMIN_USER`                       | The admin user of the Keycloak server.<br />Default value: `keycloak`                                                |
 | `KEYCLOAK_ADMIN_PASSWORD`                   | The admin password of the Keycloak server.<br />Default value: `keycloak1!`                                          |
 | `KEYCLOAK_ENFORCE_SUBGROUPS_IN_GROUP_QUERY` | Wether to enforce subgroup results in group queries when testing with Keycloak >= `23.0.0`<br />Default value: `true`|

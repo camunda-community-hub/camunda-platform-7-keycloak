@@ -4,7 +4,10 @@ import static org.cibseven.community.keycloak.json.JsonUtil.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.cibseven.bpm.engine.BadUserRequestException;
 import org.cibseven.bpm.engine.identity.Group;
@@ -45,9 +48,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	
 	protected KeycloakUserService userService;
 	protected KeycloakGroupService groupService;
+	protected KeycloakTenantService tenantService;
 
 	protected QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache;
 	protected QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache;
+	protected QueryCache<CacheableKeycloakTenantQuery, List<Tenant>> tenantQueryCache;
 	protected QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache;
 
 	/**
@@ -59,6 +64,7 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	public KeycloakIdentityProviderSession(
 					KeycloakConfiguration keycloakConfiguration, KeycloakRestTemplate restTemplate, KeycloakContextProvider keycloakContextProvider,
 					QueryCache<CacheableKeycloakUserQuery, List<User>> userQueryCache, QueryCache<CacheableKeycloakGroupQuery, List<Group>> groupQueryCache,
+					QueryCache<CacheableKeycloakTenantQuery, List<Tenant>> tenantQueryCache,
 					QueryCache<CacheableKeycloakCheckPasswordCall, Boolean> checkPasswordCache) {
 		this.keycloakConfiguration = keycloakConfiguration;
 		this.restTemplate = restTemplate;
@@ -66,9 +72,11 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 		
 		this.userService = new KeycloakUserService(keycloakConfiguration, restTemplate, keycloakContextProvider);
 		this.groupService = new  KeycloakGroupService(keycloakConfiguration, restTemplate, keycloakContextProvider);
+		this.tenantService = new KeycloakTenantService(keycloakConfiguration, restTemplate, keycloakContextProvider);
 
 		this.userQueryCache = userQueryCache;
 		this.groupQueryCache = groupQueryCache;
+		this.tenantQueryCache = tenantQueryCache;
 		this.checkPasswordCache = checkPasswordCache;
 	}
 	
@@ -160,7 +168,18 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 	 * @return list of matching users
 	 */
 	private List<User> doFindUserByQueryCriteria(CacheableKeycloakUserQuery userQuery) {
-		if (StringUtils.hasLength(userQuery.getGroupId())) {
+		if (StringUtils.hasLength(userQuery.getTenantId())) {
+			List<User> tenantMembers = userService.requestUsersByTenantId(userQuery);
+			if (StringUtils.hasLength(userQuery.getGroupId())) {
+				Set<String> groupMemberIds = userService.requestUsersByGroupId(userQuery).stream()
+						.map(User::getId)
+						.collect(Collectors.toSet());
+				return tenantMembers.stream()
+						.filter(user -> groupMemberIds.contains(user.getId()))
+						.collect(Collectors.toList());
+			}
+			return tenantMembers;
+		} else if (StringUtils.hasLength(userQuery.getGroupId())) {
 			// search within the members of a single group
 			return userService.requestUsersByGroupId(userQuery);
 		} else {
@@ -395,8 +414,38 @@ public class KeycloakIdentityProviderSession implements ReadOnlyIdentityProvider
 
 	@Override
 	public Tenant findTenantById(String id) {
-		// since multi-tenancy is currently not supported for the Keycloak plugin, always return null
-		return null;
+		return createTenantQuery(org.cibseven.bpm.engine.impl.context.Context.getCommandContext()).tenantId(id)
+				.singleResult();
+	}
+
+	/**
+	 * find tenants (Keycloak organizations) meeting given tenant query criteria (with cache lookup).
+	 * @param tenantQuery the tenant query
+	 * @return list of matching tenants
+	 */
+	protected List<Tenant> findTenants(KeycloakTenantQuery tenantQuery) {
+		List<Tenant> allMatchingTenants = tenantQueryCache
+				.getOrCompute(CacheableKeycloakTenantQuery.of(tenantQuery), this::doFindTenants);
+		return tenantService.postProcessResults(tenantQuery, allMatchingTenants);
+	}
+
+	/**
+	 * find tenants (Keycloak organizations) meeting given tenant query criteria (without cache lookup).
+	 * @param tenantQuery the tenant query
+	 * @return list of matching tenants
+	 */
+	private List<Tenant> doFindTenants(CacheableKeycloakTenantQuery tenantQuery) {
+		if (StringUtils.hasLength(tenantQuery.getGroupId())) {
+			return Collections.emptyList();
+		}
+		if (StringUtils.hasLength(tenantQuery.getUserId())) {
+			return tenantService.requestTenantsByUserId(tenantQuery.getUserId());
+		}
+		if (StringUtils.hasLength(tenantQuery.getId())) {
+			Tenant tenant = tenantService.findTenant(tenantQuery.getId());
+			return tenant != null ? Collections.singletonList(tenant) : Collections.emptyList();
+		}
+		return tenantService.getOrganizationsforTenants();
 	}
 
 }

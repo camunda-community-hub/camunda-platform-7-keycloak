@@ -18,6 +18,7 @@ public class CacheableKeycloakUserQuery {
 	private final String email;
 	private final String emailLike;
 	private final String groupId;
+	private final String tenantId;
 
 	private CacheableKeycloakUserQuery(KeycloakUserQuery delegate) {
 		this.id = delegate.getId();
@@ -29,6 +30,7 @@ public class CacheableKeycloakUserQuery {
 		this.email = delegate.getEmail();
 		this.emailLike = delegate.getEmailLike();
 		this.groupId = delegate.getGroupId();
+		this.tenantId = delegate.getTenantId();
 	}
 
 	public static CacheableKeycloakUserQuery of(KeycloakUserQuery userQuery) {
@@ -71,6 +73,10 @@ public class CacheableKeycloakUserQuery {
 		return groupId;
 	}
 
+	public String getTenantId() {
+		return tenantId;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -84,12 +90,13 @@ public class CacheableKeycloakUserQuery {
 						Objects.equals(lastNameLike, that.lastNameLike) && 
 						Objects.equals(email, that.email) && 
 						Objects.equals(emailLike, that.emailLike) && 
-						Objects.equals(groupId, that.groupId);
+						Objects.equals(groupId, that.groupId) &&
+						Objects.equals(tenantId, that.tenantId);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash(id, firstName, firstNameLike, lastName, lastNameLike, email, emailLike, groupId);
+		int result = Objects.hash(id, firstName, firstNameLike, lastName, lastNameLike, email, emailLike, groupId, tenantId);
 		result = 31 * result + Arrays.hashCode(ids);
 		return result;
 	}
